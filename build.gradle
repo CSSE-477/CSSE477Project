@@ -19,7 +19,7 @@ sourceCompatibility = 1.8
 targetCompatibility = 1.8
 
 
-group = "edu.rosehulman.csse477.calculator"
+group = "edu.rosehulman.csse477.YoloSwagProject"
 
 if (System.getenv("CI_BUILD_TAG") != null) {
     version = "${System.getenv("CI_BUILD_TAG")}"
@@ -30,7 +30,7 @@ if (System.getenv("CI_BUILD_TAG") != null) {
 
 jar {
     manifest {
-        attributes "Implementation-Title": "Rose Calculator API",
+        attributes "Implementation-Title": "YoloSwagSWS",
                 "Implementation-Version": "${version}"
     }
 }
