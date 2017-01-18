@@ -89,10 +89,22 @@ jacocoTestReport {
 	}
 }
 
-
 test {
 	jacoco {
 		append = false
+	}
+}
+
+sourceSets {
+	test {
+		java {
+			srcDir 'tests'
+		}
+	}
+	main {
+		java {
+			srcDir 'src'
+		}
 	}
 }
 
