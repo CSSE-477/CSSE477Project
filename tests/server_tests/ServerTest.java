@@ -31,37 +31,11 @@ public class ServerTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
-	@Test
-	public void testGetServiceRateTrivial() {
-		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, null);
-		Long expected = Long.MIN_VALUE;
-		float EPSILON = 0.001f;
-		assertEquals(expected, server.getServiceRate(), EPSILON);
-	}
-	
-	@Test
-	public void testGetServiceRateNonTrivial() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException {
-		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, null);
-		double expected = 1000;
-		float EPSILON = 0.0000001f;
-		long serviceTimeVal = 5;
-		long connectionsVal = 5;
-		Field serviceTime = server.getClass().getDeclaredField("serviceTime");
-		serviceTime.setAccessible(true);
-		serviceTime.set(server, serviceTimeVal);
-		Field connections = server.getClass().getDeclaredField("connections");
-		connections.setAccessible(true);
-		connections.set(server, connectionsVal);
-		assertEquals(expected, server.getServiceRate(), EPSILON);
-	}
 	
 	@Test
 	public void testIsStoppedTrivial() {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, null);
+		Server server = new Server(fakeDir, 0);
 		boolean expected = true;
 		assertEquals(expected, server.isStoped());
 	}
@@ -69,7 +43,7 @@ public class ServerTest {
 	@Test
 	public void testIsStoppedNontrivial() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, null);
+		Server server = new Server(fakeDir, 0);
 		boolean expected = false;
 		Field welcomeSocket = server.getClass().getDeclaredField("welcomeSocket");
 		welcomeSocket.setAccessible(true);

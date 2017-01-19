@@ -1,24 +1,3 @@
-/*
- * ConnectionHandler.java
- * Oct 7, 2012
- *
- * Simple Web Server (SWS) for CSSE 477
- * 
- * Copyright (C) 2012 Chandan Raj Rupakheti
- * 
- * This program is free software: you can redistribute it and/or
- * modify it under the terms of the GNU Lesser General Public License 
- * as published by the Free Software Foundation, either 
- * version 3 of the License, or any later version.
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU Lesser General Public License for more details.
- * You should have received a copy of the GNU Lesser General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl.html>.
- * 
- */
- 
 package server;
 
 import java.io.File;
@@ -64,9 +43,8 @@ public class ConnectionHandler implements Runnable {
 	 * and sends the response back to the client (web browser).
 	 */
 	public void run() {
-		// Get the start time
-		long start = System.currentTimeMillis();
-		
+		// TODO: This class is a classic example of how not to code things. Refactor this code to make it
+		// cohesive and extensible
 		InputStream inStream = null;
 		OutputStream outStream = null;
 		
@@ -78,12 +56,6 @@ public class ConnectionHandler implements Runnable {
 			// Cannot do anything if we have exception reading input or output stream
 			// May be have text to log this for further analysis?
 			e.printStackTrace();
-			
-			// Increment number of connections by 1
-			server.incrementConnections(1);
-			// Get the end time
-			long end = System.currentTimeMillis();
-			this.server.incrementServiceTime(end-start);
 			return;
 		}
 		
@@ -122,11 +94,6 @@ public class ConnectionHandler implements Runnable {
 				e.printStackTrace();
 			}
 
-			// Increment number of connections by 1
-			server.incrementConnections(1);
-			// Get the end time
-			long end = System.currentTimeMillis();
-			this.server.incrementServiceTime(end-start);
 			return;
 		}
 		
@@ -200,11 +167,5 @@ public class ConnectionHandler implements Runnable {
 			// We will ignore this exception
 			e.printStackTrace();
 		} 
-		
-		// Increment number of connections by 1
-		server.incrementConnections(1);
-		// Get the end time
-		long end = System.currentTimeMillis();
-		this.server.incrementServiceTime(end-start);
 	}
 }

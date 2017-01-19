@@ -21,8 +21,6 @@
  
 package server;
 
-import gui.WebServer;
-
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -38,22 +36,15 @@ public class Server implements Runnable {
 	private int port;
 	private boolean stop;
 	private ServerSocket welcomeSocket;
-	
-	private long connections;
-	private long serviceTime;
-	
-	private WebServer window;
+
 	/**
 	 * @param rootDirectory
 	 * @param port
 	 */
-	public Server(String rootDirectory, int port, WebServer window) {
+	public Server(String rootDirectory, int port) {
 		this.rootDirectory = rootDirectory;
 		this.port = port;
 		this.stop = false;
-		this.connections = 0;
-		this.serviceTime = 0;
-		this.window = window;
 	}
 
 	/**
@@ -75,40 +66,6 @@ public class Server implements Runnable {
 		return port;
 	}
 	
-	/**
-	 * Returns connections serviced per second. 
-	 * Synchronized to be used in threaded environment.
-	 * 
-	 * @return
-	 */
-	public synchronized double getServiceRate() {
-		if(this.serviceTime == 0)
-			return Long.MIN_VALUE;
-		double rate = this.connections/(double)this.serviceTime;
-		rate = rate * 1000;
-		return rate;
-	}
-	
-	/**
-	 * Increments number of connection by the supplied value.
-	 * Synchronized to be used in threaded environment.
-	 * 
-	 * @param value
-	 */
-	public synchronized void incrementConnections(long value) {
-		this.connections += value;
-	}
-	
-	/**
-	 * Increments the service time by the supplied value.
-	 * Synchronized to be used in threaded environment.
-	 * 
-	 * @param value
-	 */
-	public synchronized void incrementServiceTime(long value) {
-		this.serviceTime += value;
-	}
-
 	/**
 	 * The entry method for the main server thread that accepts incoming
 	 * TCP connection request and creates a {@link ConnectionHandler} for
@@ -135,7 +92,7 @@ public class Server implements Runnable {
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
-			window.showSocketException(e);
+			e.printStackTrace();
 		}
 	}
 	
