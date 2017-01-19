@@ -2,6 +2,7 @@ package integration;
 
 import static org.junit.Assert.*;
 
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -20,6 +21,7 @@ import com.google.api.client.json.jackson.JacksonFactory;
 import server.Server;
 
 public class GetRequestTests {
+	private static Server server;
 	private static String rootDirectory;
 	private static String fileName;
 	private static int port;
@@ -36,7 +38,7 @@ public class GetRequestTests {
 		rootDirectory = "web";
 		port = 80;
 
-		Server server = new Server(rootDirectory, port);
+		server = new Server(rootDirectory, port);
 		Thread runner = new Thread(server);
 		runner.start();
 		
@@ -75,5 +77,11 @@ public class GetRequestTests {
 		int expected = 200;
 		int actual = response.getStatusCode();
 		assertEquals(expected, actual);
+	}
+
+	@AfterClass
+	public static void tearDownAfterClass() {
+		server.stop();
+		// TODO: remove temp directory and file
 	}
 }
