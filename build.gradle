@@ -112,7 +112,7 @@ remotes {
 	}
 }
 
-task publishToWebServer(dependsOn: distZip) << {
+task publishToWebServer(dependsOn: jar) << {
 	ssh.run {
 		session(remotes.webServer) {
 			println "Checking if remote /tmp/YoloSwagSWS exists ..."
@@ -123,7 +123,7 @@ task publishToWebServer(dependsOn: distZip) << {
 				println("Remote /tmp/YoloSwagSWS created!")
 			}
 			println "Transfering file from local build/distributions to remote /tmp/YoloSwagSWS ..."
-			put from: "${buildDir}/distributions/*", into: '/tmp/YoloSwagSWS'
+			put from: "${buildDir}/libs/*", into: '/tmp/YoloSwagSWS'
 			println "Files transfer complete now setting up the web server ..."
 			
 			println "Checking if remote /var/www/html/YoloSwagSWS exists ..."
