@@ -1,9 +1,14 @@
+plugins {
+	id 'org.hidetake.ssh' version '2.7.0'
+}
+
 apply plugin: 'java'
 apply plugin: 'eclipse'
 apply plugin: 'idea'
-apply plugin: 'maven'
-apply plugin: 'maven-publish'
 apply plugin: 'jacoco'
+apply plugin: 'application'
+
+mainClassName = "app.SimpleWebServer"
 
 repositories {
     maven {
@@ -38,39 +43,12 @@ jar {
     }
 }
 
-uploadArchives {
-	repositories {
-		mavenDeployer {
-			repository(url: "file://${buildDir}/repo")
-		}
-	}
-}
 
 task packageSources(type: Jar, dependsOn: 'classes') {
     from sourceSets.main.allSource
     classifier = 'sources'
 }
 
-publishing {
-    publications {
-        mavenJava(MavenPublication) {
-            from components.java
-			artifact packageSources
-        }
-    }
-}
-
-publishing {
-    repositories {
-        maven {
-            credentials {
-                username System.getenv('MAVEN_USER')
-                password System.getenv('MAVEN_PASSWORD')
-            }
-            url "https://maven.csse.rose-hulman.edu/artifactory/student-release-local"
-        }
-    }
-}
 
 // Code coverage analyzer
 jacoco {
@@ -119,4 +97,48 @@ task codeCoverageInfo (dependsOn: jacocoTestReport) {
 		}
 	}
 }
+
 jacocoTestReport.finalizedBy(codeCoverageInfo)
+
+// SSH Publishing
+
+ssh.settings { knownHosts = allowAnyHosts }
+
+remotes {
+	webServer {
+		host = '477-06.csse.rose-hulman.edu'
+		user = System.getenv('SSH_USER')
+		password = System.getenv('SSH_PASSWORD')
+	}
+}
+
+task publishToWebServer(dependsOn: distZip) << {
+	ssh.run {
+		session(remotes.webServer) {
+			println "Checking if remote /tmp/YoloSwagSWS exists ..."
+			def result = execute('if test -d /tmp/YoloSwagSWS; then echo "exists"; fi')						
+			if(result != "exists") {
+				println("Remote /tmp/YoloSwagSWS does not exist, creating a new one...")
+				execute('mkdir -p /tmp/YoloSwagSWS')
+				println("Remote /tmp/YoloSwagSWS created!")
+			}
+			println "Transfering file from local build/distributions to remote /tmp/YoloSwagSWS ..."
+			put from: "${buildDir}/distributions/*", into: '/tmp/YoloSwagSWS'
+			println "Files transfer complete now setting up the web server ..."
+			
+			println "Checking if remote /var/www/html/YoloSwagSWS exists ..."
+			result = execute('if test -d /var/www/html/YoloSwagSWS; then echo "exists"; fi')
+			if(result != "exists") {
+				println("Remote /var/www/html/YoloSwagSWS does not exist, creating a new one...")
+				executeSudo('mkdir -p /var/www/html/YoloSwagSWS', pty: true)
+				println("Remote /var/www/html/YoloSwagSWS created!")
+			}
+			println "Copying data from the temp folder to the web folder ..."
+			executeSudo('cp /tmp/YoloSwagSWS/* /var/www/html/YoloSwagSWS', pty: true)
+			println "Done! Clearing the tmp folder ..."
+			execute('rm -rf /tmp/YoloSwagSWS')
+			println "All done!" 
+			println "YoloSwagSWS has been deployed to http://477-06.csse.rose-hulman.edu/YoloSwagSWS/"
+		}
+	}
+}
