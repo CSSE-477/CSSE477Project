@@ -95,19 +95,6 @@ test {
 	}
 }
 
-sourceSets {
-	test {
-		java {
-			srcDir 'tests'
-		}
-	}
-	main {
-		java {
-			srcDir 'src'
-		}
-	}
-}
-
 test.finalizedBy(jacocoTestReport)
 
 task codeCoverageInfo (dependsOn: jacocoTestReport) {
