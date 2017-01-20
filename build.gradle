@@ -113,8 +113,8 @@ ssh.settings { knownHosts = allowAnyHosts }
 remotes {
 	webServer {
 		host = '477-06.csse.rose-hulman.edu'
-		user = System.getenv('SSH_USER')
-		password = System.getenv('SSH_PASSWORD')
+		user = 'csse' //System.getenv('SSH_USER')
+		password = 'csse477' //System.getenv('SSH_PASSWORD')
 	}
 }
 
@@ -149,12 +149,12 @@ task publishToWebServer(dependsOn: jar) << {
 			execute('rm -rf /tmp/YoloSwagSWS')
 			println "All done!" 
 
-			println "Stopping YoloSwagWebServer service"
-			executeSudo('/etc/init.d/webserver stop')
-			println "Starting YoloSwagWebServer service"
-			executeSudo('/etc/init.d/webserver start')
-			println "Running curl command to see if server is started"
-			execute('curl localhost:8080')
+			//println "Stopping YoloSwagWebServer service"
+			//executeSudo('/etc/init.d/webserver stop')
+			//println "Starting YoloSwagWebServer service"
+			//executeSudo('/etc/init.d/webserver start')
+			//println "Running curl command to see if server is started"
+			//execute('curl localhost:8080')
 			println "YoloSwagSWS has been deployed to http://477-06.csse.rose-hulman.edu/YoloSwagSWS/"
 		}
 	}
