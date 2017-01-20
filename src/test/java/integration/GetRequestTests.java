@@ -38,7 +38,7 @@ public class GetRequestTests {
 	public static void setUpBeforeClass() throws Exception {
 		fileName = "index.html";
 		rootDirectory = "web";
-		port = 80;
+		port = 8080;
 
 		server = new Server(rootDirectory, port);
 		Thread runner = new Thread(server);
