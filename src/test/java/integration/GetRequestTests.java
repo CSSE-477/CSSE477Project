@@ -2,6 +2,7 @@ package integration;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -19,6 +20,9 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
 import server.Server;
+import utilities.FileCreationUtility;
+
+import java.io.File;
 
 public class GetRequestTests {
 	private static Server server;
@@ -33,7 +37,6 @@ public class GetRequestTests {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		// TODO: use a random newly created tmp directory
 		fileName = "index.html";
 		rootDirectory = "web";
 		port = 80;
@@ -79,9 +82,26 @@ public class GetRequestTests {
 		assertEquals(expected, actual);
 	}
 
+	@Test
+    public void testGet200AndCorrectObjectRespons() throws Exception {
+	    GenericUrl url = new GenericUrl("http://localhost:" + port + "/" + "upload.html");
+	    HttpRequest request = requestFactory.buildGetRequest(url);
+        HttpResponse response = request.execute();
+        int expected = 200;
+        int actual = response.getStatusCode();
+        assertEquals(expected, actual);
+        // TODO: Make the below 512 bytes more flexible
+        byte[] bytes = new byte[512];
+        response.getContent().read(bytes, 0, 512);
+        FileCreationUtility.writeToTestFile(new String(bytes, "UTF-8"));
+        File file1 = new File("file1.txt");
+        File file2 = new File("file2.txt");
+        boolean isTwoEqual = FileUtils.contentEquals(file1, file2);
+        assertTrue(isTwoEqual);
+    }
+
 	@AfterClass
 	public static void tearDownAfterClass() {
 		server.stop();
-		// TODO: remove temp directory and file
 	}
 }
