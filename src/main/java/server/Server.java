@@ -25,8 +25,7 @@ import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import utils.SwsLogger;
 
 
 /**
@@ -40,8 +39,6 @@ public class Server implements Runnable {
 	private int port;
 	private boolean stop;
 	private ServerSocket welcomeSocket;
-	
-	final static Logger logger = LogManager.getLogger(Server.class);
 
 	/**
 	 * @param rootDirectory
@@ -98,7 +95,7 @@ public class Server implements Runnable {
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
-			logger.error(e.getMessage());
+			SwsLogger.errorLogger.error(e.getMessage());
 		}
 	}
 	
@@ -119,7 +116,7 @@ public class Server implements Runnable {
 			// We do not have any other job for this socket so just close it
 			socket.close();
 		}
-		catch(Exception e){logger.error(e.getMessage());}
+		catch(Exception e){SwsLogger.errorLogger.error(e.getMessage());}
 	}
 	
 	/**

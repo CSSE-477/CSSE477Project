@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="WARN">
+  <Appenders>
+    <Console name="Console" target="SYSTEM_OUT">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </Console>
+    <File name="ErrorAppender" FileName="logs/error.log">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
+    <File name="AccessAppender" FileName="logs/access.log">
+      <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
+    </File>
+  </Appenders>
+  <Loggers>
+  	<Logger name="Error" level="all">
+  		<AppenderRef ref="Console" level="error"/>
+  		<AppenderRef ref="ErrorAppender" level="error"/>
+  	</Logger>
+  	<Logger name="Access" level="all">
+  		<AppenderRef ref="Console" level="info"/>
+  		<AppenderRef ref="AccessAppender" level="info"/>
+  	</Logger>
+    <Root level="all">
+    </Root>
+  </Loggers>
+</Configuration>
