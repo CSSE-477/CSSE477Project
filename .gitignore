@@ -10,6 +10,9 @@ tmp/
 *.bak
 *.swp
 *~.nib
+*.idea/
+.idea/
+idea/
 local.properties
 .settings/
 .loadpath
