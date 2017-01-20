@@ -45,6 +45,8 @@ jar {
                 "Implementation-Version": "${version}",
                 "Main-Class": "app.SimpleWebServer"
     }
+    baseName = 'YoloSwagSws'
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
 
