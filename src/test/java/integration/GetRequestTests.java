@@ -22,6 +22,7 @@ import server.Server;
 import utilities.FileCreationUtility;
 
 import java.io.File;
+import java.net.InetAddress;
 
 public class GetRequestTests {
 	private static Server server;
@@ -63,7 +64,8 @@ public class GetRequestTests {
 
 	@Test
 	public void testGet404NotFound() throws Exception {
-		GenericUrl url = new GenericUrl("http://localhost:" + port + "/notFound.txt");
+	    System.out.println(InetAddress.getLocalHost().getHostName());
+		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/notFound.txt");
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		
 		try {
@@ -77,7 +79,7 @@ public class GetRequestTests {
 
 	@Test
 	public void testGet200OkResponse() throws Exception {
-		GenericUrl url = new GenericUrl("http://localhost:" + port + "/" + fileName);
+		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + fileName);
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		
 		HttpResponse response = request.execute();
@@ -88,7 +90,7 @@ public class GetRequestTests {
 
 	@Test
     public void testGet200AndCorrectObjectResponse() throws Exception {
-	    GenericUrl url = new GenericUrl("http://localhost:" + port + "/" + "upload.html");
+	    GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + "upload.html");
 	    HttpRequest request = requestFactory.buildGetRequest(url);
         HttpResponse response = request.execute();
         int expected = 200;
