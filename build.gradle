@@ -84,6 +84,9 @@ test {
 	jacoco {
 		append = false
 	}
+    afterTest { desc, result ->
+        println "Executing test ${desc.name} [${desc.className}] with result: ${result.resultType}"
+    }
 }
 
 test.finalizedBy(jacocoTestReport)
