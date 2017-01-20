@@ -88,7 +88,7 @@ public class Server implements Runnable {
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
 				Socket connectionSocket = this.welcomeSocket.accept();
-				
+
 				// Come out of the loop if the stop flag is set
 				if(this.stop){
 				    this.readyState = false;

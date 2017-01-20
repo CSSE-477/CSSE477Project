@@ -44,6 +44,7 @@ public class GetRequestTests {
 		Thread runner = new Thread(server);
 		runner.start();
 
+		/*
 		int sleepAmount = 1000;
 		int retries = 10;
 		while(!server.isReady()) {
@@ -55,6 +56,7 @@ public class GetRequestTests {
             }
             retries = retries - 1;
         }
+        */
 		
 	    requestFactory = HTTP_TRANSPORT.createRequestFactory(request -> request.setParser(new JsonObjectParser(JSON_FACTORY)));
 	}
@@ -85,14 +87,13 @@ public class GetRequestTests {
 	}
 
 	@Test
-    public void testGet200AndCorrectObjectRespons() throws Exception {
+    public void testGet200AndCorrectObjectResponse() throws Exception {
 	    GenericUrl url = new GenericUrl("http://localhost:" + port + "/" + "upload.html");
 	    HttpRequest request = requestFactory.buildGetRequest(url);
         HttpResponse response = request.execute();
         int expected = 200;
         int actual = response.getStatusCode();
         assertEquals(expected, actual);
-        // TODO: Make the below 512 bytes more flexible
         byte[] bytes = new byte[512];
         response.getContent().read(bytes, 0, 512);
         FileCreationUtility.writeToTestFile(new String(bytes, "UTF-8"));
