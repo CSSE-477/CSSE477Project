@@ -7,3 +7,6 @@ The project is a web server that can handle GET requests. The web server, at the
 
 ## Architecture Diagram
 ![Architecture Diagram](docs/ArchitectureDiagram.png)
+
+## Module Diagram
+![Module Diagram](docs/ModuleDiagram.png)
