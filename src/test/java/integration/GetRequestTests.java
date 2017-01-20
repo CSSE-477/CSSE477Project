@@ -2,6 +2,7 @@ package integration;
 
 import static org.junit.Assert.*;
 
+import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -9,7 +10,6 @@ import org.junit.Test;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -19,6 +19,10 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
 import server.Server;
+import utilities.FileCreationUtility;
+
+import java.io.File;
+import java.net.InetAddress;
 
 public class GetRequestTests {
 	private static Server server;
@@ -33,7 +37,6 @@ public class GetRequestTests {
 	
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		// TODO: use a random newly created tmp directory
 		fileName = "index.html";
 		rootDirectory = "web";
 		port = 8080;
@@ -41,22 +44,25 @@ public class GetRequestTests {
 		server = new Server(rootDirectory, port);
 		Thread runner = new Thread(server);
 		runner.start();
-		
-		// wait until the server is ready
-		Thread.sleep(1000);
 
-	    requestFactory =
-	        HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
-	            @Override
-	          public void initialize(HttpRequest request) {
-	            request.setParser(new JsonObjectParser(JSON_FACTORY));
-	          }
-	        });
+		int sleepAmount = 1000;
+		int retries = 10;
+		while(!server.isReady()) {
+            if (retries > 0) {
+                Thread.sleep(sleepAmount);
+            }
+            else{
+                break;
+            }
+            retries = retries - 1;
+        }
+	    requestFactory = HTTP_TRANSPORT.createRequestFactory(request -> request.setParser(new JsonObjectParser(JSON_FACTORY)));
 	}
 
 	@Test
 	public void testGet404NotFound() throws Exception {
-		GenericUrl url = new GenericUrl("http://localhost:" + port + "/notFound.txt");
+	    System.out.println(InetAddress.getLocalHost().getHostName());
+		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/notFound.txt");
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		
 		try {
@@ -68,21 +74,36 @@ public class GetRequestTests {
 		}
 	}
 
-	// TODO: talk to chandan about this
-//	@Test
-//	public void testGet200OkResponse() throws Exception {
-//		GenericUrl url = new GenericUrl("http://localhost:" + port + "/" + fileName);
-//		HttpRequest request = requestFactory.buildGetRequest(url);
-//		
-//		HttpResponse response = request.execute();
-//		int expected = 200;
-//		int actual = response.getStatusCode();
-//		assertEquals(expected, actual);
-//	}
+	@Test
+	public void testGet200OkResponse() throws Exception {
+		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + fileName);
+		HttpRequest request = requestFactory.buildGetRequest(url);
+		
+		HttpResponse response = request.execute();
+		int expected = 200;
+		int actual = response.getStatusCode();
+		assertEquals(expected, actual);
+	}
+
+	@Test
+    public void testGet200AndCorrectObjectResponse() throws Exception {
+	    GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + "upload.html");
+	    HttpRequest request = requestFactory.buildGetRequest(url);
+        HttpResponse response = request.execute();
+        int expected = 200;
+        int actual = response.getStatusCode();
+        assertEquals(expected, actual);
+        byte[] bytes = new byte[512];
+        response.getContent().read(bytes, 0, 512);
+        FileCreationUtility.writeToTestFile(new String(bytes, "UTF-8"));
+        File file1 = new File("file1.txt");
+        File file2 = new File("file2.txt");
+        boolean isTwoEqual = FileUtils.contentEquals(file1, file2);
+        assertTrue(isTwoEqual);
+    }
 
 	@AfterClass
 	public static void tearDownAfterClass() {
 		server.stop();
-		// TODO: remove temp directory and file
 	}
 }

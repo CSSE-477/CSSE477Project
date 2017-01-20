@@ -39,6 +39,7 @@ public class Server implements Runnable {
 	private int port;
 	private boolean stop;
 	private ServerSocket welcomeSocket;
+	private boolean readyState;
 
 	/**
 	 * @param rootDirectory
@@ -48,6 +49,7 @@ public class Server implements Runnable {
 		this.rootDirectory = rootDirectory;
 		this.port = port;
 		this.stop = false;
+		this.readyState = false;
 	}
 
 	/**
@@ -77,16 +79,18 @@ public class Server implements Runnable {
 	public void run() {
 		try {
 			this.welcomeSocket = new ServerSocket(port);
-			
 			// Now keep welcoming new connections until stop flag is set to true
 			while(true) {
+			    this.readyState = true;
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
 				Socket connectionSocket = this.welcomeSocket.accept();
-				
+
 				// Come out of the loop if the stop flag is set
-				if(this.stop)
-					break;
+				if(this.stop){
+				    this.readyState = false;
+				    break;
+                }
 				
 				// Create a handler for this incoming connection and start the handler in a new thread
 				ConnectionHandler handler = new ConnectionHandler(this, connectionSocket);
@@ -118,6 +122,10 @@ public class Server implements Runnable {
 		}
 		catch(Exception e){SwsLogger.errorLogger.error(e.getMessage());}
 	}
+
+	public synchronized boolean isReady(){
+	    return this.readyState;
+    }
 	
 	/**
 	 * Checks if the server is stopeed or not.
