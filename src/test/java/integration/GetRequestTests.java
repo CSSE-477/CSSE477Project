@@ -43,8 +43,8 @@ public class GetRequestTests {
 		runner.start();
 		
 		// wait until the server is ready
-//		while (server.isStoped()) {}
-		
+		Thread.sleep(1000);
+
 	    requestFactory =
 	        HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
 	            @Override
