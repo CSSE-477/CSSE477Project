@@ -117,13 +117,13 @@ ssh.settings { knownHosts = allowAnyHosts }
 remotes {
 	staging {
 		host = '477-19.csse.rose-hulman.edu'
-		user = 'csse' //System.getenv('SSH_USER')
-		password = 'csse477' //System.getenv('SSH_PASSWORD')
+		user = System.getenv('SSH_USER')
+		password = System.getenv('SSH_PASSWORD')
 	}
 	deployment {
 		host = '477-06.csse.rose-hulman.edu'
-		user = 'csse' //System.getenv('SSH_USER')
-		password = 'csse477' //System.getenv('SSH_PASSWORD')
+		user = System.getenv('SSH_USER')
+		password = System.getenv('SSH_PASSWORD')
 	}
 }
 
@@ -158,11 +158,16 @@ task publishToWebServer(dependsOn: jar) << {
 			execute('rm -rf /tmp/YoloSwagSWS')
 			println "All done!" 
 
+			//sleep(3 * 1000)
 			//println "Stopping YoloSwagWebServer service"
 			//executeSudo('/etc/init.d/webserver stop')
+
+			//sleep(3 * 1000)
 			//println "Starting YoloSwagWebServer service"
 			//executeSudo('/etc/init.d/webserver start')
 			//println "Running curl command to see if server is started"
+
+			//sleep(3 * 1000)
 			//execute('curl localhost:8080')
 			println "YoloSwagSWS has been deployed to http://477-19.csse.rose-hulman.edu/YoloSwagSWS/"
 		}
@@ -195,11 +200,16 @@ task publishToWebServer(dependsOn: jar) << {
 			execute('rm -rf /tmp/YoloSwagSWS')
 			println "All done!" 
 
+			//sleep(3 * 1000)
 			//println "Stopping YoloSwagWebServer service"
 			//executeSudo('/etc/init.d/webserver stop')
+
+			//sleep(3 * 1000)
 			//println "Starting YoloSwagWebServer service"
 			//executeSudo('/etc/init.d/webserver start')
 			//println "Running curl command to see if server is started"
+
+			//sleep(3 * 1000)
 			//execute('curl localhost:8080')
 			println "YoloSwagSWS has been deployed to http://477-06.csse.rose-hulman.edu/YoloSwagSWS/"
 		}
