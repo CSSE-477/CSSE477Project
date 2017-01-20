@@ -50,6 +50,9 @@ public class GetRequestTests {
             if (retries > 0) {
                 Thread.sleep(sleepAmount);
             }
+            else{
+                break;
+            }
             retries = retries - 1;
         }
 		
