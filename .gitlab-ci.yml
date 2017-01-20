@@ -7,17 +7,13 @@ build:
   script:
     - gradle build
   tags:
-    - linux
-    - java
-    - gradle
+    - Team #YOLOSWAG *dabs* SWS
 
 deploy:
   stage: deploy
   script:
     - gradle publishToWebServer
   tags:
-    - linux
-    - java
-    - gradle
+    - Team #YOLOSWAG *dabs* SWS
   only:
     - tags
