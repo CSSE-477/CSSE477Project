@@ -134,16 +134,25 @@ task publishToWebServer(dependsOn: jar) << {
 			
 			println "Checking if remote /var/www/html/YoloSwagSWS exists ..."
 			result = execute('if test -d /var/www/html/YoloSwagSWS; then echo "exists"; fi')
-			if(result != "exists") {
-				println("Remote /var/www/html/YoloSwagSWS does not exist, creating a new one...")
-				executeSudo('mkdir -p /var/www/html/YoloSwagSWS', pty: true)
-				println("Remote /var/www/html/YoloSwagSWS created!")
+			if(result == "exists") {
+				println("Remote /var/www/html/YoloSwagSWS is being removed...")
+				executeSudo('rm -rf /var/www/html/YoloSwagSWS', pty: true)
+				println("Remote /var/www/html/YoloSwagSWS removed!")
 			}
+			println("Remote /var/www/html/YoloSwagSWS is being created...")
+			executeSudo('mkdir -p /var/www/html/YoloSwagSWS', pty: true)
+			println("Remote /var/www/html/YoloSwagSWS created!")
+
 			println "Copying data from the temp folder to the web folder ..."
 			executeSudo('cp /tmp/YoloSwagSWS/* /var/www/html/YoloSwagSWS', pty: true)
 			println "Done! Clearing the tmp folder ..."
 			execute('rm -rf /tmp/YoloSwagSWS')
 			println "All done!" 
+
+			println "Restarting YoloSwagWebServer service"
+			executeSudo('/etc/init.d/webserver restart')
+			println "Running curl command to see if server is started"
+			execute('curl localhost:8080')
 			println "YoloSwagSWS has been deployed to http://477-06.csse.rose-hulman.edu/YoloSwagSWS/"
 		}
 	}

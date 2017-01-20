@@ -27,7 +27,8 @@ public class SimpleWebServer {
 
 		// DONE: Instead of just printing to the console, use proper logging mechanism.
 		// SL4J/Log4J are some popular logging framework
-		SwsLogger.accessLogger.info(String.format("Simple Web Server started at port %d and serving the %s directory ...%n", port, rootDirectory));
+		SwsLogger.accessLogger.info(String.format("Simple Web Server started at port %d and serving the %s directory ...%n.", port, rootDirectory));
+		SwsLogger.accessLogger.info("Milestone 1 marker.");
 		
 		// Wait for the server thread to terminate
 		runner.join();
