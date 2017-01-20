@@ -14,7 +14,7 @@ build:
 deploy:
   stage: deploy
   script:
-    - gradle publish
+    - gradle publishToWebServer
   tags:
     - linux
     - java
