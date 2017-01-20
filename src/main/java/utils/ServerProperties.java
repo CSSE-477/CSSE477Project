@@ -1,6 +1,5 @@
-package server;
+package utils;
 
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,7 +12,7 @@ public class ServerProperties {
 		InputStream inputStream = null;
 
 		try {
-			inputStream = new FileInputStream(propertiesFileName);
+			inputStream = this.getClass().getClassLoader().getResourceAsStream(propertiesFileName);
 
 			if (inputStream != null) {
 				props.load(inputStream);

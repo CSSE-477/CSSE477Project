@@ -42,7 +42,8 @@ if (System.getenv("CI_BUILD_TAG") != null) {
 jar {
     manifest {
         attributes "Implementation-Title": "YoloSwagSWS",
-                "Implementation-Version": "${version}"
+                "Implementation-Version": "${version}",
+                "Main-Class": "app.SimpleWebServer"
     }
 }
 

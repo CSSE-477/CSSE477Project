@@ -1,10 +1,10 @@
 package app;
 
 import server.Server;
+import utils.ServerProperties;
 import utils.SwsLogger;
-import java.util.Properties;
 
-import server.ServerProperties;
+import java.util.Properties;
 
 /**
  * The entry point of the Simple Web Server (SWS).
@@ -12,11 +12,10 @@ import server.ServerProperties;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class SimpleWebServer {
-	
-	
+
 	public static void main(String[] args) throws Exception {
 		ServerProperties config = new ServerProperties();
-		Properties properties = config.getProperties("./resources/config.properties");
+		Properties properties = config.getProperties("config.properties");
 
 		String rootDirectory = properties.getProperty("rootDirectory");
 		int port = Integer.parseInt(properties.getProperty("port"));
