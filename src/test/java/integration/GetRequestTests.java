@@ -10,7 +10,6 @@ import org.junit.Test;
 import com.google.api.client.http.GenericUrl;
 import com.google.api.client.http.HttpRequest;
 import com.google.api.client.http.HttpRequestFactory;
-import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpResponse;
 import com.google.api.client.http.HttpResponseException;
 import com.google.api.client.http.HttpTransport;
@@ -44,17 +43,13 @@ public class GetRequestTests {
 		server = new Server(rootDirectory, port);
 		Thread runner = new Thread(server);
 		runner.start();
+
+		int sleepAmount = 1000;
+		while(!server.isReady()) {
+		    Thread.sleep(sleepAmount);
+        }
 		
-		// wait until the server is ready
-		while (server.isStoped()) {}
-		
-	    requestFactory =
-	        HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
-	            @Override
-	          public void initialize(HttpRequest request) {
-	            request.setParser(new JsonObjectParser(JSON_FACTORY));
-	          }
-	        });
+	    requestFactory = HTTP_TRANSPORT.createRequestFactory(request -> request.setParser(new JsonObjectParser(JSON_FACTORY)));
 	}
 
 	@Test
