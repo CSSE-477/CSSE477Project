@@ -1,0 +1,432 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<diagram program="umlet" version="14.2">
+  <zoom_level>5</zoom_level>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>585</x>
+      <y>415</y>
+      <w>115</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>ConnectionHandler
+--
+- server : Server
+- socket : Socket
+--
++ getSocket() : Socket
++ run() : void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>525</x>
+      <y>345</y>
+      <w>90</w>
+      <h>40</h>
+    </coordinates>
+    <panel_attributes>&lt;&lt;interface&gt;&gt;
+Runnable
+--
++ run() : void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>720</x>
+      <y>415</y>
+      <w>110</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>GMTConversion
+--
++ GMT_FORMAT : String
+--
++ toGTMString(Date) : String
++ fromGMTString(String) : Date</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>440</x>
+      <y>415</y>
+      <w>120</w>
+      <h>95</h>
+    </coordinates>
+    <panel_attributes>Server
+--
+- rootDirectory : String
+- port : int
+- stop : boolean
+- welcomeSocket : ServerSocket
+--
++ getRootDirectory() : String
++ getPort() : int
++ run() : void
++ stop() : void
++ isStoped() : boolean</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>300</x>
+      <y>315</y>
+      <w>600</w>
+      <h>245</h>
+    </coordinates>
+    <panel_attributes>Server</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>535</x>
+      <y>380</y>
+      <w>15</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>595</x>
+      <y>380</y>
+      <w>15</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>585</x>
+      <y>620</y>
+      <w>130</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>HttpRequest
+--
+- method : String
+- uri : String
+- version : String
+- header : Map&lt;String, String&gt;
+- body : char[]
+--
++ getMethod() : String
++ getUri() : String
++ getVersion() : String
++ getBody() : char[]
++ getHeader() : Map&lt;String, String&gt;
++ read(InputStream) : HttpRequest
++ toString() : String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>585</x>
+      <y>790</y>
+      <w>130</w>
+      <h>140</h>
+    </coordinates>
+    <panel_attributes>HttpResponse
+--
+- version : String
+- status : int
+- phrase : String
+- header : Map&lt;String, String&gt;
+- file : File
+--
++ getVersion() : String
++ getStatus() : int
++ getPhrase() : String
++ getFile() : File
++ getHeader() : Map&lt;String, String&gt;
++ put(String, String) : void
++ write(OutputStream) : void
++ toString() : String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>765</x>
+      <y>810</y>
+      <w>175</w>
+      <h>85</h>
+    </coordinates>
+    <panel_attributes>HttpResponseFactory
+--
+--
+- fillGeneralHeader(HttpResponse, String) : void
+- create200OK(File, String) : HttpResponse
+- create400BadRequest(String) : HttpResponse
+- create404NotFound(String) : HttpResponse
+- create505NotSupported(String) : HttpResponse
+- create304NotModified(String) : HttpResponse</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>355</x>
+      <y>620</y>
+      <w>180</w>
+      <h>310</h>
+    </coordinates>
+    <panel_attributes>Protocol
+--
++ SPACE : char
++ SEPARATOR : char
++ SLASH : char
++ CR : char
++ LF : char
++ CRLF : String
++ VERSION : String
++ GET : String
++ OK_CODE : int
++ OK_TEXT : String
++ MOVED_PERMANENTLY_CODE : int
++ MOVED_PERMANENTLY_TEXT : String
++ BAD_REQUEST_CODE : int
++ BAD_REQUEST_TEXT : String
++ NOT_FOUND_CODE : int
++ NOT_FOUND_TEXT : String
++ NOT_SUPPORTED_CODE : int
++ NOT_SUPPORTED_TEXT : String
++ HOST : String
++ CONNECTION : String
++ USER_AGENT : String
++ DATE : String
++ Server : String
++ LAST_MODIFIED : String
++ CONTENT_LENGTH : String
++ CONTENT_TYPE : String
++ CHUNK_LENGTH : int
++ SERVER_INFO : String
++ PROVIDER : String
++ AUTHOR : String
++ CLOSE : String
++ OPEN : String
++ DEFAULT_FILE : String
++ MIME_TEXT : String
+--
++ getServerInfo() : String</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>530</x>
+      <y>655</y>
+      <w>65</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>530</x>
+      <y>820</y>
+      <w>65</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>710</x>
+      <y>830</y>
+      <w>65</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;10.0;110.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>300</x>
+      <y>595</y>
+      <w>655</w>
+      <h>375</h>
+    </coordinates>
+    <panel_attributes>Protocol</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>555</x>
+      <y>465</y>
+      <w>40</w>
+      <h>15</h>
+    </coordinates>
+    <panel_attributes>lt=-&gt;</panel_attributes>
+    <additional_attributes>10.0;10.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>505</y>
+      <w>135</w>
+      <h>125</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;230.0;10.0;60.0;250.0;60.0;250.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>645</x>
+      <y>505</y>
+      <w>15</w>
+      <h>125</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;230.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>695</x>
+      <y>490</y>
+      <w>70</w>
+      <h>320</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>40.0;620.0;120.0;620.0;120.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>695</x>
+      <y>475</y>
+      <w>100</w>
+      <h>345</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>180.0;670.0;180.0;10.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>510</x>
+      <y>890</y>
+      <w>280</w>
+      <h>65</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>10.0;80.0;10.0;110.0;540.0;110.0;540.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>690</x>
+      <y>160</y>
+      <w>200</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>utils::SwsLogger
+--
++accessLogger = LogManager.getLogger("Access"): Logger
++errorLogger = LogManager.getLogger("Error"): Logger
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>700</x>
+      <y>230</y>
+      <w>180</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>utils::ServerProperties
+--
++getProperties(String propertiesFileName): Properties
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>670</x>
+      <y>140</y>
+      <w>245</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>Utils</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>475</x>
+      <y>200</y>
+      <w>85</w>
+      <h>35</h>
+    </coordinates>
+    <panel_attributes>app::SimpleWebServer
+--
++main(String[] args): void
+</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>455</x>
+      <y>180</y>
+      <w>120</w>
+      <h>75</h>
+    </coordinates>
+    <panel_attributes>App</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>485</x>
+      <y>230</y>
+      <w>40</w>
+      <h>195</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;370.0;10.0;110.0;60.0;110.0;60.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>555</x>
+      <y>180</y>
+      <w>145</w>
+      <h>45</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>270.0;10.0;130.0;10.0;130.0;70.0;10.0;70.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>615</x>
+      <y>210</y>
+      <w>95</w>
+      <h>50</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;.</panel_attributes>
+    <additional_attributes>170.0;80.0;10.0;80.0;10.0;10.0</additional_attributes>
+  </element>
+</diagram>
