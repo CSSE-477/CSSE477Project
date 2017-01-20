@@ -78,6 +78,9 @@ jacocoTestReport {
 }
 
 test {
+	filter {
+		includeTestsMatching "*.SuiteRunner"
+	}
 	jacoco {
 		append = false
 	}
