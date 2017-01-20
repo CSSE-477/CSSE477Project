@@ -43,7 +43,7 @@ public class GetRequestTests {
 		runner.start();
 		
 		// wait until the server is ready
-		while (server.isStoped()) {}
+//		while (server.isStoped()) {}
 		
 	    requestFactory =
 	        HTTP_TRANSPORT.createRequestFactory(new HttpRequestInitializer() {
