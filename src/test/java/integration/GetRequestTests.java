@@ -45,7 +45,6 @@ public class GetRequestTests {
 		Thread runner = new Thread(server);
 		runner.start();
 
-		/*
 		int sleepAmount = 1000;
 		int retries = 10;
 		while(!server.isReady()) {
@@ -57,7 +56,6 @@ public class GetRequestTests {
             }
             retries = retries - 1;
         }
-        */
 		
 	    requestFactory = HTTP_TRANSPORT.createRequestFactory(request -> request.setParser(new JsonObjectParser(JSON_FACTORY)));
 	}
