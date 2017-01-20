@@ -149,8 +149,10 @@ task publishToWebServer(dependsOn: jar) << {
 			execute('rm -rf /tmp/YoloSwagSWS')
 			println "All done!" 
 
-			println "Restarting YoloSwagWebServer service"
-			executeSudo('/etc/init.d/webserver restart')
+			println "Stopping YoloSwagWebServer service"
+			executeSudo('/etc/init.d/webserver stop')
+			println "Starting YoloSwagWebServer service"
+			executeSudo('/etc/init.d/webserver start')
 			println "Running curl command to see if server is started"
 			execute('curl localhost:8080')
 			println "YoloSwagSWS has been deployed to http://477-06.csse.rose-hulman.edu/YoloSwagSWS/"
