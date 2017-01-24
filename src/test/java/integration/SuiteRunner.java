@@ -8,7 +8,7 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
-import utilities.FileCreationUtility;
+import utils.FileCreationUtility;
 
 import java.io.IOException;
 

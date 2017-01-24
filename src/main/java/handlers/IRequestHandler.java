@@ -1,4 +1,4 @@
-package unit.server.handlers;
+package handlers;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;

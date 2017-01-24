@@ -19,15 +19,15 @@
  * 
  */
  
-package unit.server;
+package server;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
-import unit.server.handlers.ConnectionHandler;
-import unit.server.handlers.IRequestHandlerFactory;
+import handlers.ConnectionHandler;
+import handlers.IRequestHandlerFactory;
 import utils.SwsLogger;
 
 

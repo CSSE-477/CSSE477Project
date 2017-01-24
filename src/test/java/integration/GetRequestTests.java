@@ -18,9 +18,9 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
-import unit.server.Server;
-import unit.server.handlers.IRequestHandlerFactory;
-import utilities.FileCreationUtility;
+import server.Server;
+import handlers.IRequestHandlerFactory;
+import utils.FileCreationUtility;
 
 import java.io.File;
 import java.net.InetAddress;

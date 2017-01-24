@@ -1,4 +1,4 @@
-package unit.server.handlers;
+package handlers;
 
 import java.io.File;
 import java.io.InputStream;
