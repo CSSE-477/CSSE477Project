@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
 import unit.HttpRequestTest;
+import unit.HttpResponseFactoryTest;
 import unit.HttpResponseTest;
 import unit.ServerPropertiesTest;
 import unit.ServerTest;
@@ -22,6 +23,7 @@ import java.io.IOException;
 	ServerTest.class,
 	HttpRequestTest.class,
 	HttpResponseTest.class,
+	HttpResponseFactoryTest.class,
 	ServerPropertiesTest.class,
 	GetRequestTests.class
 })
