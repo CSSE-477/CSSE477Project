@@ -145,7 +145,7 @@ task publishToWebServer(dependsOn: jar) << {
 			}
 			println "Transfering file from local build/distributions to remote /tmp/YoloSwagSWS ..."
 			put from: "${buildDir}/libs/*", into: '/tmp/YoloSwagSWS'
-			println "Files transfer complete now setting up the web unit.server ..."
+			println "Files transfer complete now setting up the web server ..."
 			
 			println "Checking if remote /var/www/html/YoloSwagSWS exists ..."
 			result = execute('if test -d /var/www/html/YoloSwagSWS; then echo "exists"; fi')
@@ -171,7 +171,7 @@ task publishToWebServer(dependsOn: jar) << {
 			//sleep(3 * 1000)
 			//println "Starting YoloSwagWebServer service"
 			//executeSudo('/etc/init.d/webserver start')
-			//println "Running curl command to see if unit.server is started"
+			//println "Running curl command to see if server is started"
 
 			//sleep(3 * 1000)
 			//execute('curl localhost:8080')
@@ -187,7 +187,7 @@ task publishToWebServer(dependsOn: jar) << {
 			}
 			println "Transfering file from local build/distributions to remote /tmp/YoloSwagSWS ..."
 			put from: "${buildDir}/libs/*", into: '/tmp/YoloSwagSWS'
-			println "Files transfer complete now setting up the web unit.server ..."
+			println "Files transfer complete now setting up the web server ..."
 			
 			println "Checking if remote /var/www/html/YoloSwagSWS exists ..."
 			result = execute('if test -d /var/www/html/YoloSwagSWS; then echo "exists"; fi')
@@ -213,7 +213,7 @@ task publishToWebServer(dependsOn: jar) << {
 			//sleep(3 * 1000)
 			//println "Starting YoloSwagWebServer service"
 			//executeSudo('/etc/init.d/webserver start')
-			//println "Running curl command to see if unit.server is started"
+			//println "Running curl command to see if server is started"
 
 			//sleep(3 * 1000)
 			//execute('curl localhost:8080')

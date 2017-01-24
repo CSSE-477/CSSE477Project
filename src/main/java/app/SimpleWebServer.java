@@ -22,7 +22,7 @@ public class SimpleWebServer {
 		String rootDirectory = properties.getProperty("rootDirectory");
 		int port = Integer.parseInt(properties.getProperty("port"));
 
-		// Create a run the unit.server
+		// Create a run the server
 		Server server = new Server(rootDirectory, port, getPopulatedFactoryHash());
 		Thread runner = new Thread(server);
 		runner.start();

@@ -48,7 +48,7 @@ public class HttpResponseFactory {
 		Date date = Calendar.getInstance().getTime();
 		response.put(Protocol.DATE, date.toString());
 		
-		// Lets add unit.server info
+		// Lets add server info
 		response.put(Protocol.Server, Protocol.getServerInfo());
 
 		// Lets add extra header with provider info
