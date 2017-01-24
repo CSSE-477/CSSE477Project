@@ -8,12 +8,17 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
+
+import unit.ServerTest;
 import utils.FileCreationUtility;
 
 import java.io.IOException;
 
 @RunWith(Suite.class)
-@Suite.SuiteClasses({GetRequestTests.class})
+@Suite.SuiteClasses({
+	ServerTest.class,
+	GetRequestTests.class
+})
 public class SuiteRunner {
 
     @BeforeClass
