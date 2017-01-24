@@ -111,7 +111,7 @@ public class HttpResponse {
 	public void put(String key, String value) {
 		this.header.put(key, value);
 	}
-	
+
 	/**
 	 * Writes the data of the http response object to the output stream.
 	 * 
@@ -130,7 +130,7 @@ public class HttpResponse {
 			for(Map.Entry<String, String> entry : header.entrySet()) {
 				String key = entry.getKey();
 				String value = entry.getValue();
-				
+
 				// Write each header field line
 				line = key + Protocol.SEPERATOR + Protocol.SPACE + value + Protocol.CRLF;
 				out.write(line.getBytes());
