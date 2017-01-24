@@ -1,7 +1,7 @@
 package app;
 
-import server.Server;
-import server.handlers.IRequestHandlerFactory;
+import unit.server.Server;
+import unit.server.handlers.IRequestHandlerFactory;
 import utils.ServerProperties;
 import utils.SwsLogger;
 
@@ -22,7 +22,7 @@ public class SimpleWebServer {
 		String rootDirectory = properties.getProperty("rootDirectory");
 		int port = Integer.parseInt(properties.getProperty("port"));
 
-		// Create a run the server
+		// Create a run the unit.server
 		Server server = new Server(rootDirectory, port, getPopulatedFactoryHash());
 		Thread runner = new Thread(server);
 		runner.start();
@@ -31,7 +31,7 @@ public class SimpleWebServer {
 		// SL4J/Log4J are some popular logging framework
 		SwsLogger.accessLogger.info(String.format("Simple Web Server started at port %d and serving the %s directory.", port, rootDirectory));
 		
-		// Wait for the server thread to terminate
+		// Wait for the unit.server thread to terminate
 		runner.join();
 	}
 

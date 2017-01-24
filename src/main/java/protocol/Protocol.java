@@ -86,7 +86,7 @@ public class Protocol {
     public static final String MIME_TEXT = "text";
     
     /**
-     * Returns a formatted String containing server information.<br/>
+     * Returns a formatted String containing unit.server information.<br/>
      * e.g. <tt>SimpleWebServer(SWS)/1.0.0 (Mac OS X/10.5.8/i386)</tt>
      * @return
      */

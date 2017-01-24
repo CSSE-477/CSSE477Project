@@ -19,20 +19,20 @@
  * 
  */
  
-package server;
+package unit.server;
 
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
 
-import server.handlers.ConnectionHandler;
-import server.handlers.IRequestHandlerFactory;
+import unit.server.handlers.ConnectionHandler;
+import unit.server.handlers.IRequestHandlerFactory;
 import utils.SwsLogger;
 
 
 /**
- * This represents a welcoming server for the incoming
+ * This represents a welcoming unit.server for the incoming
  * TCP request from a HTTP client such as a web browser. 
  * 
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
@@ -58,7 +58,7 @@ public class Server implements Runnable {
 	}
 	
 	/**
-	 * The entry method for the main server thread that accepts incoming
+	 * The entry method for the main unit.server thread that accepts incoming
 	 * TCP connection request and creates a {@link ConnectionHandler} for
 	 * the request.
 	 */
@@ -90,7 +90,7 @@ public class Server implements Runnable {
 	}
 	
 	/**
-	 * Stops the server from listening further.
+	 * Stops the unit.server from listening further.
 	 */
 	public synchronized void stop() {
 		if(this.stop)
@@ -114,7 +114,7 @@ public class Server implements Runnable {
     }
 	
 	/**
-	 * Checks if the server is stopeed or not.
+	 * Checks if the unit.server is stopeed or not.
 	 * @return
 	 */
 	public boolean isStoped() {

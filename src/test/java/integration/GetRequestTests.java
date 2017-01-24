@@ -18,11 +18,13 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
-import server.Server;
+import unit.server.Server;
+import unit.server.handlers.IRequestHandlerFactory;
 import utilities.FileCreationUtility;
 
 import java.io.File;
 import java.net.InetAddress;
+import java.util.HashMap;
 
 public class GetRequestTests {
 	private static Server server;
@@ -41,7 +43,7 @@ public class GetRequestTests {
 		rootDirectory = "web";
 		port = 8080;
 
-		server = new Server(rootDirectory, port);
+		server = new Server(rootDirectory, port, new HashMap<String, IRequestHandlerFactory>());
 		Thread runner = new Thread(server);
 		runner.start();
 
