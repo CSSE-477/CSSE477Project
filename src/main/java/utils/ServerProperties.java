@@ -13,10 +13,13 @@ public class ServerProperties {
 
 		try {
 			inputStream = this.getClass().getClassLoader().getResourceAsStream(propertiesFileName);
-
-			if (inputStream != null) {
-				props.load(inputStream);
+			
+			// file not found
+			if (inputStream == null) {
+				throw new Exception();
 			}
+
+			props.load(inputStream);
 		} catch (Exception e) {
 			throw new FileNotFoundException("property file '" + propertiesFileName + "' not found");
 		} finally {

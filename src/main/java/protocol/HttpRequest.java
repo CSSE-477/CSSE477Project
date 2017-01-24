@@ -104,7 +104,11 @@ public class HttpRequest {
 		// Rest of the request is a header that maps keys to values
 		// e.g. Host: www.rose-hulman.edu
 		// We will convert both the strings to lower case to be able to search later
-		line = reader.readLine().trim();
+		line = reader.readLine();
+		// Chandan's readLine().trim() was blowing up
+		if (line == null) {
+			line = "";
+		}
 		
 		while(!line.equals("")) {
 			// THIS IS A PATCH 
@@ -136,7 +140,11 @@ public class HttpRequest {
 			}
 			
 			// Processed one more line, now lets read another header line and loop
-			line = reader.readLine().trim();
+			line = reader.readLine();
+			// Chandan's readLine().trim() was blowing up
+			if (line == null) {
+				line = "";
+			}
 		}
 		
 		int contentLength = 0;
