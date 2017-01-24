@@ -4,6 +4,7 @@ import static org.junit.Assert.*;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -47,9 +48,35 @@ public class HttpRequestTest {
 		String actual = request.getVersion();
 		assertEquals(expected, actual);
 	}
+
+	@Test
+	public void testGetHeader() throws Exception {
+		String key = "testHeader".toLowerCase();
+		String value = "testValue";
+		String req = sampleRequestLine + key + ": " + value + "\r";
+
+		InputStream input = new ByteArrayInputStream(req.getBytes());
+		HttpRequest request = HttpRequest.read(input);
+
+		Map<String, String> headers = request.getHeader();
+		String actual = headers.get(key);
+		assertEquals(value, actual);
+	}
 	
-//	@Test
-//	public void testGetHeader() throws Exception {
-//		
-//	}
+	@Test
+	public void testGetHeaders() throws Exception {
+		String key1 = "testHeader".toLowerCase();
+		String value1 = "testValue";
+		String key2 = "yolo";
+		String value2 = "swag";
+		
+		String req = sampleRequestLine + key1 + ": " + value1 + "\r" +
+						key2 + ": " + value2 + "\r";
+		InputStream input = new ByteArrayInputStream(req.getBytes());
+		HttpRequest request = HttpRequest.read(input);
+
+		Map<String, String> headers = request.getHeader();
+		assertEquals(value1, headers.get(key1));
+		assertEquals(value2, headers.get(key2));
+	}
 }

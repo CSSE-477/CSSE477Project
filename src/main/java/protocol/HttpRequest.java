@@ -140,7 +140,11 @@ public class HttpRequest {
 			}
 			
 			// Processed one more line, now lets read another header line and loop
-			line = reader.readLine().trim();
+			line = reader.readLine();
+			// Chandan's readLine().trim() was blowing up
+			if (line == null) {
+				line = "";
+			}
 		}
 		
 		int contentLength = 0;
