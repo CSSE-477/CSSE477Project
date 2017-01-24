@@ -1,9 +1,11 @@
 package app;
 
 import server.Server;
+import server.handlers.IRequestHandlerFactory;
 import utils.ServerProperties;
 import utils.SwsLogger;
 
+import java.util.HashMap;
 import java.util.Properties;
 
 /**
@@ -21,7 +23,7 @@ public class SimpleWebServer {
 		int port = Integer.parseInt(properties.getProperty("port"));
 
 		// Create a run the server
-		Server server = new Server(rootDirectory, port);
+		Server server = new Server(rootDirectory, port, getPopulatedFactoryHash());
 		Thread runner = new Thread(server);
 		runner.start();
 
@@ -31,5 +33,11 @@ public class SimpleWebServer {
 		
 		// Wait for the server thread to terminate
 		runner.join();
+	}
+
+	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(){
+		HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap = new HashMap();
+		// Add factories to the map or create them in-line if that is preferable, then return below
+		return requestHandlerFactoryMap;
 	}
 }

@@ -24,7 +24,10 @@ package server;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
 
+import server.handlers.ConnectionHandler;
+import server.handlers.IRequestHandlerFactory;
 import utils.SwsLogger;
 
 
@@ -40,35 +43,18 @@ public class Server implements Runnable {
 	private boolean stop;
 	private ServerSocket welcomeSocket;
 	private boolean readyState;
+	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
 
 	/**
 	 * @param rootDirectory
 	 * @param port
 	 */
-	public Server(String rootDirectory, int port) {
+	public Server(String rootDirectory, int port, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
 		this.rootDirectory = rootDirectory;
 		this.port = port;
 		this.stop = false;
 		this.readyState = false;
-	}
-
-	/**
-	 * Gets the root directory for this web server.
-	 * 
-	 * @return the rootDirectory
-	 */
-	public String getRootDirectory() {
-		return rootDirectory;
-	}
-
-
-	/**
-	 * Gets the port number for this web server.
-	 * 
-	 * @return the port
-	 */
-	public int getPort() {
-		return port;
+		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
 	}
 	
 	/**
@@ -93,7 +79,7 @@ public class Server implements Runnable {
                 }
 				
 				// Create a handler for this incoming connection and start the handler in a new thread
-				ConnectionHandler handler = new ConnectionHandler(this, connectionSocket);
+				ConnectionHandler handler = new ConnectionHandler(this.rootDirectory, connectionSocket, this.requestHandlerFactoryMap);
 				new Thread(handler).start();
 			}
 			this.welcomeSocket.close();

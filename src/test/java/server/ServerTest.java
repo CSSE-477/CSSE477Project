@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
+import java.util.HashMap;
 
 import org.junit.After;
 import org.junit.AfterClass;
@@ -13,6 +14,7 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 
 import server.Server;
+import server.handlers.IRequestHandlerFactory;
 
 public class ServerTest {
 
@@ -35,7 +37,7 @@ public class ServerTest {
 	@Test
 	public void testIsStoppedTrivial() {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0);
+		Server server = new Server(fakeDir, 0, new HashMap<String, IRequestHandlerFactory>());
 		boolean expected = true;
 		assertEquals(expected, server.isStoped());
 	}
@@ -43,7 +45,7 @@ public class ServerTest {
 	@Test
 	public void testIsStoppedNontrivial() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0);
+		Server server = new Server(fakeDir, 0, new HashMap<String, IRequestHandlerFactory>());
 		boolean expected = false;
 		Field welcomeSocket = server.getClass().getDeclaredField("welcomeSocket");
 		welcomeSocket.setAccessible(true);

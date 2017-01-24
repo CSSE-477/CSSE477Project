@@ -1,9 +1,10 @@
-package server;
+package server.handlers;
 
 import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.util.HashMap;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
@@ -20,21 +21,15 @@ import protocol.ProtocolException;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class ConnectionHandler implements Runnable {
-	private Server server;
+	private String rootDirectory;
 	private Socket socket;
+	private HashMap<String, IRequestHandlerFactory> requesthandlerFactoryMap;
 	
-	public ConnectionHandler(Server server, Socket socket) {
-		this.server = server;
+	public ConnectionHandler(String rootDirectory, Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
+		this.rootDirectory = rootDirectory;
 		this.socket = socket;
+		this.requesthandlerFactoryMap = requestHandlerFactoryMap;
 	}
-	
-	/**
-	 * @return the socket
-	 */
-	public Socket getSocket() {
-		return socket;
-	}
-
 
 	/**
 	 * The entry point for connection handler. It first parses
@@ -115,18 +110,17 @@ public class ConnectionHandler implements Runnable {
 				// Handling GET request here
 				// Get relative URI path from request
 				String uri = request.getUri();
-				// Get root directory path from server
-				String rootDirectory = server.getRootDirectory();
 				// Combine them together to form absolute file path
-				File file = new File(rootDirectory + uri);
+				File file = new File(this.rootDirectory + uri);
 				// Check if the file exists
 				if(file.exists()) {
 					if(file.isDirectory()) {
 						// Look for default index.html file in a directory
-						String location = rootDirectory + uri + System.getProperty("file.separator") + Protocol.DEFAULT_FILE;
+						String location = this.rootDirectory + uri + System.getProperty("file.separator") + Protocol.DEFAULT_FILE;
 						file = new File(location);
 						if(file.exists()) {
 							// Lets create 200 OK response
+							// TODO: this.requestHandlerFactoryMap.get(String type)
 							response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
 						}
 						else {
