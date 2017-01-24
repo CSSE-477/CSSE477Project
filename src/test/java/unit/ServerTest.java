@@ -35,21 +35,19 @@ public class ServerTest {
 	@Test
 	public void testIsStoppedTrivial() {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, new HashMap());
-		boolean expected = true;
-		assertEquals(expected, server.isStoped());
+		Server server = new Server(fakeDir, 0, new HashMap<>());
+		assertEquals(true, server.isStoped());
 	}
 
 	@Test
 	public void testIsStoppedNontrivial() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, new HashMap());
-		boolean expected = false;
+		Server server = new Server(fakeDir, 0, new HashMap<>());
 		Field welcomeSocket = server.getClass().getDeclaredField("welcomeSocket");
 		welcomeSocket.setAccessible(true);
 		ServerSocket socket = new ServerSocket();
 		welcomeSocket.set(server, socket);
-		assertEquals(expected, server.isStoped());
+		assertEquals(false, server.isStoped());
 		socket.close();
 	}
 }

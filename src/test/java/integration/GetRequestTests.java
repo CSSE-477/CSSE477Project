@@ -19,7 +19,6 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
 import server.Server;
-import handlers.IRequestHandlerFactory;
 import utils.FileCreationUtility;
 
 import java.io.File;
@@ -28,7 +27,6 @@ import java.util.HashMap;
 
 public class GetRequestTests {
 	private static Server server;
-	private static String rootDirectory;
 	private static String fileName;
 	private static int port;
 	
@@ -40,10 +38,10 @@ public class GetRequestTests {
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
 		fileName = "index.html";
-		rootDirectory = "web";
+		String rootDirectory = "web";
 		port = 8080;
 
-		server = new Server(rootDirectory, port, new HashMap<String, IRequestHandlerFactory>());
+		server = new Server(rootDirectory, port, new HashMap<>());
 		Thread runner = new Thread(server);
 		runner.start();
 
@@ -96,7 +94,7 @@ public class GetRequestTests {
         int actual = response.getStatusCode();
         assertEquals(expected, actual);
         byte[] bytes = new byte[512];
-        response.getContent().read(bytes, 0, 512);
+        // response.getContent().read(bytes, 0, 512);
         FileCreationUtility.writeToTestFile(new String(bytes, "UTF-8"));
         File file1 = new File("file1.txt");
         File file2 = new File("file2.txt");

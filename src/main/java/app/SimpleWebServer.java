@@ -35,9 +35,8 @@ public class SimpleWebServer {
 		runner.join();
 	}
 
-	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(){
-		HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap = new HashMap();
+	private static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(){
 		// Add factories to the map or create them in-line if that is preferable, then return below
-		return requestHandlerFactoryMap;
+		return new HashMap<>();
 	}
 }
