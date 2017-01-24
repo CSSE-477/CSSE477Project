@@ -1,6 +1,6 @@
 package unit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import protocol.HttpRequest;
+import protocol.ProtocolException;
 
 public class HttpRequestTest {
 	String sampleRequestLine;
@@ -17,6 +18,13 @@ public class HttpRequestTest {
 	@Before
 	public void setUp() {
 		sampleRequestLine = "GET /somedir/page.html HTTP/1.1\r";
+	}
+	
+	@Test(expected=ProtocolException.class)
+	public void testBadProtocolRequestCode() throws Exception {
+		String requestLine = "GET";
+		InputStream input = new ByteArrayInputStream(requestLine.getBytes());
+		HttpRequest.read(input);
 	}
 
 	@Test
