@@ -9,6 +9,7 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import unit.HttpRequestTest;
 import unit.ServerTest;
 import utils.FileCreationUtility;
 
@@ -17,6 +18,7 @@ import java.io.IOException;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	ServerTest.class,
+	HttpRequestTest.class,
 	GetRequestTests.class
 })
 public class SuiteRunner {
