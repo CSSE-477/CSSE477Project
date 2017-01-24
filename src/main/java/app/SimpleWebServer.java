@@ -1,6 +1,7 @@
 package app;
 
 import handlers.GetRequestHandlerFactory;
+import handlers.PostRequestHandlerFactory;
 import protocol.Protocol;
 import server.Server;
 import handlers.IRequestHandlerFactory;
@@ -40,6 +41,7 @@ public class SimpleWebServer {
 	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(String rootDirectory){
 		// Add factories to the map or create them in-line if that is preferable, then return below
 		HashMap<String, IRequestHandlerFactory> factoryMap = new HashMap<>();
+		factoryMap.put(Protocol.POST, new PostRequestHandlerFactory(rootDirectory));
 		factoryMap.put(Protocol.GET, new GetRequestHandlerFactory(rootDirectory));
 		return factoryMap;
 	}

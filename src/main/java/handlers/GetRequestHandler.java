@@ -22,10 +22,10 @@ public class GetRequestHandler implements IRequestHandler {
     public HttpResponse handleRequest(HttpRequest request) {
         HttpResponse response;
         String uri = request.getUri();
-        File file = new File(this.rootDirectory + uri);
+        File file = new File(this.rootDirectory.concat(uri));
         if(file.exists()) {
             if(file.isDirectory()) {
-                String location = this.rootDirectory + uri + System.getProperty("file.separator") + Protocol.DEFAULT_FILE;
+                String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator")).concat(Protocol.DEFAULT_FILE);
                 file = new File(location);
                 if(file.exists()) {
                     response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);

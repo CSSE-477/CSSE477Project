@@ -39,6 +39,7 @@ public class Protocol {
     // Some useful protocol elements
     public static final String VERSION = "HTTP/1.1";
     public static final String GET = "GET";
+    public static final String POST = "POST";
     
     // Some useful http codes and text
     public static final int OK_CODE = 200;
@@ -55,6 +56,12 @@ public class Protocol {
     
     public static final int NOT_FOUND_CODE = 404;
     public static final String NOT_FOUND_TEXT = "Not Found";
+
+    public static final int INTERNAL_SERVER_ERROR_CODE = 500;
+    public static final String INTERNAL_SERVER_ERROR_TEXT = "Internal Server Error";
+
+    public static final int NOT_IMPLEMENTED_CODE = 501;
+    public static final String NOT_IMPLEMENTED_TEXT = "Not Implemented";
     
     public static final int NOT_SUPPORTED_CODE = 505;
     public static final String NOT_SUPPORTED_TEXT = "HTTP Version Not Supported";

@@ -151,4 +151,20 @@ public class HttpResponseFactory {
 
 		return response;
 	}
+
+	public static HttpResponse create500InternalServerError(String connection) {
+		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.INTERNAL_SERVER_ERROR_CODE, Protocol.INTERNAL_SERVER_ERROR_TEXT, new HashMap<>(), null);
+
+		fillGeneralHeader(response, connection);
+
+		return response;
+	}
+
+	public static HttpResponse create501NotImplemented(String connection) {
+        HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.NOT_IMPLEMENTED_CODE, Protocol.NOT_IMPLEMENTED_TEXT, new HashMap<>(), null);
+
+        fillGeneralHeader(response, connection);
+
+        return response;
+    }
 }

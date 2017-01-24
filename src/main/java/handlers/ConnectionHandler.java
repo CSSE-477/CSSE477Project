@@ -47,7 +47,7 @@ public class ConnectionHandler implements Runnable {
 		catch(Exception e) {
 			// Cannot do anything if we have exception reading input or output stream
 			// May be have text to log this for further analysis?
-			SwsLogger.errorLogger.error(e.getStackTrace());
+			SwsLogger.errorLogger.error(e.getMessage());
 			return;
 		}
 		
@@ -64,15 +64,15 @@ public class ConnectionHandler implements Runnable {
 			// We know only two kind of exception is possible inside fromInputStream
 			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
 			int status = pe.getStatus();
-			if(status == Protocol.BAD_REQUEST_CODE) {
+			if (status == Protocol.BAD_REQUEST_CODE) {
 				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 			}
-			if (status == Protocol.NOT_SUPPORTED_CODE) {
+			else if (status == Protocol.NOT_SUPPORTED_CODE) {
 				response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
 			}
 		}
 		catch(Exception e) {
-			SwsLogger.errorLogger.error(e.getStackTrace());
+			SwsLogger.errorLogger.error(e.getMessage());
 			// For any other error, we will create bad request response as well
 			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 		}
@@ -85,7 +85,7 @@ public class ConnectionHandler implements Runnable {
 			}
 			catch(Exception e){
 				// We will ignore this exception
-				SwsLogger.errorLogger.error(e.getStackTrace());
+				SwsLogger.errorLogger.error(e.getMessage());
 			}
 
 			return;
@@ -95,20 +95,20 @@ public class ConnectionHandler implements Runnable {
 		try {
 			// Fill in the code to create a response for version mismatch.
 			// You may want to use constants such as Protocol.VERSION, Protocol.NOT_SUPPORTED_CODE, and more.
-			// You can check if the version matches as follows
-			if(!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
-                HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
-			}
-			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
-			if(factory == null){
-                response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
-            }
-            else{
+                // You can check if the version matches as follows
+                if(!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
+                    HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+                }
+                IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
+                if(factory == null){
+                    response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
+                }
+                else{
                 response = factory.getRequestHandler().handleRequest(request);
             }
 		}
 		catch(Exception e) {
-            SwsLogger.errorLogger.error(e.getStackTrace());
+            SwsLogger.errorLogger.error(e.getMessage());
         }
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
@@ -124,7 +124,7 @@ public class ConnectionHandler implements Runnable {
 		}
 		catch(Exception e){
 			// We will ignore this exception
-			SwsLogger.errorLogger.error(e.getStackTrace());
+			SwsLogger.errorLogger.error(e.getMessage());
 		} 
 	}
 }
