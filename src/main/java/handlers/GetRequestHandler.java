@@ -20,7 +20,7 @@ public class GetRequestHandler implements IRequestHandler {
 
     @Override
     public HttpResponse handleRequest(HttpRequest request) {
-        HttpResponse response = null;
+        HttpResponse response;
         String uri = request.getUri();
         File file = new File(this.rootDirectory + uri);
         if(file.exists()) {

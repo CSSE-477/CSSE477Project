@@ -1,7 +1,5 @@
 package handlers;
 
-import handlers.IRequestHandler;
-
 /**
  * Created by TrottaSN on 1/23/2017.
  */

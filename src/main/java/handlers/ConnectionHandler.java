@@ -11,6 +11,7 @@ import protocol.HttpResponse;
 import protocol.HttpResponseFactory;
 import protocol.Protocol;
 import protocol.ProtocolException;
+import utils.SwsLogger;
 
 /**
  * This class is responsible for handling a incoming request
@@ -22,11 +23,11 @@ import protocol.ProtocolException;
  */
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
-	private HashMap<String, IRequestHandlerFactory> requesthandlerFactoryMap;
+	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
 	
 	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
 		this.socket = socket;
-		this.requesthandlerFactoryMap = requestHandlerFactoryMap;
+		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
 	}
 
 	/**
@@ -36,8 +37,6 @@ public class ConnectionHandler implements Runnable {
 	 * and sends the response back to the client (web browser).
 	 */
 	public void run() {
-		// TODO: This class is a classic example of how not to code things. Refactor this code to make it
-		// cohesive and extensible
 		InputStream inStream = null;
 		OutputStream outStream = null;
 		
@@ -48,7 +47,7 @@ public class ConnectionHandler implements Runnable {
 		catch(Exception e) {
 			// Cannot do anything if we have exception reading input or output stream
 			// May be have text to log this for further analysis?
-			e.printStackTrace();
+			SwsLogger.errorLogger.error(e.getStackTrace());
 			return;
 		}
 		
@@ -73,7 +72,7 @@ public class ConnectionHandler implements Runnable {
 			}
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			SwsLogger.errorLogger.error(e.getStackTrace());
 			// For any other error, we will create bad request response as well
 			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 		}
@@ -86,7 +85,7 @@ public class ConnectionHandler implements Runnable {
 			}
 			catch(Exception e){
 				// We will ignore this exception
-				e.printStackTrace();
+				SwsLogger.errorLogger.error(e.getStackTrace());
 			}
 
 			return;
@@ -98,11 +97,9 @@ public class ConnectionHandler implements Runnable {
 			// You may want to use constants such as Protocol.VERSION, Protocol.NOT_SUPPORTED_CODE, and more.
 			// You can check if the version matches as follows
 			if(!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
-				// Here you checked that the "Protocol.VERSION" string is not equal to the  
-				// "request.version" string ignoring the case of the letters in both strings
-				// TODO: Fill in the rest of the code here
+                HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 			}
-			IRequestHandlerFactory factory = this.requesthandlerFactoryMap.get(request.getMethod());
+			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
 			if(factory == null){
                 response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
             }
@@ -111,11 +108,8 @@ public class ConnectionHandler implements Runnable {
             }
 		}
 		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-
-		// TODO: So far response could be null for protocol version mismatch.
+            SwsLogger.errorLogger.error(e.getStackTrace());
+        }
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if(response == null) {
@@ -130,7 +124,7 @@ public class ConnectionHandler implements Runnable {
 		}
 		catch(Exception e){
 			// We will ignore this exception
-			e.printStackTrace();
+			SwsLogger.errorLogger.error(e.getStackTrace());
 		} 
 	}
 }

@@ -64,8 +64,7 @@ public class HttpResponseFactory {
 	 * @return A {@link HttpResponse} object represent 200 status.
 	 */
 	public static HttpResponse create200OK(File file, String connection) {
-		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.OK_CODE, 
-				Protocol.OK_TEXT, new HashMap<String, String>(), file);
+		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.OK_CODE, Protocol.OK_TEXT, new HashMap<>(), file);
 		
 		// Lets fill up header fields with more information
 		fillGeneralHeader(response, connection);
@@ -100,7 +99,7 @@ public class HttpResponseFactory {
 	 */
 	public static HttpResponse create400BadRequest(String connection) {
 		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.BAD_REQUEST_CODE, 
-				Protocol.BAD_REQUEST_TEXT, new HashMap<String, String>(), null);
+				Protocol.BAD_REQUEST_TEXT, new HashMap<>(), null);
 		
 		// Lets fill up header fields with more information
 		fillGeneralHeader(response, connection);
@@ -115,8 +114,7 @@ public class HttpResponseFactory {
 	 * @return A {@link HttpResponse} object represent 404 status.
 	 */
 	public static HttpResponse create404NotFound(String connection) {
-		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.NOT_FOUND_CODE, 
-				Protocol.NOT_FOUND_TEXT, new HashMap<String, String>(), null);
+		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.NOT_FOUND_CODE, Protocol.NOT_FOUND_TEXT, new HashMap<>(), null);
 		
 		// Lets fill up the header fields with more information
 		fillGeneralHeader(response, connection);
@@ -131,8 +129,12 @@ public class HttpResponseFactory {
 	 * @return A {@link HttpResponse} object represent 505 status.
 	 */
 	public static HttpResponse create505NotSupported(String connection) {
-		// TODO fill in this method
-		return null;
+		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.NOT_SUPPORTED_CODE, Protocol.NOT_SUPPORTED_TEXT, new HashMap<>(), null);
+
+		// Lets fill up the header fields with more information
+		fillGeneralHeader(response, connection);
+
+		return response;
 	}
 	
 	/**
@@ -142,7 +144,11 @@ public class HttpResponseFactory {
 	 * @return A {@link HttpResponse} object represent 304 status.
 	 */
 	public static HttpResponse create304NotModified(String connection) {
-		// TODO fill in this method
-		return null;
+		HttpResponse response = new HttpResponse(Protocol.VERSION, Protocol.NOT_MODIFIED_CODE, Protocol.NOT_MODIFIED_TEXT, new HashMap<>(), null);
+
+		// Lets fill up the header fields with more information
+		fillGeneralHeader(response, connection);
+
+		return response;
 	}
 }
