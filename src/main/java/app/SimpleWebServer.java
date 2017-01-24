@@ -37,6 +37,7 @@ public class SimpleWebServer {
 
 	private static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(){
 		// Add factories to the map or create them in-line if that is preferable, then return below
+		
 		return new HashMap<>();
 	}
 }
