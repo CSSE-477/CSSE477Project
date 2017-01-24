@@ -21,12 +21,10 @@ import protocol.ProtocolException;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class ConnectionHandler implements Runnable {
-	private String rootDirectory;
 	private Socket socket;
 	private HashMap<String, IRequestHandlerFactory> requesthandlerFactoryMap;
 	
-	public ConnectionHandler(String rootDirectory, Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
-		this.rootDirectory = rootDirectory;
+	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
 		this.socket = socket;
 		this.requesthandlerFactoryMap = requestHandlerFactoryMap;
 	}
@@ -70,7 +68,9 @@ public class ConnectionHandler implements Runnable {
 			if(status == Protocol.BAD_REQUEST_CODE) {
 				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 			}
-			// TODO: Handle version not supported code as well
+			if (status == Protocol.NOT_SUPPORTED_CODE) {
+				response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
+			}
 		}
 		catch(Exception e) {
 			e.printStackTrace();
@@ -102,42 +102,13 @@ public class ConnectionHandler implements Runnable {
 				// "request.version" string ignoring the case of the letters in both strings
 				// TODO: Fill in the rest of the code here
 			}
-			else if(request.getMethod().equalsIgnoreCase(Protocol.GET)) {
-//				Map<String, String> header = request.getHeader();
-//				String date = header.get("if-modified-since");
-//				String hostName = header.get("host");
-//				
-				// Handling GET request here
-				// Get relative URI path from request
-				String uri = request.getUri();
-				// Combine them together to form absolute file path
-				File file = new File(this.rootDirectory + uri);
-				// Check if the file exists
-				if(file.exists()) {
-					if(file.isDirectory()) {
-						// Look for default index.html file in a directory
-						String location = this.rootDirectory + uri + System.getProperty("file.separator") + Protocol.DEFAULT_FILE;
-						file = new File(location);
-						if(file.exists()) {
-							// Lets create 200 OK response
-							// TODO: this.requestHandlerFactoryMap.get(String type)
-							response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
-						}
-						else {
-							// File does not exist so lets create 404 file not found code
-							response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
-						}
-					}
-					else { // Its a file
-						// Lets create 200 OK response
-						response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
-					}
-				}
-				else {
-					// File does not exist so lets create 404 file not found code
-					response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
-				}
-			}
+			IRequestHandlerFactory factory = this.requesthandlerFactoryMap.get(request.getMethod());
+			if(factory == null){
+                response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
+            }
+            else{
+                response = factory.getRequestHandler().handleRequest(request);
+            }
 		}
 		catch(Exception e) {
 			e.printStackTrace();

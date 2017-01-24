@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.net.ServerSocket;
 import java.util.HashMap;
 
+import app.SimpleWebServer;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -35,14 +36,14 @@ public class ServerTest {
 	@Test
 	public void testIsStoppedTrivial() {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, new HashMap<>());
+		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir));
 		assertEquals(true, server.isStoped());
 	}
 
 	@Test
 	public void testIsStoppedNontrivial() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
 		String fakeDir = "dir";
-		Server server = new Server(fakeDir, 0, new HashMap<>());
+		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir));
 		Field welcomeSocket = server.getClass().getDeclaredField("welcomeSocket");
 		welcomeSocket.setAccessible(true);
 		ServerSocket socket = new ServerSocket();
