@@ -2,6 +2,7 @@ package integration;
 
 import static org.junit.Assert.*;
 
+import app.SimpleWebServer;
 import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -40,8 +41,7 @@ public class GetRequestTests {
 		fileName = "index.html";
 		String rootDirectory = "web";
 		port = 8080;
-
-		server = new Server(rootDirectory, port, new HashMap<>());
+		server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory));
 		Thread runner = new Thread(server);
 		runner.start();
 

@@ -38,7 +38,6 @@ import utils.SwsLogger;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class Server implements Runnable {
-	private String rootDirectory;
 	private int port;
 	private boolean stop;
 	private ServerSocket welcomeSocket;
@@ -46,11 +45,9 @@ public class Server implements Runnable {
 	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
 
 	/**
-	 * @param rootDirectory
 	 * @param port
 	 */
-	public Server(String rootDirectory, int port, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
-		this.rootDirectory = rootDirectory;
+	public Server(int port, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
 		this.port = port;
 		this.stop = false;
 		this.readyState = false;
@@ -79,7 +76,7 @@ public class Server implements Runnable {
                 }
 				
 				// Create a handler for this incoming connection and start the handler in a new thread
-				ConnectionHandler handler = new ConnectionHandler(this.rootDirectory, connectionSocket, this.requestHandlerFactoryMap);
+				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.requestHandlerFactoryMap);
 				new Thread(handler).start();
 			}
 			this.welcomeSocket.close();
@@ -109,7 +106,7 @@ public class Server implements Runnable {
 		catch(Exception e){SwsLogger.errorLogger.error(e.getMessage());}
 	}
 
-	public synchronized boolean isReady(){
+	public synchronized boolean isReady() {
 	    return this.readyState;
     }
 	
