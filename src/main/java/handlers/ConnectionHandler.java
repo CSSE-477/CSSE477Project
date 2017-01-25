@@ -100,7 +100,7 @@ public class ConnectionHandler implements Runnable {
 			}
 			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
 			if(factory == null){
-                response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
+                response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
             }
             else{
                 response = factory.getRequestHandler().handleRequest(request);
