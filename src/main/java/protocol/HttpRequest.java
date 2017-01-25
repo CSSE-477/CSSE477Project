@@ -127,7 +127,7 @@ public class HttpRequest {
 				String value = line.substring(index+1); // Get the rest, e.g. "www.rose-hulman.edu"
 				
 				// Lets strip off the white spaces from key if any and change it to lower case
-				key = key.trim().toLowerCase();
+				key = key.trim();
 				
 				// Lets also remove ":" from the key
 				key = key.substring(0, key.length() - 1);
@@ -149,7 +149,7 @@ public class HttpRequest {
 		
 		int contentLength = 0;
 		try {
-			contentLength = Integer.parseInt(request.header.get(Protocol.CONTENT_LENGTH.toLowerCase()));
+			contentLength = Integer.parseInt(request.header.get(Protocol.CONTENT_LENGTH));
 		}
 		catch(Exception e){}
 		
