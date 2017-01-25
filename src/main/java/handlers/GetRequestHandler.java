@@ -23,24 +23,23 @@ public class GetRequestHandler implements IRequestHandler {
         HttpResponse response;
         String uri = request.getUri();
         File file = new File(this.rootDirectory.concat(uri));
-        if(file.exists()) {
-            if(file.isDirectory()) {
-                String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator")).concat(Protocol.DEFAULT_FILE);
-                file = new File(location);
-                if(file.exists()) {
-                    response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
-                }
-                else {
-                    response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
-                }
-            }
-            else {
+        
+        if (!file.exists()) {
+        	response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+        } else if (file.isDirectory()) {
+        	// check for default file before sending 404
+            String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator")).concat(Protocol.DEFAULT_FILE);
+            file = new File(location);
+            if(file.exists()) {
                 response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
             }
+            else {
+                response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+            }
+        } else {
+        	response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
         }
-        else {
-            response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
-        }
+
         return response;
     }
 }
