@@ -40,6 +40,7 @@ public class PostRequestHandler implements IRequestHandler {
         FileWriter fw;
         try {
             fw = new FileWriter(testFile, true);
+            System.out.println(request.getHeader());
             int amount = Integer.parseInt(request.getHeader().get(Protocol.CONTENT_LENGTH));
             fw.write(new String(request.getBody()), 0, amount);
             fw.close();
