@@ -1,6 +1,7 @@
 package app;
 
 import handlers.GetRequestHandlerFactory;
+import handlers.HeadRequestHandlerFactory;
 import handlers.PostRequestHandlerFactory;
 import protocol.Protocol;
 import server.Server;
@@ -43,6 +44,7 @@ public class SimpleWebServer {
 		HashMap<String, IRequestHandlerFactory> factoryMap = new HashMap<>();
 		factoryMap.put(Protocol.POST, new PostRequestHandlerFactory(rootDirectory));
 		factoryMap.put(Protocol.GET, new GetRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.HEAD, new HeadRequestHandlerFactory(rootDirectory));
 		return factoryMap;
 	}
 }
