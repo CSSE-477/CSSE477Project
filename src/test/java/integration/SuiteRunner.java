@@ -1,5 +1,7 @@
 package integration;
 
+import java.io.IOException;
+
 /**
  * Created by TrottaSN on 1/19/2017.
  */
@@ -9,19 +11,21 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
+import unit.GMTConversionTest;
 import unit.HttpRequestTest;
+import unit.HttpResponseFactoryTest;
 import unit.HttpResponseTest;
 import unit.ServerPropertiesTest;
 import unit.ServerTest;
 import utils.FileCreationUtility;
-
-import java.io.IOException;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	ServerTest.class,
 	HttpRequestTest.class,
 	HttpResponseTest.class,
+	HttpResponseFactoryTest.class,
+	GMTConversionTest.class,
 	ServerPropertiesTest.class,
 	GetRequestTests.class
 })

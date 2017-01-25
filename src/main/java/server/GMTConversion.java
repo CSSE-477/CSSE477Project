@@ -30,11 +30,4 @@ public class GMTConversion {
 	
 		return gmtFormat.parse(dateString);
 	}
-	
-	public static void main(String[] args) throws Exception {
-		Date date = new Date();
-		System.out.println("From Any Timezone Date:\t" + date);
-		String newTime = toGMTString(date);
-		System.out.println("To GMT Timezone Date:\t" + newTime);
-	}
 }

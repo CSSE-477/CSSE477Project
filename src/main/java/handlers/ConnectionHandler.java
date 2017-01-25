@@ -1,6 +1,5 @@
 package handlers;
 
-import java.io.File;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
@@ -95,15 +94,15 @@ public class ConnectionHandler implements Runnable {
 		try {
 			// Fill in the code to create a response for version mismatch.
 			// You may want to use constants such as Protocol.VERSION, Protocol.NOT_SUPPORTED_CODE, and more.
-                // You can check if the version matches as follows
-                if(!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
-                    HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
-                }
-                IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
-                if(factory == null){
-                    response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
-                }
-                else{
+			// You can check if the version matches as follows
+			if(!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
+                HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+			}
+			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
+			if(factory == null){
+                response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
+            }
+            else{
                 response = factory.getRequestHandler().handleRequest(request);
             }
 		}
@@ -119,7 +118,7 @@ public class ConnectionHandler implements Runnable {
 		try{
 			// Write response and we are all done so close the socket
 			response.write(outStream);
-//			System.out.println(response);
+            // System.out.println(response);
 			socket.close();
 		}
 		catch(Exception e){
