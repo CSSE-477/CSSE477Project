@@ -101,4 +101,30 @@ public class HttpResponseFactoryTest {
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
 	}
+
+	@Test
+	public void testCreate500InternalServerError() {
+		HttpResponse res = HttpResponseFactory.create500InternalServerError(connection);
+
+		int actualStatus = res.getStatus();
+		int expectedStatus = Protocol.INTERNAL_SERVER_ERROR_CODE;
+		String actualPhrase = res.getPhrase();
+		String expectedPhrase = Protocol.INTERNAL_SERVER_ERROR_TEXT;
+
+		assertEquals(expectedStatus, actualStatus);
+		assertEquals(expectedPhrase, actualPhrase);
+	}
+
+	@Test
+	public void testCreate501NotImplemented() {
+		HttpResponse res = HttpResponseFactory.create501NotImplemented(connection);
+
+		int actualStatus = res.getStatus();
+		int expectedStatus = Protocol.NOT_IMPLEMENTED_CODE;
+		String actualPhrase = res.getPhrase();
+		String expectedPhrase = Protocol.NOT_IMPLEMENTED_TEXT;
+
+		assertEquals(expectedStatus, actualStatus);
+		assertEquals(expectedPhrase, actualPhrase);
+	}
 }
