@@ -27,7 +27,8 @@ import utils.FileCreationUtility;
 	HttpResponseFactoryTest.class,
 	GMTConversionTest.class,
 	ServerPropertiesTest.class,
-	GetRequestTests.class
+	GetRequestTests.class,
+	HeadRequestTests.class
 })
 public class SuiteRunner {
 
