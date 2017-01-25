@@ -1,5 +1,8 @@
 package app;
 
+import handlers.GetRequestHandlerFactory;
+import handlers.PostRequestHandlerFactory;
+import protocol.Protocol;
 import server.Server;
 import handlers.IRequestHandlerFactory;
 import utils.ServerProperties;
@@ -23,7 +26,7 @@ public class SimpleWebServer {
 		int port = Integer.parseInt(properties.getProperty("port"));
 
 		// Create a run the server
-		Server server = new Server(rootDirectory, port, getPopulatedFactoryHash());
+		Server server = new Server(port, getPopulatedFactoryHash(rootDirectory));
 		Thread runner = new Thread(server);
 		runner.start();
 
@@ -35,8 +38,11 @@ public class SimpleWebServer {
 		runner.join();
 	}
 
-	private static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(){
+	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(String rootDirectory){
 		// Add factories to the map or create them in-line if that is preferable, then return below
-		return new HashMap<>();
+		HashMap<String, IRequestHandlerFactory> factoryMap = new HashMap<>();
+		factoryMap.put(Protocol.POST, new PostRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.GET, new GetRequestHandlerFactory(rootDirectory));
+		return factoryMap;
 	}
 }

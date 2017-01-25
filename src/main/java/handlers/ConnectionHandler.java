@@ -11,6 +11,7 @@ import protocol.HttpResponse;
 import protocol.HttpResponseFactory;
 import protocol.Protocol;
 import protocol.ProtocolException;
+import utils.SwsLogger;
 
 /**
  * This class is responsible for handling a incoming request
@@ -21,14 +22,12 @@ import protocol.ProtocolException;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class ConnectionHandler implements Runnable {
-	private String rootDirectory;
 	private Socket socket;
-	private HashMap<String, IRequestHandlerFactory> requesthandlerFactoryMap;
+	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
 	
-	public ConnectionHandler(String rootDirectory, Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
-		this.rootDirectory = rootDirectory;
+	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
 		this.socket = socket;
-		this.requesthandlerFactoryMap = requestHandlerFactoryMap;
+		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
 	}
 
 	/**
@@ -38,8 +37,6 @@ public class ConnectionHandler implements Runnable {
 	 * and sends the response back to the client (web browser).
 	 */
 	public void run() {
-		// TODO: This class is a classic example of how not to code things. Refactor this code to make it
-		// cohesive and extensible
 		InputStream inStream = null;
 		OutputStream outStream = null;
 		
@@ -50,7 +47,7 @@ public class ConnectionHandler implements Runnable {
 		catch(Exception e) {
 			// Cannot do anything if we have exception reading input or output stream
 			// May be have text to log this for further analysis?
-			e.printStackTrace();
+			SwsLogger.errorLogger.error(e.getMessage());
 			return;
 		}
 		
@@ -67,13 +64,15 @@ public class ConnectionHandler implements Runnable {
 			// We know only two kind of exception is possible inside fromInputStream
 			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
 			int status = pe.getStatus();
-			if(status == Protocol.BAD_REQUEST_CODE) {
+			if (status == Protocol.BAD_REQUEST_CODE) {
 				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 			}
-			// TODO: Handle version not supported code as well
+			else if (status == Protocol.NOT_SUPPORTED_CODE) {
+				response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
+			}
 		}
 		catch(Exception e) {
-			e.printStackTrace();
+			SwsLogger.errorLogger.error(e.getMessage());
 			// For any other error, we will create bad request response as well
 			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 		}
@@ -86,7 +85,7 @@ public class ConnectionHandler implements Runnable {
 			}
 			catch(Exception e){
 				// We will ignore this exception
-				e.printStackTrace();
+				SwsLogger.errorLogger.error(e.getMessage());
 			}
 
 			return;
@@ -96,55 +95,21 @@ public class ConnectionHandler implements Runnable {
 		try {
 			// Fill in the code to create a response for version mismatch.
 			// You may want to use constants such as Protocol.VERSION, Protocol.NOT_SUPPORTED_CODE, and more.
-			// You can check if the version matches as follows
-			if(!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
-				// Here you checked that the "Protocol.VERSION" string is not equal to the  
-				// "request.version" string ignoring the case of the letters in both strings
-				// TODO: Fill in the rest of the code here
-			}
-			else if(request.getMethod().equalsIgnoreCase(Protocol.GET)) {
-//				Map<String, String> header = request.getHeader();
-//				String date = header.get("if-modified-since");
-//				String hostName = header.get("host");
-//				
-				// Handling GET request here
-				// Get relative URI path from request
-				String uri = request.getUri();
-				// Combine them together to form absolute file path
-				File file = new File(this.rootDirectory + uri);
-				// Check if the file exists
-				if(file.exists()) {
-					if(file.isDirectory()) {
-						// Look for default index.html file in a directory
-						String location = this.rootDirectory + uri + System.getProperty("file.separator") + Protocol.DEFAULT_FILE;
-						file = new File(location);
-						if(file.exists()) {
-							// Lets create 200 OK response
-							// TODO: this.requestHandlerFactoryMap.get(String type)
-							response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
-						}
-						else {
-							// File does not exist so lets create 404 file not found code
-							response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
-						}
-					}
-					else { // Its a file
-						// Lets create 200 OK response
-						response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
-					}
-				}
-				else {
-					// File does not exist so lets create 404 file not found code
-					response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
-				}
-			}
+                // You can check if the version matches as follows
+                if(!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
+                    HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+                }
+                IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
+                if(factory == null){
+                    response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
+                }
+                else{
+                response = factory.getRequestHandler().handleRequest(request);
+            }
 		}
 		catch(Exception e) {
-			e.printStackTrace();
-		}
-		
-
-		// TODO: So far response could be null for protocol version mismatch.
+            SwsLogger.errorLogger.error(e.getMessage());
+        }
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if(response == null) {
@@ -159,7 +124,7 @@ public class ConnectionHandler implements Runnable {
 		}
 		catch(Exception e){
 			// We will ignore this exception
-			e.printStackTrace();
+			SwsLogger.errorLogger.error(e.getMessage());
 		} 
 	}
 }
