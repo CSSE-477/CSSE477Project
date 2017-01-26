@@ -41,6 +41,8 @@ public class Protocol {
     public static final String GET = "GET";
     public static final String HEAD = "HEAD";
     public static final String POST = "POST";
+    public static final String PUT = "PUT";
+    public static final String DELETE = "DELETE";
     
     // Some useful http codes and text
     public static final int OK_CODE = 200;

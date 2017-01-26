@@ -79,7 +79,7 @@ jacocoTestReport {
 
 test {
 	filter {
-		includeTestsMatching "*.SuiteRunner"
+		includeTestsMatching "*MasterSuite"
 	}
 	jacoco {
 		append = false

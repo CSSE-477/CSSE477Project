@@ -1,8 +1,10 @@
 package app;
 
+import handlers.DeleteRequestHandlerFactory;
 import handlers.GetRequestHandlerFactory;
 import handlers.HeadRequestHandlerFactory;
 import handlers.PostRequestHandlerFactory;
+import handlers.PutRequestHandlerFactory;
 import protocol.Protocol;
 import server.Server;
 import handlers.IRequestHandlerFactory;
@@ -42,9 +44,11 @@ public class SimpleWebServer {
 	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(String rootDirectory){
 		// Add factories to the map or create them in-line if that is preferable, then return below
 		HashMap<String, IRequestHandlerFactory> factoryMap = new HashMap<>();
-		factoryMap.put(Protocol.POST, new PostRequestHandlerFactory(rootDirectory));
 		factoryMap.put(Protocol.GET, new GetRequestHandlerFactory(rootDirectory));
 		factoryMap.put(Protocol.HEAD, new HeadRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.POST, new PostRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.PUT, new PutRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.DELETE, new DeleteRequestHandlerFactory(rootDirectory));
 		return factoryMap;
 	}
 }
