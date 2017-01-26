@@ -16,12 +16,9 @@ public class ServerProperties {
 			
 			// file not found
 			if (inputStream == null) {
-				throw new Exception();
+				throw new FileNotFoundException("property file '" + propertiesFileName + "' not found");
 			}
-
 			props.load(inputStream);
-		} catch (Exception e) {
-			throw new FileNotFoundException("property file '" + propertiesFileName + "' not found");
 		} finally {
 			if (inputStream != null) {
 				inputStream.close();
