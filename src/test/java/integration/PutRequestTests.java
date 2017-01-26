@@ -1,11 +1,12 @@
 package integration;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
-import app.SimpleWebServer;
-import protocol.Protocol;
+import java.io.File;
+import java.io.FileWriter;
+import java.net.InetAddress;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -22,13 +23,8 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
+import app.SimpleWebServer;
 import server.Server;
-import utils.FileCreationUtility;
-
-import java.io.File;
-import java.io.FileWriter;
-import java.net.InetAddress;
-import java.util.HashMap;
 
 public class PutRequestTests {
 	private static Server server;
@@ -139,5 +135,10 @@ public class PutRequestTests {
 	@AfterClass
 	public static void tearDownAfterClass() {
 		server.stop();
+		
+		File testFile = new File(rootDirectory, fileName);
+		if (testFile.exists()) {
+			testFile.delete();
+		}
 	}
 }
