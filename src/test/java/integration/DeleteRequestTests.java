@@ -57,7 +57,7 @@ import server.Server;
  * 
  * @author Jesse Shellabarger
  */
-public class DeleteRequestTest {
+public class DeleteRequestTests {
 
 	private static Server server;
 	private static File testFile;

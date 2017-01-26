@@ -40,6 +40,7 @@ public class Protocol {
     public static final String VERSION = "HTTP/1.1";
     public static final String GET = "GET";
     public static final String POST = "POST";
+    public static final String PUT = "PUT";
     public static final String DELETE = "DELETE";
     
     // Some useful http codes and text
