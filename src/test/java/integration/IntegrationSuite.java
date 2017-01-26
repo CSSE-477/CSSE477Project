@@ -11,20 +11,13 @@ import org.junit.BeforeClass;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 
-import unit.GMTConversionTest;
-import unit.HttpRequestTest;
-import unit.HttpResponseFactoryTest;
-import unit.HttpResponseTest;
-import unit.ServerPropertiesTest;
-import unit.ServerTest;
-import utils.FileCreationUtility;
-
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
 	GetRequestTests.class,
 	PutRequestTests.class,
 	DeleteRequestTests.class,
-	PostRequestTests.class
+	PostRequestTests.class,
+	HeadRequestTests.class
 })
 public class IntegrationSuite {
 

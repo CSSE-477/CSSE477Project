@@ -61,7 +61,6 @@ public class GetRequestTests {
 	@SuppressWarnings("Duplicates")
 	@Test
 	public void testGet404NotFound() throws Exception {
-	    System.out.println(InetAddress.getLocalHost().getHostName());
 		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/notFound.txt");
 		HttpRequest request = requestFactory.buildGetRequest(url);
 
@@ -80,6 +79,17 @@ public class GetRequestTests {
 	@Test
 	public void testGet200OkResponse() throws Exception {
 		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + fileName);
+		HttpRequest request = requestFactory.buildGetRequest(url);
+		
+		HttpResponse response = request.execute();
+		int expected = 200;
+		int actual = response.getStatusCode();
+		assertEquals(expected, actual);
+	}
+
+	@Test
+	public void testGet200OkResponseDefaultFile() throws Exception {
+		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/");
 		HttpRequest request = requestFactory.buildGetRequest(url);
 		
 		HttpResponse response = request.execute();
@@ -123,6 +133,26 @@ public class GetRequestTests {
         objectGotten.delete();
     }
 
+	@Test
+	public void testGet404NotFoundResponseEmptyDirectory() throws Exception {
+		String emptyDir = "emptyGetDir";
+		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + emptyDir);
+		HttpRequest request = requestFactory.buildGetRequest(url);
+
+		File f = new File("web", emptyDir);
+		f.mkdir();
+
+		try {
+			request.execute();
+		} catch (HttpResponseException e) {
+			int expected = 404;
+			int actual = e.getStatusCode();
+			assertEquals(expected, actual);
+		} finally {
+			f.delete();
+		}
+	}
+	
 	@AfterClass
 	public static void tearDownAfterClass() {
 		server.stop();
