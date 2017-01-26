@@ -25,7 +25,7 @@
  * NY 13699-5722
  * http://clarkson.edu/~rupakhcr
  */
- 
+
 package handlers;
 
 import java.io.File;
@@ -36,7 +36,6 @@ import protocol.HttpResponseFactory;
 import protocol.Protocol;
 import utils.SwsLogger;
 
-
 /**
  * 
  * @author Jesse Shellabarger
@@ -45,11 +44,13 @@ public class DeleteRequestHandler implements IRequestHandler {
 
 	private String rootDirectory;
 
-    public DeleteRequestHandler(String rootDirectory) {
-        this.rootDirectory = rootDirectory;
-    }
+	public DeleteRequestHandler(String rootDirectory) {
+		this.rootDirectory = rootDirectory;
+	}
 
-	/* (non-Javadoc)
+	/*
+	 * (non-Javadoc)
+	 * 
 	 * @see handlers.IRequestHandler#handleRequest(protocol.HttpRequest)
 	 */
 	@Override
@@ -58,10 +59,12 @@ public class DeleteRequestHandler implements IRequestHandler {
 		File file = new File(this.rootDirectory + uri);
 		if (file.exists()) {
 			file.delete();
-			SwsLogger.accessLogger.info("Deleted file " + file.getAbsolutePath() + ". Sending 200 OK");
+			SwsLogger.accessLogger
+					.info(this.getClass().getName() + ": Deleted file " + file.getAbsolutePath() + ". Sending 200 OK");
 			return HttpResponseFactory.create200OK(file, Protocol.CLOSE);
 		}
-		SwsLogger.accessLogger.info("Could not delete file " + file.getAbsolutePath() + ". Sending 404 Not Found");
+		SwsLogger.accessLogger.info(this.getClass().getName() + ": Could not delete file " + file.getAbsolutePath()
+				+ ". Sending 404 Not Found");
 		return HttpResponseFactory.create404NotFound(Protocol.CLOSE);
 	}
 
