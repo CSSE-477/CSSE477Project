@@ -21,12 +21,6 @@ import utils.FileCreationUtility;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	ServerTest.class,
-	HttpRequestTest.class,
-	HttpResponseTest.class,
-	HttpResponseFactoryTest.class,
-	GMTConversionTest.class,
-	ServerPropertiesTest.class,
 	GetRequestTests.class,
 	PutRequestTests.class,
 	DeleteRequestTests.class,
