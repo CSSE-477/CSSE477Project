@@ -28,7 +28,8 @@ import utils.FileCreationUtility;
 	GMTConversionTest.class,
 	ServerPropertiesTest.class,
 	GetRequestTests.class,
-	PutRequestTests.class
+	PutRequestTests.class,
+	DeleteRequestTests.class
 })
 public class SuiteRunner {
 
