@@ -24,7 +24,6 @@ import utils.FileCreationUtility;
 
 import java.io.File;
 import java.net.InetAddress;
-import java.util.HashMap;
 
 public class GetRequestTests {
 	private static Server server;
