@@ -60,10 +60,10 @@ public class DeleteRequestHandler implements IRequestHandler {
 		if (file.exists()) {
 			file.delete();
 			SwsLogger.accessLogger
-					.info(this.getClass().getName() + ": Deleted file " + file.getAbsolutePath() + ". Sending 200 OK");
+					.info("Deleted file " + file.getAbsolutePath() + ". Sending 200 OK");
 			return HttpResponseFactory.create200OK(file, Protocol.CLOSE);
 		}
-		SwsLogger.accessLogger.info(this.getClass().getName() + ": Could not delete file " + file.getAbsolutePath()
+		SwsLogger.accessLogger.info("Could not delete file " + file.getAbsolutePath()
 				+ ". Sending 404 Not Found");
 		return HttpResponseFactory.create404NotFound(Protocol.CLOSE);
 	}
