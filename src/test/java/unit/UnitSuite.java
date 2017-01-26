@@ -19,7 +19,7 @@ import org.junit.runners.Suite;
         ServerPropertiesTest.class,
         ServerTest.class
 })
-public class UnitTestSuite {
+public class UnitSuite {
 
     @BeforeClass
     public static void setUp() throws IOException {
