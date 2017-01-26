@@ -30,7 +30,7 @@ package handlers;
 
 /**
  * 
- * @author Chandan R. Rupakheti (rupakhcr@clarkson.edu)
+ * @author Jesse Shellabarger
  */
 public class DeleteRequestHandlerFactory implements IRequestHandlerFactory {
 

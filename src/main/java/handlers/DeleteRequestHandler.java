@@ -37,7 +37,7 @@ import protocol.Protocol;
 
 /**
  * 
- * @author Chandan R. Rupakheti (rupakhcr@clarkson.edu)
+ * @author Jesse Shellabarger
  */
 public class DeleteRequestHandler implements IRequestHandler {
 
