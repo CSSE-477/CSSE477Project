@@ -29,13 +29,13 @@ import utils.FileCreationUtility;
 	ServerPropertiesTest.class,
 	GetRequestTests.class,
 	PutRequestTests.class,
-	DeleteRequestTests.class
+	DeleteRequestTests.class,
+	PostRequestTests.class
 })
 public class SuiteRunner {
 
     @BeforeClass
     public static void setUp() throws IOException {
-        FileCreationUtility.createResourceFile();
     }
 
     @AfterClass

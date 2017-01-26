@@ -1,6 +1,7 @@
 package utils;
 
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -10,18 +11,15 @@ import java.io.PrintWriter;
 public class FileCreationUtility {
 
     private static final String RESOURCE_DIR = "." + File.separator + "resource.files";
-    private static final String DEFAULT_RESOURCE_FILE_NAME = "resource";
     private static final String EXTENSION_SEP = ".";
-    private static final String ENCODING = "UTF-8";
-    public enum Extension { html }
+    public enum Extension { html, txt }
 
-    public static boolean createResourceFile() {
-        Extension extension = Extension.html;
+    public static boolean createResourceFile(String fileName, Extension extension) {
         File dir = new File(RESOURCE_DIR);
         if(!dir.exists()){
             dir.mkdir();
         }
-        File testFile = new File(createFilePath(DEFAULT_RESOURCE_FILE_NAME, extension));
+        File testFile = new File(createFilePath(fileName, extension));
         if(testFile.exists()) {
             testFile.delete();
         }
@@ -33,23 +31,18 @@ public class FileCreationUtility {
         return true;
     }
 
-    /*
-    public static boolean removeResourceFile() {
-        String resourceName = DEFAULT_RESOURCE_FILE_NAME;
-        Extension extension = Extension.html;
-        File f = new File(createURI(resourceName, extension));
-        if(f.exists()) {
+    public static boolean removeResourceFile(String fileName, Extension extension) {
+        File f = new File(createFilePath(fileName, extension));
+        if (f.exists()) {
             f.delete();
         }
         return true;
     }
-    */
 
-    public static boolean writeToTestFile(String toWrite) {
-        Extension extension = Extension.html;
+    public static boolean writeToTestFile(String toWrite, boolean overwrite, String fileName, Extension extension) {
         try{
-            PrintWriter writer = new PrintWriter(createFilePath(DEFAULT_RESOURCE_FILE_NAME, extension), ENCODING);
-            writer.println(toWrite);
+            FileWriter writer = new FileWriter(createFilePath(fileName, extension), overwrite);
+            writer.write(toWrite, 0, toWrite.length());
             writer.close();
         } catch (IOException e) {
             return false;
@@ -74,6 +67,14 @@ public class FileCreationUtility {
             }
         }
         return dir.delete();
+    }
+
+    public static File retrieveTestFile(String fileName, Extension extension) {
+        File testFile = new File(createFilePath(fileName, extension));
+        if(!testFile.exists() || !testFile.isFile()){
+            return null;
+        }
+        return testFile;
     }
 
     private static String createFilePath(String resourceName, Extension extension) {

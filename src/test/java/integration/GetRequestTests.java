@@ -3,7 +3,6 @@ package integration;
 import static org.junit.Assert.*;
 
 import app.SimpleWebServer;
-import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -20,9 +19,10 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
 import server.Server;
-import utils.FileCreationUtility;
 
 import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.net.InetAddress;
 
 public class GetRequestTests {
@@ -58,12 +58,16 @@ public class GetRequestTests {
 	    requestFactory = HTTP_TRANSPORT.createRequestFactory(request -> request.setParser(new JsonObjectParser(JSON_FACTORY)));
 	}
 
+	@SuppressWarnings("Duplicates")
 	@Test
 	public void testGet404NotFound() throws Exception {
 	    System.out.println(InetAddress.getLocalHost().getHostName());
 		GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/notFound.txt");
 		HttpRequest request = requestFactory.buildGetRequest(url);
-		
+
+		/*
+		EXTRACT IF POSSIBLE - BUT NOT A CRITICAL DUPLICATION
+		 */
 		try {
 			request.execute();
 		} catch (HttpResponseException e) {
@@ -86,19 +90,37 @@ public class GetRequestTests {
 
 	@Test
     public void testGet200AndCorrectObjectResponse() throws Exception {
-	    GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + "upload.html");
-	    HttpRequest request = requestFactory.buildGetRequest(url);
+        String fullPath = "./web/test.html";
+        String previousContent = "Previous Content.";
+        File fileBeforeCall = new File(fullPath);
+        if(fileBeforeCall.exists()){
+            fileBeforeCall.delete();
+        }
+        fileBeforeCall.createNewFile();
+        try{
+            FileWriter writer = new FileWriter(fullPath, true);
+            writer.write(previousContent, 0, previousContent.length());
+            writer.close();
+        } catch (IOException e) {
+            assertTrue(false);
+        }
+	    GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + "test.html");
+        HttpRequest request = requestFactory.buildGetRequest(url);
         HttpResponse response = request.execute();
+
         int expected = 200;
         int actual = response.getStatusCode();
+
         assertEquals(expected, actual);
-        byte[] bytes = new byte[512];
-        // response.getContent().read(bytes, 0, 512);
-        FileCreationUtility.writeToTestFile(new String(bytes, "UTF-8"));
-        File file1 = new File("file1.txt");
-        File file2 = new File("file2.txt");
-        boolean isTwoEqual = FileUtils.contentEquals(file1, file2);
-        assertTrue(isTwoEqual);
+        String actualContent = previousContent;
+        byte[] responseContentByteArray = new byte[Math.toIntExact(response.getHeaders().getContentLength())];
+        response.getContent().read(responseContentByteArray);
+        assertTrue(actualContent.equals(new String(responseContentByteArray)));
+
+        File objectGotten = new File("./web/test.html");
+        assertTrue(objectGotten.exists());
+        assertTrue(objectGotten.isFile());
+        objectGotten.delete();
     }
 
 	@AfterClass
