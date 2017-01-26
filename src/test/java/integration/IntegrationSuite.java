@@ -13,11 +13,11 @@ import org.junit.runners.Suite;
 
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
-	HeadRequestTests.class,
 	GetRequestTests.class,
 	PutRequestTests.class,
 	DeleteRequestTests.class,
-	PostRequestTests.class
+	PostRequestTests.class,
+	HeadRequestTests.class
 })
 public class IntegrationSuite {
 
