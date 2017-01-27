@@ -46,7 +46,7 @@ public class ConnectionHandler implements Runnable {
 			// Cannot do anything if we have exception reading input or output
 			// stream
 			// May be have text to log this for further analysis?
-			SwsLogger.errorLogger.error(e.getMessage());
+			SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
 			return;
 		}
 
@@ -56,7 +56,6 @@ public class ConnectionHandler implements Runnable {
 		HttpResponse response = null;
 		try {
 			request = HttpRequest.read(inStream);
-			System.out.println(request);
 		} catch (ProtocolException pe) {
 			// We have some sort of protocol exception. Get its status code and
 			// create response
@@ -65,12 +64,14 @@ public class ConnectionHandler implements Runnable {
 			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
 			int status = pe.getStatus();
 			if (status == Protocol.BAD_REQUEST_CODE) {
+				SwsLogger.accessLogger.info("Bad HTTP request received. Sending 400 Bad Request.");
 				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 			} else if (status == Protocol.NOT_SUPPORTED_CODE) {
+				SwsLogger.accessLogger.info("Unsupported HTTP request received. Sending 505 Not Supported.");
 				response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
 			}
 		} catch (Exception e) {
-			SwsLogger.errorLogger.error(e.getMessage());
+			SwsLogger.errorLogger.error("Exception occured while trying to read HTTP request!\n" + e.toString());
 			// For any other error, we will create bad request response as well
 			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 		}
@@ -83,7 +84,7 @@ public class ConnectionHandler implements Runnable {
 				// System.out.println(response);
 			} catch (Exception e) {
 				// We will ignore this exception
-				SwsLogger.errorLogger.error(e.getMessage());
+				SwsLogger.errorLogger.error("Exception occured while sending HTTP resonponse!\n" + e.toString());
 			}
 
 			return;
@@ -96,22 +97,24 @@ public class ConnectionHandler implements Runnable {
 			// Protocol.NOT_SUPPORTED_CODE, and more.
 			// You can check if the version matches as follows
 			if (!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
+				SwsLogger.accessLogger.info("HTTP request received with unsupported version. Sending 400 Bad Request.");
 				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 			} else {
 				IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
 				if (factory == null) {
+					SwsLogger.accessLogger.info("HTTP request received for unsupported method. Sending 501 Not Implemented.");
 					response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
 				} else {
 					response = factory.getRequestHandler().handleRequest(request);
 				}
 			}
 		} catch (Exception e) {
-			System.out.println("Here");
-			SwsLogger.errorLogger.error(e.getMessage());
+			SwsLogger.errorLogger.error(e.toString());
 		}
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if (response == null) {
+			SwsLogger.accessLogger.info("Null response created. Sending 400 Bad Request");
 			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
 		}
 
@@ -122,8 +125,7 @@ public class ConnectionHandler implements Runnable {
 			socket.close();
 		} catch (Exception e) {
 			// We will ignore this exception
-			System.out.println("Here2");
-			SwsLogger.errorLogger.error(e.getMessage());
+			SwsLogger.errorLogger.error("Error while writing to socket! \n" + e.toString());
 		}
 	}
 }
