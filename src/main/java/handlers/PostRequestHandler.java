@@ -27,14 +27,17 @@ public class PostRequestHandler implements IRequestHandler {
         String fullPath = this.rootDirectory.concat(fileRequested);
         File testFile = new File(fullPath);
         if(testFile.isDirectory()){
+            String errorMessage = "POST - Bad Request";
+            SwsLogger.errorLogger.error(errorMessage);
             return HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
         }
         if (!testFile.exists()) {
             try {
                 testFile.createNewFile();
             } catch (IOException e) {
-                SwsLogger.errorLogger.error(e.getStackTrace().toString());
-                return HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+                String errorMessage = "POST - I/O failed creating new file.";
+                SwsLogger.errorLogger.error(errorMessage);
+                return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
             }
         }
         FileWriter fw;
@@ -45,9 +48,12 @@ public class PostRequestHandler implements IRequestHandler {
             fw.write(new String(request.getBody()), 0, amount);
             fw.close();
         } catch (IOException e) {
-            SwsLogger.errorLogger.error(e.getMessage());
+            String errorMessage = "POST - I/O failed when writing and closing file.";
+            SwsLogger.errorLogger.error(errorMessage);
             return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
         }
+        String successMessage = "POST - sent successful 200 OK";
+        SwsLogger.accessLogger.info(successMessage);
         return HttpResponseFactory.create200OK(testFile, Protocol.CLOSE);
     }
 }

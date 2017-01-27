@@ -154,18 +154,19 @@ public class PostRequestTests {
 
     @Test
     public void testPost500InternalServerErrorFileLocked() throws Exception {
-        String fullPath = "./web/notFound.txt";
-        File fileBeforeCall = new File(fullPath);
-        if(fileBeforeCall.exists()){
-            fileBeforeCall.delete();
+        String fileName = "test.txt";
+        String rootDirectory = "./web";
+        File testFile = new File(fileName);
+        if(testFile.exists()){
+            testFile.delete();
         }
-        fileBeforeCall.createNewFile();
-        GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + "notFound.txt");
+        testFile.createNewFile();
+        GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + rootDirectory + "/" + fileName);
         String requestBody = "This is POST request content!";
         HttpRequest request = requestFactory.buildPostRequest(url, ByteArrayContent.fromString("text/plain", requestBody));
         request.getHeaders().setContentType("application/json");
 
-        File testFile = new File(fullPath);
+        testFile = new File(rootDirectory, fileName);
         testFile.setWritable(false);
 
         try {
@@ -174,10 +175,49 @@ public class PostRequestTests {
             int expectedCode = 500;
             int actualCode = e.getStatusCode();
             assertEquals(expectedCode, actualCode);
+            testFile.setWritable(true);
+            testFile.delete();
+            return;
         }
+        assertTrue(false);
+    }
 
-        testFile.setWritable(true);
-        testFile.delete();
+    @Test
+    public void testPost500InternalServerErrorDirectory() throws Exception {
+        String fileName = "file.txt";
+        String rootDirectory = "./web/test";
+        File testFile = new File(rootDirectory);
+        if(testFile.exists()){
+            testFile.delete();
+        }
+        testFile.mkdirs();
+        File testFile2 = new File(rootDirectory, fileName);
+        if(testFile2.exists()) {
+            testFile2.delete();
+        }
+        testFile2.createNewFile();
+        GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + rootDirectory + "/" + fileName);
+        String requestBody = "This is POST request content!";
+        HttpRequest request = requestFactory.buildPostRequest(url, ByteArrayContent.fromString("text/plain", requestBody));
+        request.getHeaders().setContentType("application/json");
+
+        testFile = new File(rootDirectory);
+
+        try {
+            request.execute();
+        } catch (HttpResponseException e) {
+            int expectedCode = 500;
+            int actualCode = e.getStatusCode();
+            assertEquals(expectedCode, actualCode);
+            if(testFile2.exists()) {
+                testFile2.delete();
+            }
+            if(testFile.exists()){
+                testFile.delete();
+            }
+            return;
+        }
+        assertTrue(false);
     }
 
     @AfterClass
