@@ -5,7 +5,6 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
-import java.util.HashMap;
 
 import app.SimpleWebServer;
 import org.junit.After;
