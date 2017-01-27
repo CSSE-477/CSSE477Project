@@ -27,28 +27,28 @@ public class PutRequestHandler implements IRequestHandler {
         String fullPath = this.rootDirectory.concat(fileRequested);
         File testFile = new File(fullPath);
         if(testFile.isDirectory()){
-        	System.out.println("Here");
+        	SwsLogger.errorLogger.error("PUT: Requested file is a directory, responding with 400 Bad Request.");
             return HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
         }
         if (!testFile.exists()) {
             try {
                 testFile.createNewFile();
             } catch (IOException e) {
-                SwsLogger.errorLogger.error(e.getStackTrace().toString());
+            	SwsLogger.errorLogger.error("PUT: IOException encountered while creating file, responding with 500 Internal Server Error.");
                 return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
             }
         }
         FileWriter fw;
         try {
             fw = new FileWriter(testFile, false);
-            System.out.println(request.getHeader());
             int amount = Integer.parseInt(request.getHeader().get(Protocol.CONTENT_LENGTH));
             fw.write(new String(request.getBody()), 0, amount);
             fw.close();
         } catch (IOException e) {
-            SwsLogger.errorLogger.error(e.getMessage());
+        	SwsLogger.errorLogger.error("PUT: IOException encountered while writing to file, responding with 500 Internal Server Error.");
             return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
         }
+    	SwsLogger.accessLogger.info("PUT: Executed succesfully, responding with 200 OK.");
         return HttpResponseFactory.create200OK(testFile, Protocol.CLOSE);
     }
 }
