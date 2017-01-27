@@ -35,7 +35,7 @@ public class PostRequestHandler implements IRequestHandler {
             try {
                 testFile.createNewFile();
             } catch (IOException e) {
-                String errorMessage = "POST - I/O failed creating new file.";
+                String errorMessage = "POST - I/O failed creating new file. " + testFile.getAbsolutePath();
                 SwsLogger.errorLogger.error(errorMessage);
                 return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
             }

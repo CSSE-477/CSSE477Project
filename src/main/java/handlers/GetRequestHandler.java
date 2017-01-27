@@ -24,7 +24,7 @@ public class GetRequestHandler implements IRequestHandler {
         HttpResponse response;
         String uri = request.getUri();
         File file = new File(this.rootDirectory.concat(uri));
-        
+
         if (!file.exists()) {
 			SwsLogger.errorLogger
 			.error("GET to file " + file.getAbsolutePath() + ". Sending 404 Not Found");
