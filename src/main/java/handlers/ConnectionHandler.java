@@ -91,26 +91,25 @@ public class ConnectionHandler implements Runnable {
 		}
 
 		// We reached here means no error so far, so lets process further
-		try {
-			// Fill in the code to create a response for version mismatch.
-			// You may want to use constants such as Protocol.VERSION,
-			// Protocol.NOT_SUPPORTED_CODE, and more.
-			// You can check if the version matches as follows
-			if (!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
-				SwsLogger.accessLogger.info("HTTP request received with unsupported version. Sending 400 Bad Request.");
-				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+
+		// Fill in the code to create a response for version mismatch.
+		// You may want to use constants such as Protocol.VERSION,
+		// Protocol.NOT_SUPPORTED_CODE, and more.
+		// You can check if the version matches as follows
+		if (!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
+			SwsLogger.accessLogger.info("HTTP request received with unsupported version. Sending 400 Bad Request.");
+			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+		} else {
+			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
+			if (factory == null) {
+				SwsLogger.accessLogger
+						.info("HTTP request received for unsupported method. Sending 501 Not Implemented.");
+				response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
 			} else {
-				IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
-				if (factory == null) {
-					SwsLogger.accessLogger.info("HTTP request received for unsupported method. Sending 501 Not Implemented.");
-					response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
-				} else {
-					response = factory.getRequestHandler().handleRequest(request);
-				}
+				response = factory.getRequestHandler().handleRequest(request);
 			}
-		} catch (Exception e) {
-			SwsLogger.errorLogger.error(e.toString());
 		}
+
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if (response == null) {
