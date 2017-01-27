@@ -3,21 +3,20 @@ package utils;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  * Created by TrottaSN on 1/19/2017.
  */
 public class FileCreationUtility {
 
-    private static final String RESOURCE_DIR = "." + File.separator + "resource.files";
+    private static final String RESOURCE_DIR = "." + File.separator + "src" + File.separator + "test" + File.separator + "resource" + File.separator + "files";
     private static final String EXTENSION_SEP = ".";
     public enum Extension { html, txt }
 
     public static boolean createResourceFile(String fileName, Extension extension) {
         File dir = new File(RESOURCE_DIR);
         if(!dir.exists()){
-            dir.mkdir();
+            dir.mkdirs();
         }
         File testFile = new File(createFilePath(fileName, extension));
         if(testFile.exists()) {

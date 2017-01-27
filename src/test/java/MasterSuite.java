@@ -26,7 +26,7 @@ public class MasterSuite {
 
     @AfterClass
     public static void tearDown() throws IOException {
-        FileCreationUtility.reclaimResourceDirectory();
+        // FileCreationUtility.reclaimResourceDirectory();
     }
 
 }
