@@ -156,7 +156,7 @@ public class PostRequestTests {
     public void testPost500InternalServerErrorFileLocked() throws Exception {
         String fileName = "test.txt";
         String rootDirectory = "./web";
-        File testFile = new File(fileName);
+        File testFile = new File(rootDirectory, fileName);
         if(testFile.exists()){
             testFile.delete();
         }
