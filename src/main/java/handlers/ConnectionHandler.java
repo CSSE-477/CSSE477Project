@@ -5,11 +5,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 
-import protocol.HttpRequest;
-import protocol.HttpResponse;
-import protocol.HttpResponseFactory;
-import protocol.Protocol;
-import protocol.ProtocolException;
+import protocol.*;
 import utils.SwsLogger;
 
 /**
@@ -63,17 +59,10 @@ public class ConnectionHandler implements Runnable {
 			// fromInputStream
 			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
 			int status = pe.getStatus();
-			if (status == Protocol.BAD_REQUEST_CODE) {
-				SwsLogger.accessLogger.info("Bad HTTP request received. Sending 400 Bad Request.");
-				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
-			} else if (status == Protocol.NOT_SUPPORTED_CODE) {
-				SwsLogger.accessLogger.info("Unsupported HTTP request received. Sending 505 Not Supported.");
-				response = HttpResponseFactory.create505NotSupported(Protocol.CLOSE);
-			}
+            response = (new HttpResponseBuilder(status, Protocol.CLOSE)).generateResponse();
 		} catch (Exception e) {
-			SwsLogger.errorLogger.error("Exception occured while trying to read HTTP request!\n" + e.toString());
 			// For any other error, we will create bad request response as well
-			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+            response = (new HttpResponseBuilder(400, Protocol.CLOSE)).generateResponse();
 		}
 
 		if (response != null) {
@@ -97,14 +86,11 @@ public class ConnectionHandler implements Runnable {
 		// Protocol.NOT_SUPPORTED_CODE, and more.
 		// You can check if the version matches as follows
 		if (!request.getVersion().equalsIgnoreCase(Protocol.VERSION)) {
-			SwsLogger.accessLogger.info("HTTP request received with unsupported version. Sending 400 Bad Request.");
-			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+			response = (new HttpResponseBuilder(400, Protocol.CLOSE)).generateResponse();
 		} else {
 			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
 			if (factory == null) {
-				SwsLogger.accessLogger
-						.info("HTTP request received for unsupported method. Sending 501 Not Implemented.");
-				response = HttpResponseFactory.create501NotImplemented(Protocol.CLOSE);
+                response = (new HttpResponseBuilder(501, Protocol.CLOSE)).generateResponse();
 			} else {
 				response = factory.getRequestHandler().handleRequest(request);
 			}
@@ -113,8 +99,7 @@ public class ConnectionHandler implements Runnable {
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if (response == null) {
-			SwsLogger.accessLogger.info("Null response created. Sending 400 Bad Request");
-			response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+            response = (new HttpResponseBuilder(400, Protocol.CLOSE)).generateResponse();
 		}
 
 		try {

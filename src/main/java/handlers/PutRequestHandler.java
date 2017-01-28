@@ -2,7 +2,7 @@ package handlers;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
-import protocol.HttpResponseFactory;
+import protocol.HttpResponseBuilder;
 import protocol.Protocol;
 import utils.SwsLogger;
 
@@ -27,15 +27,13 @@ public class PutRequestHandler implements IRequestHandler {
         String fullPath = this.rootDirectory.concat(fileRequested);
         File testFile = new File(fullPath);
         if(testFile.isDirectory()){
-        	SwsLogger.errorLogger.error("PUT: Requested file is a directory, responding with 400 Bad Request.");
-            return HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+            return (new HttpResponseBuilder(400, Protocol.CLOSE)).generateResponse();
         }
         if (!testFile.exists()) {
             try {
                 testFile.createNewFile();
             } catch (IOException e) {
-            	SwsLogger.errorLogger.error("PUT: IOException encountered while creating file, responding with 500 Internal Server Error.");
-                return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
+                return (new HttpResponseBuilder(500, Protocol.CLOSE)).generateResponse();
             }
         }
         FileWriter fw;
@@ -45,10 +43,9 @@ public class PutRequestHandler implements IRequestHandler {
             fw.write(new String(request.getBody()), 0, amount);
             fw.close();
         } catch (IOException e) {
-        	SwsLogger.errorLogger.error("PUT: IOException encountered while writing to file, responding with 500 Internal Server Error.");
-            return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
+            return (new HttpResponseBuilder(500, Protocol.CLOSE)).generateResponse();
         }
     	SwsLogger.accessLogger.info("PUT: Executed succesfully, responding with 200 OK.");
-        return HttpResponseFactory.create200OK(testFile, Protocol.CLOSE);
+        return (new HttpResponseBuilder(200, Protocol.CLOSE)).setFile(testFile).generateResponse();
     }
 }

@@ -2,7 +2,7 @@ package handlers;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
-import protocol.HttpResponseFactory;
+import protocol.HttpResponseBuilder;
 import protocol.Protocol;
 import utils.SwsLogger;
 
@@ -26,27 +26,19 @@ public class GetRequestHandler implements IRequestHandler {
         File file = new File(this.rootDirectory.concat(uri));
 
         if (!file.exists()) {
-			SwsLogger.errorLogger
-			.error("GET to file " + file.getAbsolutePath() + ". Sending 404 Not Found");
-        	response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+        	response = (new HttpResponseBuilder(404, Protocol.CLOSE)).generateResponse();
         } else if (file.isDirectory()) {
         	// check for default file before sending 404
             String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator")).concat(Protocol.DEFAULT_FILE);
             file = new File(location);
             if(file.exists()) {
-    			SwsLogger.accessLogger
-    			.info("GET to file " + file.getAbsolutePath() + ". Sending 200 OK");
-                response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
+                response = (new HttpResponseBuilder(200, Protocol.CLOSE)).setFile(file).generateResponse();
             }
             else {
-    			SwsLogger.errorLogger
-    			.error("GET to file " + file.getAbsolutePath() + ". Sending 404 Not Found");
-                response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+                response = (new HttpResponseBuilder(404, Protocol.CLOSE)).generateResponse();
             }
         } else {
-			SwsLogger.accessLogger
-			.info("GET to file " + file.getAbsolutePath() + ". Sending 200 OK");
-        	response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
+        	response = (new HttpResponseBuilder(400, Protocol.CLOSE)).setFile(file).generateResponse();
         }
 
         return response;

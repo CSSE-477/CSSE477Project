@@ -104,15 +104,6 @@ public class HttpResponse {
 	}
 
 	/**
-	 * Maps a key to value in the header map.
-	 * @param key A key, e.g. "Host"
-	 * @param value A value, e.g. "www.rose-hulman.edu"
-	 */
-	public void put(String key, String value) {
-		this.header.put(key, value);
-	}
-
-	/**
 	 * Writes the data of the http response object to the output stream.
 	 * 
 	 * @param outStream The output stream

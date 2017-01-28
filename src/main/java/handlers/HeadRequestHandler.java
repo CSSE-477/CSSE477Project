@@ -7,7 +7,7 @@ import org.apache.commons.io.FilenameUtils;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
-import protocol.HttpResponseFactory;
+import protocol.HttpResponseBuilder;
 import protocol.Protocol;
 import utils.SwsLogger;
 
@@ -31,9 +31,7 @@ public class HeadRequestHandler implements IRequestHandler {
 		File file = new File(fullPath);
 
 		if (!file.exists()) {
-			SwsLogger.errorLogger
-			.error("HEAD to file " + file.getAbsolutePath() + ". Sending 404 Not Found");
-			response = HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+			response = (new HttpResponseBuilder(404, Protocol.CLOSE)).generateResponse();
 		} else if (file.isDirectory()) {
 			// check for default file before sending 400
 			String location = fullPath.concat(System.getProperty("file.separator")).concat(Protocol.DEFAULT_FILE);
@@ -46,7 +44,7 @@ public class HeadRequestHandler implements IRequestHandler {
 			} else {
 				SwsLogger.errorLogger
 				.error("HEAD to file " + file.getAbsolutePath() + ". Sending 400 Bad Request");
-				response = HttpResponseFactory.create400BadRequest(Protocol.CLOSE);	
+				response = (new HttpResponseBuilder(400, Protocol.CLOSE)).generateResponse();
 			}
 		} else {
 			// file exists; return last modified, file size, file type
@@ -59,18 +57,10 @@ public class HeadRequestHandler implements IRequestHandler {
 	}
 	
 	private HttpResponse getHeadResponseFromFile(File file) {
-		HttpResponse response = HttpResponseFactory.create200OK(file, Protocol.CLOSE);
-
 		String lastModified = new Date(file.lastModified()).toString();
-		response.put("lastModified", lastModified);
-		
 		String fileSize = String.valueOf(file.length());
-		response.put("fileSize", fileSize);
-		
 		String fileType = FilenameUtils.getExtension(file.getAbsolutePath());
-		response.put("fileType", fileType);
-		
-		return response;
+		return (new HttpResponseBuilder(200, Protocol.CLOSE)).setFile(file).putHeader("lastModified", lastModified).putHeader("fileSize", fileSize).putHeader("fileType", fileType).generateResponse();
 	}
 
 }

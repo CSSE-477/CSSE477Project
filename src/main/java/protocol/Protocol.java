@@ -43,31 +43,6 @@ public class Protocol {
     public static final String POST = "POST";
     public static final String PUT = "PUT";
     public static final String DELETE = "DELETE";
-    
-    // Some useful http codes and text
-    public static final int OK_CODE = 200;
-    public static final String OK_TEXT = "OK";
-    
-    public static final int MOVED_PERMANENTLY_CODE = 301;
-    public static final String MOVED_PERMANENTLY_TEXT = "Moved Permanently";
-
-    public static final int NOT_MODIFIED_CODE = 304;
-    public static final String NOT_MODIFIED_TEXT = "Not Modified";
-    
-    public static final int BAD_REQUEST_CODE = 400;
-    public static final String BAD_REQUEST_TEXT = "Bad Request";
-    
-    public static final int NOT_FOUND_CODE = 404;
-    public static final String NOT_FOUND_TEXT = "Not Found";
-
-    public static final int INTERNAL_SERVER_ERROR_CODE = 500;
-    public static final String INTERNAL_SERVER_ERROR_TEXT = "Internal Server Error";
-
-    public static final int NOT_IMPLEMENTED_CODE = 501;
-    public static final String NOT_IMPLEMENTED_TEXT = "Not Implemented";
-    
-    public static final int NOT_SUPPORTED_CODE = 505;
-    public static final String NOT_SUPPORTED_TEXT = "HTTP Version Not Supported";
 
     // Some useful header elements in request
     public static final String HOST = "Host";

@@ -32,7 +32,7 @@ import java.io.File;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
-import protocol.HttpResponseFactory;
+import protocol.HttpResponseBuilder;
 import protocol.Protocol;
 import utils.SwsLogger;
 
@@ -59,13 +59,9 @@ public class DeleteRequestHandler implements IRequestHandler {
 		File file = new File(this.rootDirectory + uri);
 		if (file.exists()) {
 			file.delete();
-			SwsLogger.accessLogger
-					.info("Deleted file " + file.getAbsolutePath() + ". Sending 200 OK");
-			return HttpResponseFactory.create200OK(file, Protocol.CLOSE);
+			return (new HttpResponseBuilder(200, Protocol.CLOSE)).setFile(file).generateResponse();
 		}
-		SwsLogger.accessLogger.info("Could not delete file " + file.getAbsolutePath()
-				+ ". Sending 404 Not Found");
-		return HttpResponseFactory.create404NotFound(Protocol.CLOSE);
+		return (new HttpResponseBuilder(404, Protocol.CLOSE)).generateResponse();
 	}
 
 }

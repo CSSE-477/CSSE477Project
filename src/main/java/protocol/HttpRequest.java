@@ -22,7 +22,7 @@ public class HttpRequest {
 	private char[] body;
 	
 	private HttpRequest() {
-		this.header = new HashMap<String, String>();
+		this.header = new HashMap<>();
 		this.body = new char[0];
 	}
 	

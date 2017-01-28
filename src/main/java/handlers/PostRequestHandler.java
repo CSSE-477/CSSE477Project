@@ -2,7 +2,7 @@ package handlers;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
-import protocol.HttpResponseFactory;
+import protocol.HttpResponseBuilder;
 import protocol.Protocol;
 import utils.SwsLogger;
 
@@ -27,17 +27,13 @@ public class PostRequestHandler implements IRequestHandler {
         String fullPath = this.rootDirectory.concat(fileRequested);
         File testFile = new File(fullPath);
         if(testFile.isDirectory()){
-            String errorMessage = "POST - Bad Request";
-            SwsLogger.errorLogger.error(errorMessage);
-            return HttpResponseFactory.create400BadRequest(Protocol.CLOSE);
+            return (new HttpResponseBuilder(400, Protocol.CLOSE)).generateResponse();
         }
         if (!testFile.exists()) {
             try {
                 testFile.createNewFile();
             } catch (IOException e) {
-                String errorMessage = "POST - I/O failed creating new file. " + testFile.getAbsolutePath();
-                SwsLogger.errorLogger.error(errorMessage);
-                return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
+                (new HttpResponseBuilder(500, Protocol.CLOSE)).generateResponse();
             }
         }
         FileWriter fw;
@@ -48,12 +44,8 @@ public class PostRequestHandler implements IRequestHandler {
             fw.write(new String(request.getBody()), 0, amount);
             fw.close();
         } catch (IOException e) {
-            String errorMessage = "POST - I/O failed when writing and closing file.";
-            SwsLogger.errorLogger.error(errorMessage);
-            return HttpResponseFactory.create500InternalServerError(Protocol.CLOSE);
+            (new HttpResponseBuilder(500, Protocol.CLOSE)).generateResponse();
         }
-        String successMessage = "POST - sent successful 200 OK";
-        SwsLogger.accessLogger.info(successMessage);
-        return HttpResponseFactory.create200OK(testFile, Protocol.CLOSE);
+        return (new HttpResponseBuilder(200, Protocol.CLOSE)).setFile(testFile).generateResponse();
     }
 }
