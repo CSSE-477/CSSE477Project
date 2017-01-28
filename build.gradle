@@ -170,6 +170,7 @@ task publishToWebServer(dependsOn: jar) << {
 			println "Starting YoloSwagWebServer service"
 			executeSudo('service webserver start', pty: true)
 
+			sleep(3 * 1000)
 			println "Running curl command to see if server is started"
 			executeSudo('/bin/bash /home/csse/e2e.sh', pty: true)
 			println("YoloSwagSWS has been deployed to " + System.getenv('SSH_HOST'))
