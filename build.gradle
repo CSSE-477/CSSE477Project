@@ -146,7 +146,7 @@ task publishToWebServer(dependsOn: jar) << {
 			result = execute('if test -d /var/www/html/YoloSwagSWS; then echo "exists"; fi')
 			if(result == "exists") {
 				println("Remote /var/www/html/YoloSwagSWS is being copied to /var/www/html/tmp for rollback...")
-				executeSudo('mkdir -p /var/www/html/tmp/YoloSwagSWScp /var/www/html/YoloSwagSWS/* /var/www/html/tmp/YoloSwagSWS', pty: true)
+				executeSudo('mkdir -p /var/www/html/tmp/YoloSwagSWS', pty: true)
 				executeSudo('cp /var/www/html/YoloSwagSWS/* /var/www/html/tmp/YoloSwagSWS', pty: true)
 				println("Remote /var/www/html/YoloSwagSWS copied!")
 
