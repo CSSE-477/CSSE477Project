@@ -160,12 +160,12 @@ task publishToWebServer(dependsOn: jar) << {
 			println "All done!" 
 
 			//sleep(3 * 1000)
-			//println "Stopping YoloSwagWebServer service"
-			//executeSudo('/etc/init.d/webserver stop')
+			println "Stopping YoloSwagWebServer service"
+			executeSudo('service webserver stop', pty: true)
 
 			//sleep(3 * 1000)
-			//println "Starting YoloSwagWebServer service"
-			//executeSudo('/etc/init.d/webserver start')
+			println "Starting YoloSwagWebServer service"
+			executeSudo('service webserver start', pty: true)
 			//println "Running curl command to see if server is started"
 
 			//sleep(3 * 1000)
