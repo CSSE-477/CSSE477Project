@@ -163,14 +163,14 @@ task publishToWebServer(dependsOn: jar) << {
 			println "Stopping YoloSwagWebServer service"
 			executeSudo('service webserver stop', pty: true)
 
-			//sleep(3 * 1000)
+			sleep(3 * 1000)
 			println "Starting YoloSwagWebServer service"
 			executeSudo('service webserver start', pty: true)
 			//println "Running curl command to see if server is started"
 
 			//sleep(3 * 1000)
 			//execute('curl localhost:8080')
-			println "YoloSwagSWS has been deployed to http://477-06.csse.rose-hulman.edu/YoloSwagSWS/"
+			println("YoloSwagSWS has been deployed to " + System.getenv('SSH_HOST'))
 		}
 	}
 }
