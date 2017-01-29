@@ -21,6 +21,7 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
 import app.SimpleWebServer;
+import protocol.ProtocolConfiguration;
 import server.Server;
 
 public class HeadRequestTests {
@@ -38,7 +39,8 @@ public class HeadRequestTests {
 		fileName = "index.html";
 		String rootDirectory = "web";
 		port = 8080;
-		server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory));
+		ProtocolConfiguration protocol = SimpleWebServer.getProtocolConfiguration();
+		server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory, protocol), protocol);
 		Thread runner = new Thread(server);
 		runner.start();
 

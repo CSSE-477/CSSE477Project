@@ -35,12 +35,13 @@ import java.util.Map;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class HttpResponse {
-	private String version;
+
+    private String version;
 	private int status;
 	private String phrase;
 	private Map<String, String> header;
 	private File file;
-
+	private ProtocolConfiguration protocol;
 	
 	/**
 	 * Constructs a HttpResponse object using supplied parameter
@@ -51,12 +52,13 @@ public class HttpResponse {
 	 * @param header The header field map.
 	 * @param file The file to be sent.
 	 */
-	public HttpResponse(String version, int status, String phrase, Map<String, String> header, File file) {
+	public HttpResponse(String version, int status, String phrase, Map<String, String> header, File file, ProtocolConfiguration protocol) {
 		this.version = version;
 		this.status = status;
 		this.phrase = phrase;
 		this.header = header;
 		this.file = file;
+		this.protocol = protocol;
 	}
 
 	/**
@@ -110,10 +112,14 @@ public class HttpResponse {
 	 * @throws Exception
 	 */
 	public void write(OutputStream outStream) throws Exception {
-		BufferedOutputStream out = new BufferedOutputStream(outStream, Protocol.CHUNK_LENGTH);
+
+        int CHUNK_LENGTH = 4096;
+        int OK_CODE = 200;
+
+        BufferedOutputStream out = new BufferedOutputStream(outStream, CHUNK_LENGTH);
 
 		// First status line
-		String line = this.version + Protocol.SPACE + this.status + Protocol.SPACE + this.phrase + Protocol.CRLF;
+		String line = this.version + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE) + this.status + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE) + this.phrase + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.CR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF);
 		out.write(line.getBytes());
 		
 		// Write header fields if there is something to write in header field
@@ -123,21 +129,21 @@ public class HttpResponse {
 				String value = entry.getValue();
 
 				// Write each header field line
-				line = key + Protocol.SEPERATOR + Protocol.SPACE + value + Protocol.CRLF;
+				line = key + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SEPARATOR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE) + value + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.CR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF);
 				out.write(line.getBytes());
 			}
 		}
 
 		// Write a blank line
-		out.write(Protocol.CRLF.getBytes());
+		out.write(("" + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.CR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF)).getBytes());
 
 		// We are reading a file
-		if(this.getStatus() == Protocol.OK_CODE && file != null && file.exists()) {
+		if(this.getStatus() == OK_CODE && file != null && file.exists()) {
 			// Process text documents
 			FileInputStream fileInStream = new FileInputStream(file);
-			BufferedInputStream inStream = new BufferedInputStream(fileInStream, Protocol.CHUNK_LENGTH);
+			BufferedInputStream inStream = new BufferedInputStream(fileInStream, CHUNK_LENGTH);
 			
-			byte[] buffer = new byte[Protocol.CHUNK_LENGTH];
+			byte[] buffer = new byte[CHUNK_LENGTH];
 			int bytesRead = 0;
 			// While there is some bytes to read from file, read each chunk and send to the socket out stream
 			while((bytesRead = inStream.read(buffer)) != -1) {
@@ -156,21 +162,21 @@ public class HttpResponse {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("----------------------------------\n");
 		buffer.append(this.version);
-		buffer.append(Protocol.SPACE);
+		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
 		buffer.append(this.status);
-		buffer.append(Protocol.SPACE);
+		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
 		buffer.append(this.phrase);
-		buffer.append(Protocol.LF);
+		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
 		
 		for(Map.Entry<String, String> entry : this.header.entrySet()) {
 			buffer.append(entry.getKey());
-			buffer.append(Protocol.SEPERATOR);
-			buffer.append(Protocol.SPACE);
+			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SEPARATOR));
+			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
 			buffer.append(entry.getValue());
-			buffer.append(Protocol.LF);
+			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
 		}
 		
-		buffer.append(Protocol.LF);
+		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
 		if(file != null) {
 			buffer.append("Data: ");
 			buffer.append(this.file.getAbsolutePath());

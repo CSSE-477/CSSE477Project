@@ -28,6 +28,7 @@ import java.util.HashMap;
 
 import handlers.ConnectionHandler;
 import handlers.IRequestHandlerFactory;
+import protocol.ProtocolConfiguration;
 import utils.SwsLogger;
 
 
@@ -43,15 +44,17 @@ public class Server implements Runnable {
 	private ServerSocket welcomeSocket;
 	private boolean readyState;
 	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
+	private ProtocolConfiguration protocol;
 
 	/**
 	 * @param port
 	 */
-	public Server(int port, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
+	public Server(int port, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap, ProtocolConfiguration protocol) {
 		this.port = port;
 		this.stop = false;
 		this.readyState = false;
 		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
+		this.protocol = protocol;
 	}
 	
 	/**
@@ -76,7 +79,7 @@ public class Server implements Runnable {
                 }
 				
 				// Create a handler for this incoming connection and start the handler in a new thread
-				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.requestHandlerFactoryMap);
+				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.requestHandlerFactoryMap, this.protocol);
 				new Thread(handler).start();
 			}
 			this.welcomeSocket.close();

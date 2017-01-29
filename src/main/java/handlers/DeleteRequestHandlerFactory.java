@@ -28,6 +28,8 @@
  
 package handlers;
 
+import protocol.ProtocolConfiguration;
+
 /**
  * 
  * @author Jesse Shellabarger
@@ -35,9 +37,11 @@ package handlers;
 public class DeleteRequestHandlerFactory implements IRequestHandlerFactory {
 
 	private String rootDirectory;
+	private ProtocolConfiguration protocol;
 
-    public DeleteRequestHandlerFactory(String rootDirectory){
+    public DeleteRequestHandlerFactory(String rootDirectory, ProtocolConfiguration protocol){
         this.rootDirectory = rootDirectory;
+        this.protocol = protocol;
     }
 
 	/* (non-Javadoc)
@@ -45,7 +49,7 @@ public class DeleteRequestHandlerFactory implements IRequestHandlerFactory {
 	 */
     @Override
     public IRequestHandler getRequestHandler() {
-        return new DeleteRequestHandler(this.rootDirectory);
+        return new DeleteRequestHandler(this.rootDirectory, this.protocol);
     }
 
 }

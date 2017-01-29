@@ -15,15 +15,18 @@ import java.util.StringTokenizer;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class HttpRequest {
-	private String method;
+
+    private String method;
 	private String uri;
 	private String version;
 	private Map<String, String> header;
 	private char[] body;
+	private ProtocolConfiguration protocol;
 	
-	private HttpRequest() {
+	private HttpRequest(ProtocolConfiguration protocol) {
 		this.header = new HashMap<>();
 		this.body = new char[0];
+		this.protocol = protocol;
 	}
 	
 	/**
@@ -75,18 +78,20 @@ public class HttpRequest {
 	 * @throws Exception Throws either {@link ProtocolException} for bad request or 
 	 * {@link IOException} for socket input stream read errors.
 	 */
-	public static HttpRequest read(InputStream inputStream) throws Exception {
+	public static HttpRequest read(InputStream inputStream, ProtocolConfiguration protocol) throws Exception {
 		// We will fill this object with the data from input stream and return it
-		HttpRequest request = new HttpRequest();
+		HttpRequest request = new HttpRequest(protocol);
 		
 		InputStreamReader inStreamReader = new InputStreamReader(inputStream);
 		BufferedReader reader = new BufferedReader(inStreamReader);
 		
 		//First Request Line: GET /somedir/page.html HTTP/1.1
 		String line = reader.readLine(); // A line ends with either a \r, or a \n, or both
-		
-		if(line == null) {
-			throw new ProtocolException(Protocol.BAD_REQUEST_CODE, Protocol.BAD_REQUEST_TEXT);
+
+        int BAD_REQUEST_CODE = 400;
+        String BAD_REQUEST_TEXT = "Bad Request";
+        if(line == null) {
+			throw new ProtocolException(BAD_REQUEST_CODE, BAD_REQUEST_TEXT);
 		}
 		
 		// We will break this line using space as delimeter into three parts
@@ -94,7 +99,7 @@ public class HttpRequest {
 		
 		// Error checking the first line must have exactly three elements
 		if(tokenizer.countTokens() != 3) {
-			throw new ProtocolException(Protocol.BAD_REQUEST_CODE, Protocol.BAD_REQUEST_TEXT);
+			throw new ProtocolException(BAD_REQUEST_CODE, BAD_REQUEST_TEXT);
 		}
 		
 		request.method = tokenizer.nextToken();		// GET
@@ -149,7 +154,7 @@ public class HttpRequest {
 		
 		int contentLength = 0;
 		try {
-			contentLength = Integer.parseInt(request.header.get(Protocol.CONTENT_LENGTH));
+			contentLength = Integer.parseInt(request.header.get(protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_LENGTH)));
 		}
 		catch(Exception e){}
 		
@@ -167,18 +172,18 @@ public class HttpRequest {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("----------- Header ----------------\n");
 		buffer.append(this.method);
-		buffer.append(Protocol.SPACE);
+		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
 		buffer.append(this.uri);
-		buffer.append(Protocol.SPACE);
+		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
 		buffer.append(this.version);
-		buffer.append(Protocol.LF);
+		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
 		
 		for(Map.Entry<String, String> entry : this.header.entrySet()) {
 			buffer.append(entry.getKey());
-			buffer.append(Protocol.SEPERATOR);
-			buffer.append(Protocol.SPACE);
+			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SEPARATOR));
+			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
 			buffer.append(entry.getValue());
-			buffer.append(Protocol.LF);
+			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
 		}
 		buffer.append("------------- Body ---------------\n");
 		buffer.append(this.body);

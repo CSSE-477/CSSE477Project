@@ -10,6 +10,7 @@ import java.util.Map;
 
 /**
  * Created by TrottaSN on 1/27/2017.
+ *
  */
 public class HttpResponseBuilder {
 
@@ -21,9 +22,10 @@ public class HttpResponseBuilder {
     private String phrase;
     private Map<String, String> header;
     private File file;
+    private ProtocolConfiguration protocol;
 
     private HttpResponseBuilder(String version, int status, String phrase, Map<String, String> header, File file, String connection) {
-        // Some useful http codes and text
+
         this.defaultPhraseMap = new HashMap<>();
         this.defaultPhraseMap.put(200, "OK");
         this.defaultPhraseMap.put(301, "Moved Permanently");
@@ -35,7 +37,7 @@ public class HttpResponseBuilder {
         this.defaultPhraseMap.put(505, "HTTP Version Not Supported");
 
         if(version == null){
-            this.version = Protocol.VERSION;
+            this.version = this.protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.VERSION);
         }
         if(status == -1){
             this.status = DEFAULT_STATUS_CODE;
@@ -45,17 +47,17 @@ public class HttpResponseBuilder {
         }
         if(header == null){
             this.header = new HashMap<>();
-            this.header.put(Protocol.CONNECTION, connection);
+            this.header.put(this.protocol.getRequestHeader(ProtocolConfiguration.RequestHeaders.CONNECTION), connection);
 
             // Lets add current date
             Date date = Calendar.getInstance().getTime();
-            this.header.put(Protocol.DATE, date.toString());
+            this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.DATE), date.toString());
 
             // Lets add server info
-            this.header.put(Protocol.Server, Protocol.getServerInfo());
+            this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.SERVER), this.protocol.getServerInfo());
 
             // Lets add extra header with provider info
-            this.header.put(Protocol.PROVIDER, Protocol.AUTHOR);
+            this.header.put(this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.PROVIDER), this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.AUTHOR));
         }
         if(file == null) {
             this.file = null;
@@ -106,11 +108,11 @@ public class HttpResponseBuilder {
         // Lets add last modified date for the file
         long timeSinceEpoch = file.lastModified();
         Date modifiedTime = new Date(timeSinceEpoch);
-        this.header.put(Protocol.LAST_MODIFIED, modifiedTime.toString());
+        this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.LAST_MODIFIED), modifiedTime.toString());
 
         // Lets get content length in bytes
         long length = file.length();
-        this.header.put(Protocol.CONTENT_LENGTH, length + "");
+        this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_LENGTH), length + "");
 
         // Lets get MIME type for the file
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
@@ -119,13 +121,13 @@ public class HttpResponseBuilder {
         // So we will not add this field if we cannot figure out what a mime type is for the file.
         // Let browser do this job by itself.
         if(mime != null) {
-            this.header.put(Protocol.CONTENT_TYPE, mime);
+            this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), mime);
         }
         return this;
     }
 
     public HttpResponse generateResponse() {
-        HttpResponse response = new HttpResponse(this.version, this.status, this.phrase, this.header, this.file);
+        HttpResponse response = new HttpResponse(this.version, this.status, this.phrase, this.header, this.file, this.protocol);
         return response;
     }
 }

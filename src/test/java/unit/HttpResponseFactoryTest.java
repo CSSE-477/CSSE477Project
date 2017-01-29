@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import protocol.HttpResponse;
-import protocol.Protocol;
 
 public class HttpResponseFactoryTest {
 	private String connection;

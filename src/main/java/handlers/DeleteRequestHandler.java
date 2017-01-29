@@ -33,8 +33,7 @@ import java.io.File;
 import protocol.HttpRequest;
 import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
-import protocol.Protocol;
-import utils.SwsLogger;
+import protocol.ProtocolConfiguration;
 
 /**
  * 
@@ -43,9 +42,11 @@ import utils.SwsLogger;
 public class DeleteRequestHandler implements IRequestHandler {
 
 	private String rootDirectory;
+	private ProtocolConfiguration protocol;
 
-	public DeleteRequestHandler(String rootDirectory) {
+	public DeleteRequestHandler(String rootDirectory, ProtocolConfiguration protocol) {
 		this.rootDirectory = rootDirectory;
+		this.protocol = protocol;
 	}
 
 	/*
@@ -59,9 +60,9 @@ public class DeleteRequestHandler implements IRequestHandler {
 		File file = new File(this.rootDirectory + uri);
 		if (file.exists()) {
 			file.delete();
-			return (new HttpResponseBuilder(200, Protocol.CLOSE)).setFile(file).generateResponse();
+			return (new HttpResponseBuilder(200, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).setFile(file).generateResponse();
 		}
-		return (new HttpResponseBuilder(404, Protocol.CLOSE)).generateResponse();
+		return (new HttpResponseBuilder(404, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
 	}
 
 }
