@@ -28,15 +28,15 @@ public class PostRequestHandler implements IRequestHandler {
         String fileRequested = request.getUri();
         String fullPath = this.rootDirectory.concat(fileRequested);
         File testFile = new File(fullPath);
-        if(testFile.isDirectory()){
-            return (new HttpResponseBuilder(400, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
-        }
         if (!testFile.exists()) {
             try {
                 testFile.createNewFile();
             } catch (IOException e) {
-                (new HttpResponseBuilder(500, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+                return (new HttpResponseBuilder(500, this.protocol)).generateResponse();
             }
+        }
+        else if(testFile.isDirectory()){
+            return (new HttpResponseBuilder(400, this.protocol)).generateResponse();
         }
         FileWriter fw;
         try {
@@ -46,8 +46,8 @@ public class PostRequestHandler implements IRequestHandler {
             fw.write(new String(request.getBody()), 0, amount);
             fw.close();
         } catch (IOException e) {
-            (new HttpResponseBuilder(500, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+            return (new HttpResponseBuilder(500, this.protocol)).generateResponse();
         }
-        return (new HttpResponseBuilder(200, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).setFile(testFile).generateResponse();
+        return (new HttpResponseBuilder(200, this.protocol)).setFile(testFile).generateResponse();
     }
 }

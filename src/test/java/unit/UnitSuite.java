@@ -14,7 +14,7 @@ import org.junit.runners.Suite;
 @Suite.SuiteClasses({
         GMTConversionTest.class,
         HttpRequestTest.class,
-        HttpResponseFactoryTest.class,
+        HttpResponseBuilderTest.class,
         HttpResponseTest.class,
         ServerPropertiesTest.class,
         ServerTest.class

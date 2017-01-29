@@ -157,8 +157,8 @@ public class PostRequestTests {
     @Test
     public void testPost500InternalServerErrorFileLocked() throws Exception {
         String fileName = "test.txt";
-        String rootDirectory = "./web";
-        File testFile = new File(rootDirectory, fileName);
+        String rootDirectory = "web";
+        File testFile = new File("./".concat(rootDirectory), fileName);
         if(testFile.exists()){
             testFile.delete();
         }
@@ -185,20 +185,15 @@ public class PostRequestTests {
     }
 
     @Test
-    public void testPost500InternalServerErrorDirectory() throws Exception {
-        String fileName = "file.txt";
-        String rootDirectory = "./web/test";
-        File testFile = new File(rootDirectory);
+    public void testPost400InternalServerErrorDirectory() throws Exception {
+        String rootDirectory = "test";
+        File testFile = new File("./web".concat(rootDirectory));
         if(testFile.exists()){
             testFile.delete();
         }
+
         testFile.mkdirs();
-        File testFile2 = new File(rootDirectory, fileName);
-        if(testFile2.exists()) {
-            testFile2.delete();
-        }
-        testFile2.createNewFile();
-        GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + rootDirectory + "/" + fileName);
+        GenericUrl url = new GenericUrl("http://" + InetAddress.getLocalHost().getHostAddress() + ":" + port + "/" + rootDirectory);
         String requestBody = "This is POST request content!";
         HttpRequest request = requestFactory.buildPostRequest(url, ByteArrayContent.fromString("text/plain", requestBody));
         request.getHeaders().setContentType("application/json");
@@ -208,12 +203,9 @@ public class PostRequestTests {
         try {
             request.execute();
         } catch (HttpResponseException e) {
-            int expectedCode = 500;
+            int expectedCode = 400;
             int actualCode = e.getStatusCode();
             assertEquals(expectedCode, actualCode);
-            if(testFile2.exists()) {
-                testFile2.delete();
-            }
             if(testFile.exists()){
                 testFile.delete();
             }

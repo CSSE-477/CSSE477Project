@@ -61,10 +61,10 @@ public class ConnectionHandler implements Runnable {
 			// fromInputStream
 			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
 			int status = pe.getStatus();
-            response = (new HttpResponseBuilder(status, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE)).generateResponse());
+            response = (new HttpResponseBuilder(status, this.protocol)).generateResponse();
 		} catch (Exception e) {
 			// For any other error, we will create bad request response as well
-            response = (new HttpResponseBuilder(400, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+            response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
 		}
 
 		if (response != null) {
@@ -88,11 +88,11 @@ public class ConnectionHandler implements Runnable {
 		// Protocol.NOT_SUPPORTED_CODE, and more.
 		// You can check if the version matches as follows
 		if (!request.getVersion().equalsIgnoreCase(this.protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.VERSION))) {
-			response = (new HttpResponseBuilder(400, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+			response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
 		} else {
 			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
 			if (factory == null) {
-                response = (new HttpResponseBuilder(501, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+                response = (new HttpResponseBuilder(501, this.protocol)).generateResponse();
 			} else {
 				response = factory.getRequestHandler().handleRequest(request);
 			}
@@ -101,7 +101,7 @@ public class ConnectionHandler implements Runnable {
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if (response == null) {
-            response = (new HttpResponseBuilder(400, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+            response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
 		}
 
 		try {

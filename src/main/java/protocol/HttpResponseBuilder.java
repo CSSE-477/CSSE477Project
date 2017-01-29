@@ -16,7 +16,6 @@ public class HttpResponseBuilder {
 
     private static final int DEFAULT_STATUS_CODE = 500;
 
-    private HashMap<Integer, String> defaultPhraseMap;
     private String version;
     private int status;
     private String phrase;
@@ -24,30 +23,31 @@ public class HttpResponseBuilder {
     private File file;
     private ProtocolConfiguration protocol;
 
-    private HttpResponseBuilder(String version, int status, String phrase, Map<String, String> header, File file, String connection) {
+    private HttpResponseBuilder(String version, int status, String phrase, Map<String, String> header, File file, ProtocolConfiguration protocol) {
 
-        this.defaultPhraseMap = new HashMap<>();
-        this.defaultPhraseMap.put(200, "OK");
-        this.defaultPhraseMap.put(301, "Moved Permanently");
-        this.defaultPhraseMap.put(304, "Not Modified");
-        this.defaultPhraseMap.put(400, "Bad Request");
-        this.defaultPhraseMap.put(404, "Not Found");
-        this.defaultPhraseMap.put(500, "Internal Server Error");
-        this.defaultPhraseMap.put(501, "Not Implemented");
-        this.defaultPhraseMap.put(505, "HTTP Version Not Supported");
+        this.protocol = protocol;
 
         if(version == null){
             this.version = this.protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.VERSION);
         }
+        else {
+            this.version = version;
+        }
         if(status == -1){
             this.status = DEFAULT_STATUS_CODE;
         }
+        else{
+            this.status = status;
+        }
         if(phrase == null){
-            this.phrase = this.defaultPhraseMap.get(this.status);
+            this.phrase = this.protocol.getPhrase(this.status);
+        }
+        else{
+            this.phrase = phrase;
         }
         if(header == null){
             this.header = new HashMap<>();
-            this.header.put(this.protocol.getRequestHeader(ProtocolConfiguration.RequestHeaders.CONNECTION), connection);
+            this.header.put(this.protocol.getRequestHeader(ProtocolConfiguration.RequestHeaders.CONNECTION), this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE));
 
             // Lets add current date
             Date date = Calendar.getInstance().getTime();
@@ -59,17 +59,18 @@ public class HttpResponseBuilder {
             // Lets add extra header with provider info
             this.header.put(this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.PROVIDER), this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.AUTHOR));
         }
-        if(file == null) {
-            this.file = null;
+        else{
+            this.header = header;
         }
+        this.file = file;
     }
 
-    public HttpResponseBuilder(String connection){
-        this(null, -1, null, null, null, connection);
+    public HttpResponseBuilder(ProtocolConfiguration protocol){
+        this(null, -1, null, null, null, protocol);
     }
 
-    public HttpResponseBuilder(int status, String connection){
-        this(null, status, null, null, null, connection);
+    public HttpResponseBuilder(int status, ProtocolConfiguration protocol){
+        this(null, status, null, null, null, protocol);
     }
 
     public HttpResponseBuilder setVersion(String version){
@@ -127,7 +128,6 @@ public class HttpResponseBuilder {
     }
 
     public HttpResponse generateResponse() {
-        HttpResponse response = new HttpResponse(this.version, this.status, this.phrase, this.header, this.file, this.protocol);
-        return response;
+        return new HttpResponse(this.version, this.status, this.phrase, this.header, this.file, this.protocol);
     }
 }

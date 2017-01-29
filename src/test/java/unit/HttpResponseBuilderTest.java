@@ -11,13 +11,16 @@ import org.junit.Before;
 import org.junit.Test;
 
 import protocol.HttpResponse;
+import protocol.HttpResponseBuilder;
+import protocol.ProtocolConfiguration;
 
-public class HttpResponseFactoryTest {
-	private String connection;
+public class HttpResponseBuilderTest {
+
+	private ProtocolConfiguration protocol;
 	
 	@Before
 	public void setUp() {
-		connection = Protocol.CLOSE;
+		this.protocol = new ProtocolConfiguration();
 	}
 	
 	@Test
@@ -32,17 +35,18 @@ public class HttpResponseFactoryTest {
 	    BufferedWriter out = new BufferedWriter(new FileWriter(temp));
 	    out.write("this is the file string");
 	    out.close();
-	    
-	    HttpResponse res = HttpResponseFactory.create200OK(temp, connection);
+
+	    HttpResponseBuilder builder = new HttpResponseBuilder(200, protocol).putHeader(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), "text/html").setFile(temp);
+	    HttpResponse res = builder.generateResponse();
 
 	    Map<String, String> header = res.getHeader();
-	    assertEquals("text/html", header.get(Protocol.CONTENT_TYPE));
+	    assertEquals("text/html", header.get(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE)));
 	    assertEquals(temp, res.getFile());
 
 		int actualStatus = res.getStatus();
-		int expectedStatus = Protocol.OK_CODE;
+		int expectedStatus = 200;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = Protocol.OK_TEXT;
+		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -50,12 +54,14 @@ public class HttpResponseFactoryTest {
 	
 	@Test
 	public void testCreate400BadRequest() {
-		HttpResponse res = HttpResponseFactory.create400BadRequest(connection);
+
+		HttpResponseBuilder builder = new HttpResponseBuilder(400, this.protocol);
+		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
-		int expectedStatus = Protocol.BAD_REQUEST_CODE;
+		int expectedStatus = 400;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = Protocol.BAD_REQUEST_TEXT;
+		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -63,12 +69,13 @@ public class HttpResponseFactoryTest {
 
 	@Test
 	public void testCreate404NotFound() {
-		HttpResponse res = HttpResponseFactory.create404NotFound(connection);
+		HttpResponseBuilder builder = new HttpResponseBuilder(404, this.protocol);
+		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
-		int expectedStatus = Protocol.NOT_FOUND_CODE;
+		int expectedStatus = 404;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = Protocol.NOT_FOUND_TEXT;
+		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -76,12 +83,12 @@ public class HttpResponseFactoryTest {
 	
 	@Test
 	public void testCreate505NotSupported() {
-		HttpResponse res = HttpResponseFactory.create505NotSupported(connection);
-
+		HttpResponseBuilder builder = new HttpResponseBuilder(505, this.protocol);
+		HttpResponse res = builder.generateResponse();
 		int actualStatus = res.getStatus();
-		int expectedStatus = Protocol.NOT_SUPPORTED_CODE;
+		int expectedStatus = 505;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = Protocol.NOT_SUPPORTED_TEXT;
+		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -89,12 +96,13 @@ public class HttpResponseFactoryTest {
 	
 	@Test
 	public void testCreate304NotModified() {
-		HttpResponse res = HttpResponseFactory.create304NotModified(connection);
+		HttpResponseBuilder builder = new HttpResponseBuilder(304, this.protocol);
+		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
-		int expectedStatus = Protocol.NOT_MODIFIED_CODE;
+		int expectedStatus = 304;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = Protocol.NOT_MODIFIED_TEXT;
+		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -102,12 +110,13 @@ public class HttpResponseFactoryTest {
 
 	@Test
 	public void testCreate500InternalServerError() {
-		HttpResponse res = HttpResponseFactory.create500InternalServerError(connection);
+		HttpResponseBuilder builder = new HttpResponseBuilder(500, this.protocol);
+		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
-		int expectedStatus = Protocol.INTERNAL_SERVER_ERROR_CODE;
+		int expectedStatus = 500;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = Protocol.INTERNAL_SERVER_ERROR_TEXT;
+		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -115,12 +124,13 @@ public class HttpResponseFactoryTest {
 
 	@Test
 	public void testCreate501NotImplemented() {
-		HttpResponse res = HttpResponseFactory.create501NotImplemented(connection);
+		HttpResponseBuilder builder = new HttpResponseBuilder(501, this.protocol);
+		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
-		int expectedStatus = Protocol.NOT_IMPLEMENTED_CODE;
+		int expectedStatus = 501;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = Protocol.NOT_IMPLEMENTED_TEXT;
+		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);

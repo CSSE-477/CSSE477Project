@@ -35,8 +35,19 @@ public class ProtocolConfiguration {
     private Map serverInfoMap;
     private Map protocolElementMap;
     private Map charsetConstantsMap;
+    private Map defaultPhraseMap;
 
     public ProtocolConfiguration() {
+
+        HashMap<Integer, String> defaultPhraseMap = new HashMap<>();
+        defaultPhraseMap.put(200, "OK");
+        defaultPhraseMap.put(301, "Moved Permanently");
+        defaultPhraseMap.put(304, "Not Modified");
+        defaultPhraseMap.put(400, "Bad Request");
+        defaultPhraseMap.put(404, "Not Found");
+        defaultPhraseMap.put(500, "Internal Server Error");
+        defaultPhraseMap.put(501, "Not Implemented");
+        defaultPhraseMap.put(505, "HTTP Version Not Supported");
 
         HashMap<CharsetConstants, Character> charsetConstantsMap = new HashMap<>();
         charsetConstantsMap.put(CharsetConstants.SPACE, ' ');
@@ -79,6 +90,7 @@ public class ProtocolConfiguration {
         this.serverInfoMap = Collections.unmodifiableMap(serverInfoMap);
         this.protocolElementMap = Collections.unmodifiableMap(protocolElementMap);
         this.charsetConstantsMap = Collections.unmodifiableMap(charsetConstantsMap);
+        this.defaultPhraseMap = Collections.unmodifiableMap(defaultPhraseMap);
     }
 
     public String getServerInfo(ServerInfoFields field){
@@ -95,6 +107,10 @@ public class ProtocolConfiguration {
 
     public String getProtocolElement(ProtocolElements element) {
         return (String)this.protocolElementMap.get(element);
+    }
+
+    public String getPhrase(Integer code) {
+        return (String)this.defaultPhraseMap.get(code);
     }
 
     public Character getCharsetConstant(CharsetConstants constant) {

@@ -34,7 +34,7 @@ public class HeadRequestHandler implements IRequestHandler {
 		File file = new File(fullPath);
 
 		if (!file.exists()) {
-			response = (new HttpResponseBuilder(404, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+			response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
 		} else if (file.isDirectory()) {
 			// check for default file before sending 400
 			String location = fullPath.concat(System.getProperty("file.separator")).concat(this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.DEFAULT_FILE));
@@ -47,7 +47,7 @@ public class HeadRequestHandler implements IRequestHandler {
 			} else {
 				SwsLogger.errorLogger
 				.error("HEAD to file " + file.getAbsolutePath() + ". Sending 400 Bad Request");
-				response = (new HttpResponseBuilder(400, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+				response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
 			}
 		} else {
 			// file exists; return last modified, file size, file type
@@ -63,7 +63,7 @@ public class HeadRequestHandler implements IRequestHandler {
 		String lastModified = new Date(file.lastModified()).toString();
 		String fileSize = String.valueOf(file.length());
 		String fileType = FilenameUtils.getExtension(file.getAbsolutePath());
-		return (new HttpResponseBuilder(200, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).setFile(file).putHeader("lastModified", lastModified).putHeader("fileSize", fileSize).putHeader("fileType", fileType).generateResponse();
+		return (new HttpResponseBuilder(200, this.protocol)).setFile(file).putHeader("lastModified", lastModified).putHeader("fileSize", fileSize).putHeader("fileType", fileType).generateResponse();
 	}
 
 }

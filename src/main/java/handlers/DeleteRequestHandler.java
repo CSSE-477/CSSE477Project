@@ -60,9 +60,9 @@ public class DeleteRequestHandler implements IRequestHandler {
 		File file = new File(this.rootDirectory + uri);
 		if (file.exists()) {
 			file.delete();
-			return (new HttpResponseBuilder(200, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).setFile(file).generateResponse();
+			return (new HttpResponseBuilder(200, this.protocol)).setFile(file).generateResponse();
 		}
-		return (new HttpResponseBuilder(404, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+		return (new HttpResponseBuilder(404, this.protocol)).generateResponse();
 	}
 
 }

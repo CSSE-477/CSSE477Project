@@ -28,19 +28,19 @@ public class GetRequestHandler implements IRequestHandler {
         File file = new File(this.rootDirectory.concat(uri));
 
         if (!file.exists()) {
-        	response = (new HttpResponseBuilder(404, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+        	response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
         } else if (file.isDirectory()) {
         	// check for default file before sending 404
             String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator")).concat(this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.DEFAULT_FILE));
             file = new File(location);
             if(file.exists()) {
-                response = (new HttpResponseBuilder(200, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).setFile(file).generateResponse();
+                response = (new HttpResponseBuilder(200, this.protocol)).putHeader(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), "text/html").setFile(file).generateResponse();
             }
             else {
-                response = (new HttpResponseBuilder(404, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).generateResponse();
+                response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
             }
         } else {
-        	response = (new HttpResponseBuilder(400, this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE))).setFile(file).generateResponse();
+            response = (new HttpResponseBuilder(200, this.protocol)).putHeader(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), "text/html").setFile(file).generateResponse();
         }
 
         return response;

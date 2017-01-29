@@ -11,6 +11,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import protocol.HttpResponse;
+import protocol.ProtocolConfiguration;
 
 public class HttpResponseTest {
 	private String version;
@@ -18,40 +19,42 @@ public class HttpResponseTest {
 	private String phrase;
 	private Map<String, String> header;
 	private File file;
+	private ProtocolConfiguration protocol;
 
 	@Before
 	public void setUp() {
-		version = "defaultVersion";
-		status = Protocol.OK_CODE;
-		phrase = "defaultPhrase";
+		this.protocol = new ProtocolConfiguration();
+		version = this.protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.VERSION);
+		status = 200;
+		phrase = this.protocol.getPhrase(this.status);
 		header = new HashMap<>();
 		file = null;
 	}
 
 	@Test
 	public void testGetVersion() {
-		version = "HTTP/1.1";
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		version = "someweirdversion";
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, protocol);
 		assertEquals(version, res.getVersion());
 	}
 	
 	@Test
 	public void testGetStatus() {
-		status = Protocol.NOT_FOUND_CODE;
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		status = 404;
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, protocol);
 		assertEquals(status, res.getStatus());
 	}
 	
 	@Test
 	public void testGetPhrase() {
 		phrase = "Bad Request";
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, protocol);
 		assertEquals(phrase, res.getPhrase());
 	}
 	
 	@Test
 	public void testGetFile() {
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, protocol);
 		assertEquals(file, res.getFile());
 	}
 	
@@ -61,18 +64,7 @@ public class HttpResponseTest {
 		String key = "helloWorld".toLowerCase();
 		header.put(key, value);
 
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
-		assertEquals(value, res.getHeader().get(key));
-	}
-	
-	@Test
-	public void testPutHeader() {
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
-		assertEquals(header, res.getHeader());
-		
-		String key = "key";
-		String value = "value";
-		res.put(key, value);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, protocol);
 		assertEquals(value, res.getHeader().get(key));
 	}
 	
@@ -83,7 +75,7 @@ public class HttpResponseTest {
 		String value = "testValue";
 		String key = "helloWorld".toLowerCase();
 		header.put(key, value);
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, protocol);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();		
 		String expected = version + " " + status + " " + phrase + "\r\n" +
