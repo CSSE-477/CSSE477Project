@@ -187,7 +187,7 @@ public class PostRequestTests {
     @Test
     public void testPost400InternalServerErrorDirectory() throws Exception {
         String rootDirectory = "test";
-        File testFile = new File("./web".concat(rootDirectory));
+        File testFile = new File("./web", rootDirectory);
         if(testFile.exists()){
             testFile.delete();
         }
@@ -198,17 +198,13 @@ public class PostRequestTests {
         HttpRequest request = requestFactory.buildPostRequest(url, ByteArrayContent.fromString("text/plain", requestBody));
         request.getHeaders().setContentType("application/json");
 
-        testFile = new File(rootDirectory);
-
         try {
             request.execute();
         } catch (HttpResponseException e) {
             int expectedCode = 400;
             int actualCode = e.getStatusCode();
             assertEquals(expectedCode, actualCode);
-            if(testFile.exists()){
-                testFile.delete();
-            }
+            testFile.delete();
             return;
         }
         assertTrue(false);
