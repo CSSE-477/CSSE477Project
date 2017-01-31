@@ -119,7 +119,10 @@ public class HttpResponse {
         BufferedOutputStream out = new BufferedOutputStream(outStream, CHUNK_LENGTH);
 
 		// First status line
-		String line = this.version + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE) + this.status + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE) + this.phrase + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.CR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF);
+		String line = this.version + this.protocol.getCharsetConstant(CharsetConstants.SPACE) +
+				this.status + this.protocol.getCharsetConstant(CharsetConstants.SPACE) + this.phrase +
+				this.protocol.getCharsetConstant(CharsetConstants.CR) +
+				this.protocol.getCharsetConstant(CharsetConstants.LF);
 		out.write(line.getBytes());
 		
 		// Write header fields if there is something to write in header field
@@ -129,13 +132,17 @@ public class HttpResponse {
 				String value = entry.getValue();
 
 				// Write each header field line
-				line = key + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SEPARATOR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE) + value + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.CR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF);
+				line = key + this.protocol.getCharsetConstant(CharsetConstants.SEPARATOR) +
+						this.protocol.getCharsetConstant(CharsetConstants.SPACE) + value +
+						this.protocol.getCharsetConstant(CharsetConstants.CR) +
+						this.protocol.getCharsetConstant(CharsetConstants.LF);
 				out.write(line.getBytes());
 			}
 		}
 
 		// Write a blank line
-		out.write(("" + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.CR) + this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF)).getBytes());
+		out.write(("" + this.protocol.getCharsetConstant(CharsetConstants.CR) +
+				this.protocol.getCharsetConstant(CharsetConstants.LF)).getBytes());
 
 		// We are reading a file
 		if(this.getStatus() == OK_CODE && file != null && file.exists()) {
@@ -162,21 +169,21 @@ public class HttpResponse {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("----------------------------------\n");
 		buffer.append(this.version);
-		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
+		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
 		buffer.append(this.status);
-		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
+		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
 		buffer.append(this.phrase);
-		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
+		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
 		
 		for(Map.Entry<String, String> entry : this.header.entrySet()) {
 			buffer.append(entry.getKey());
-			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SEPARATOR));
-			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
+			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SEPARATOR));
+			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
 			buffer.append(entry.getValue());
-			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
+			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
 		}
 		
-		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
+		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
 		if(file != null) {
 			buffer.append("Data: ");
 			buffer.append(this.file.getAbsolutePath());

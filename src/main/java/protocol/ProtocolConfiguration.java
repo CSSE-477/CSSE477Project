@@ -10,26 +10,6 @@ import java.util.Map;
  */
 public class ProtocolConfiguration {
 
-    public enum ProtocolElements {
-        VERSION, GET, POST, PUT, HEAD, DELETE
-    }
-
-    public enum ResponseHeaders {
-        DATE, SERVER, LAST_MODIFIED, CONTENT_LENGTH, CONTENT_TYPE
-    }
-
-    public enum RequestHeaders {
-        HOST, CONNECTION, USER_AGENT
-    }
-
-    public enum ServerInfoFields {
-        SERVER_INFO, PROVIDER, AUTHOR, CLOSE, OPEN, DEFAULT_FILE, MIME_TEXT
-    }
-
-    public enum CharsetConstants {
-        SPACE, SEPARATOR, SLASH, CR, LF
-    }
-
     private Map responseHeaderMap;
     private Map requestHeaderMap;
     private Map serverInfoMap;
@@ -97,7 +77,7 @@ public class ProtocolConfiguration {
         return (String)this.serverInfoMap.get(field);
     }
 
-    public String getRequestHeader(RequestHeaders header){
+    String getRequestHeader(RequestHeaders header){
         return (String)this.requestHeaderMap.get(header);
     }
 
@@ -113,7 +93,7 @@ public class ProtocolConfiguration {
         return (String)this.defaultPhraseMap.get(code);
     }
 
-    public Character getCharsetConstant(CharsetConstants constant) {
+    Character getCharsetConstant(CharsetConstants constant) {
         return (Character)this.charsetConstantsMap.get(constant);
     }
 
@@ -122,12 +102,14 @@ public class ProtocolConfiguration {
      * e.g. <tt>SimpleWebServer(SWS)/1.0.0 (Mac OS X/10.5.8/i386)</tt>
      * @return
      */
-    public String getServerInfo() {
+    String getServerInfo() {
         String os = System.getProperty("os.name"); // e.g. Mac OSX, Ubuntu, etc.
         String osVersion = System.getProperty("os.version"); // e.g. 10.5, 10.0.4, etc
         String architecture = System.getProperty("os.arch"); // e.g. i386, x86_64, etc
-        String serverInfo = this.getServerInfo(ProtocolConfiguration.ServerInfoFields.SERVER_INFO) + this.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SLASH) +
-                "(" + os + this.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SLASH) + osVersion + this.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SLASH) + architecture + ")";
+        String serverInfo = this.getServerInfo(ServerInfoFields.SERVER_INFO) +
+                this.getCharsetConstant(CharsetConstants.SLASH) + "(" + os +
+                this.getCharsetConstant(CharsetConstants.SLASH) + osVersion +
+                this.getCharsetConstant(CharsetConstants.SLASH) + architecture + ")";
         return serverInfo;
     }
 }

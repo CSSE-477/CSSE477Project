@@ -28,7 +28,7 @@ public class HttpResponseBuilder {
         this.protocol = protocol;
 
         if(version == null){
-            this.version = this.protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.VERSION);
+            this.version = this.protocol.getProtocolElement(ProtocolElements.VERSION);
         }
         else {
             this.version = version;
@@ -47,17 +47,19 @@ public class HttpResponseBuilder {
         }
         if(header == null){
             this.header = new HashMap<>();
-            this.header.put(this.protocol.getRequestHeader(ProtocolConfiguration.RequestHeaders.CONNECTION), this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.CLOSE));
+            this.header.put(this.protocol.getRequestHeader(RequestHeaders.CONNECTION),
+                    this.protocol.getServerInfo(ServerInfoFields.CLOSE));
 
             // Lets add current date
             Date date = Calendar.getInstance().getTime();
-            this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.DATE), date.toString());
+            this.header.put(this.protocol.getResponseHeader(ResponseHeaders.DATE), date.toString());
 
             // Lets add server info
-            this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.SERVER), this.protocol.getServerInfo());
+            this.header.put(this.protocol.getResponseHeader(ResponseHeaders.SERVER), this.protocol.getServerInfo());
 
             // Lets add extra header with provider info
-            this.header.put(this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.PROVIDER), this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.AUTHOR));
+            this.header.put(this.protocol.getServerInfo(ServerInfoFields.PROVIDER),
+                    this.protocol.getServerInfo(ServerInfoFields.AUTHOR));
         }
         else{
             this.header = header;
@@ -66,7 +68,8 @@ public class HttpResponseBuilder {
     }
 
     public HttpResponseBuilder(ProtocolConfiguration protocol){
-        this(null, -1, null, null, null, protocol);
+        this(null, -1, null, null,
+                null, protocol);
     }
 
     public HttpResponseBuilder(int status, ProtocolConfiguration protocol){
@@ -109,11 +112,11 @@ public class HttpResponseBuilder {
         // Lets add last modified date for the file
         long timeSinceEpoch = file.lastModified();
         Date modifiedTime = new Date(timeSinceEpoch);
-        this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.LAST_MODIFIED), modifiedTime.toString());
+        this.header.put(this.protocol.getResponseHeader(ResponseHeaders.LAST_MODIFIED), modifiedTime.toString());
 
         // Lets get content length in bytes
         long length = file.length();
-        this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_LENGTH), length + "");
+        this.header.put(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_LENGTH), length + "");
 
         // Lets get MIME type for the file
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
@@ -122,7 +125,7 @@ public class HttpResponseBuilder {
         // So we will not add this field if we cannot figure out what a mime type is for the file.
         // Let browser do this job by itself.
         if(mime != null) {
-            this.header.put(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), mime);
+            this.header.put(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE), mime);
         }
         return this;
     }

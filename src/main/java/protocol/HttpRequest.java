@@ -154,7 +154,8 @@ public class HttpRequest {
 		
 		int contentLength = 0;
 		try {
-			contentLength = Integer.parseInt(request.header.get(protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_LENGTH)));
+			contentLength = Integer.parseInt(request.header
+					.get(protocol.getResponseHeader(ResponseHeaders.CONTENT_LENGTH)));
 		}
 		catch(Exception e){}
 		
@@ -172,18 +173,18 @@ public class HttpRequest {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("----------- Header ----------------\n");
 		buffer.append(this.method);
-		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
+		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
 		buffer.append(this.uri);
-		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
+		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
 		buffer.append(this.version);
-		buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
+		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
 		
 		for(Map.Entry<String, String> entry : this.header.entrySet()) {
 			buffer.append(entry.getKey());
-			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SEPARATOR));
-			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.SPACE));
+			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SEPARATOR));
+			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
 			buffer.append(entry.getValue());
-			buffer.append(this.protocol.getCharsetConstant(ProtocolConfiguration.CharsetConstants.LF));
+			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
 		}
 		buffer.append("------------- Body ---------------\n");
 		buffer.append(this.body);

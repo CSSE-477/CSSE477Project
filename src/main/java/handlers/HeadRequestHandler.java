@@ -5,10 +5,7 @@ import java.util.Date;
 
 import org.apache.commons.io.FilenameUtils;
 
-import protocol.HttpRequest;
-import protocol.HttpResponse;
-import protocol.HttpResponseBuilder;
-import protocol.ProtocolConfiguration;
+import protocol.*;
 import utils.SwsLogger;
 
 /**
@@ -37,7 +34,8 @@ public class HeadRequestHandler implements IRequestHandler {
 			response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
 		} else if (file.isDirectory()) {
 			// check for default file before sending 400
-			String location = fullPath.concat(System.getProperty("file.separator")).concat(this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.DEFAULT_FILE));
+			String location = fullPath.concat(System.getProperty("file.separator"))
+					.concat(this.protocol.getServerInfo(ServerInfoFields.DEFAULT_FILE));
 			file = new File(location);
 
 			if (file.exists()) {
@@ -63,7 +61,9 @@ public class HeadRequestHandler implements IRequestHandler {
 		String lastModified = new Date(file.lastModified()).toString();
 		String fileSize = String.valueOf(file.length());
 		String fileType = FilenameUtils.getExtension(file.getAbsolutePath());
-		return (new HttpResponseBuilder(200, this.protocol)).setFile(file).putHeader("lastModified", lastModified).putHeader("fileSize", fileSize).putHeader("fileType", fileType).generateResponse();
+		return (new HttpResponseBuilder(200, this.protocol)).setFile(file)
+                .putHeader("lastModified", lastModified).putHeader("fileSize", fileSize)
+                .putHeader("fileType", fileType).generateResponse();
 	}
 
 }

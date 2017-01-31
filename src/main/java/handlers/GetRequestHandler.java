@@ -1,9 +1,6 @@
 package handlers;
 
-import protocol.HttpRequest;
-import protocol.HttpResponse;
-import protocol.HttpResponseBuilder;
-import protocol.ProtocolConfiguration;
+import protocol.*;
 
 import java.io.File;
 
@@ -31,16 +28,21 @@ public class GetRequestHandler implements IRequestHandler {
         	response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
         } else if (file.isDirectory()) {
         	// check for default file before sending 404
-            String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator")).concat(this.protocol.getServerInfo(ProtocolConfiguration.ServerInfoFields.DEFAULT_FILE));
+            String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator"))
+                    .concat(this.protocol.getServerInfo(ServerInfoFields.DEFAULT_FILE));
             file = new File(location);
             if(file.exists()) {
-                response = (new HttpResponseBuilder(200, this.protocol)).putHeader(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), "text/html").setFile(file).generateResponse();
+                response = (new HttpResponseBuilder(200, this.protocol))
+                        .putHeader(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE), "text/html")
+                        .setFile(file).generateResponse();
             }
             else {
                 response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
             }
         } else {
-            response = (new HttpResponseBuilder(200, this.protocol)).putHeader(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), "text/html").setFile(file).generateResponse();
+            response = (new HttpResponseBuilder(200, this.protocol))
+                    .putHeader(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE), "text/html")
+                    .setFile(file).generateResponse();
         }
 
         return response;

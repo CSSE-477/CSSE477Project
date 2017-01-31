@@ -1,9 +1,6 @@
 package handlers;
 
-import protocol.HttpRequest;
-import protocol.HttpResponse;
-import protocol.HttpResponseBuilder;
-import protocol.ProtocolConfiguration;
+import protocol.*;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -41,7 +38,8 @@ public class PutRequestHandler implements IRequestHandler {
         FileWriter fw;
         try {
             fw = new FileWriter(testFile, false);
-            int amount = Integer.parseInt(request.getHeader().get(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_LENGTH)));
+            int amount = Integer.parseInt(request.getHeader().get(this.protocol
+                    .getResponseHeader(ResponseHeaders.CONTENT_LENGTH)));
             fw.write(new String(request.getBody()), 0, amount);
             fw.close();
         } catch (IOException e) {

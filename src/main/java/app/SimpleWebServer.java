@@ -6,6 +6,7 @@ import handlers.HeadRequestHandlerFactory;
 import handlers.PostRequestHandlerFactory;
 import handlers.PutRequestHandlerFactory;
 import protocol.ProtocolConfiguration;
+import protocol.ProtocolElements;
 import server.Server;
 import handlers.IRequestHandlerFactory;
 import utils.ServerProperties;
@@ -37,7 +38,8 @@ public class SimpleWebServer {
 
 		// DONE: Instead of just printing to the console, use proper logging mechanism.
 		// SL4J/Log4J are some popular logging framework
-		SwsLogger.accessLogger.info(String.format("Simple Web Server started at port %d and serving the %s directory.", port, rootDirectory));
+		SwsLogger.accessLogger.info(String.format("Simple Web Server started at port %d and serving the %s directory.",
+				port, rootDirectory));
 		
 		// Wait for the unit.server thread to terminate
 		runner.join();
@@ -46,11 +48,16 @@ public class SimpleWebServer {
 	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(String rootDirectory, ProtocolConfiguration protocol){
 		// Add factories to the map or create them in-line if that is preferable, then return below
 		HashMap<String, IRequestHandlerFactory> factoryMap = new HashMap<>();
-		factoryMap.put(protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.GET), new GetRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.HEAD), new HeadRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.POST), new PostRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.PUT), new PutRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.DELETE), new DeleteRequestHandlerFactory(rootDirectory, protocol));
+		factoryMap.put(protocol.getProtocolElement(ProtocolElements.GET),
+				new GetRequestHandlerFactory(rootDirectory, protocol));
+		factoryMap.put(protocol.getProtocolElement(ProtocolElements.HEAD),
+				new HeadRequestHandlerFactory(rootDirectory, protocol));
+		factoryMap.put(protocol.getProtocolElement(ProtocolElements.POST),
+				new PostRequestHandlerFactory(rootDirectory, protocol));
+		factoryMap.put(protocol.getProtocolElement(ProtocolElements.PUT),
+				new PutRequestHandlerFactory(rootDirectory, protocol));
+		factoryMap.put(protocol.getProtocolElement(ProtocolElements.DELETE),
+				new DeleteRequestHandlerFactory(rootDirectory, protocol));
 		return factoryMap;
 	}
 

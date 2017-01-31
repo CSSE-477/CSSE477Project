@@ -21,7 +21,8 @@ public class ConnectionHandler implements Runnable {
 	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
 	private ProtocolConfiguration protocol;
 
-	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap, ProtocolConfiguration protocol) {
+	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap,
+							 ProtocolConfiguration protocol) {
 		this.socket = socket;
 		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
 		this.protocol = protocol;
@@ -87,7 +88,7 @@ public class ConnectionHandler implements Runnable {
 		// You may want to use constants such as Protocol.VERSION,
 		// Protocol.NOT_SUPPORTED_CODE, and more.
 		// You can check if the version matches as follows
-		if (!request.getVersion().equalsIgnoreCase(this.protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.VERSION))) {
+		if (!request.getVersion().equalsIgnoreCase(this.protocol.getProtocolElement(ProtocolElements.VERSION))) {
 			response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
 		} else {
 			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
