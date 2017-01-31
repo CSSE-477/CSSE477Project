@@ -13,6 +13,7 @@ import org.junit.Test;
 import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
 import protocol.ProtocolConfiguration;
+import protocol.ResponseHeaders;
 
 public class HttpResponseBuilderTest {
 
@@ -36,11 +37,12 @@ public class HttpResponseBuilderTest {
 	    out.write("this is the file string");
 	    out.close();
 
-	    HttpResponseBuilder builder = new HttpResponseBuilder(200, protocol).putHeader(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE), "text/html").setFile(temp);
+	    HttpResponseBuilder builder = new HttpResponseBuilder(200, protocol)
+				.putHeader(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE), "text/html").setFile(temp);
 	    HttpResponse res = builder.generateResponse();
 
 	    Map<String, String> header = res.getHeader();
-	    assertEquals("text/html", header.get(this.protocol.getResponseHeader(ProtocolConfiguration.ResponseHeaders.CONTENT_TYPE)));
+	    assertEquals("text/html", header.get(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE)));
 	    assertEquals(temp, res.getFile());
 
 		int actualStatus = res.getStatus();

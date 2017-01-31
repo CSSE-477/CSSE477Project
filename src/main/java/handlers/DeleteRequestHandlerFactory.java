@@ -28,7 +28,12 @@
  
 package handlers;
 
+import protocol.HttpRequest;
+import protocol.HttpResponse;
+import protocol.HttpResponseBuilder;
 import protocol.ProtocolConfiguration;
+
+import java.io.File;
 
 /**
  * 
@@ -36,15 +41,15 @@ import protocol.ProtocolConfiguration;
  */
 public class DeleteRequestHandlerFactory implements IRequestHandlerFactory {
 
-	private String rootDirectory;
-	private ProtocolConfiguration protocol;
+    private String rootDirectory;
+    private ProtocolConfiguration protocol;
 
-    public DeleteRequestHandlerFactory(String rootDirectory, ProtocolConfiguration protocol){
+    public DeleteRequestHandlerFactory(String rootDirectory, ProtocolConfiguration protocol) {
         this.rootDirectory = rootDirectory;
         this.protocol = protocol;
     }
 
-	/* (non-Javadoc)
+    /* (non-Javadoc)
 	 * @see handlers.IRequestHandlerFactory#getRequestHandler()
 	 */
     @Override
@@ -52,4 +57,35 @@ public class DeleteRequestHandlerFactory implements IRequestHandlerFactory {
         return new DeleteRequestHandler(this.rootDirectory, this.protocol);
     }
 
+    /**
+     *
+     * @author Jesse Shellabarger
+     */
+    public class DeleteRequestHandler implements IRequestHandler {
+
+        private String rootDirectory;
+        private ProtocolConfiguration protocol;
+
+        DeleteRequestHandler(String rootDirectory, ProtocolConfiguration protocol) {
+            this.rootDirectory = rootDirectory;
+            this.protocol = protocol;
+        }
+
+        /*
+         * (non-Javadoc)
+         *
+         * @see handlers.IRequestHandler#handleRequest(protocol.HttpRequest)
+         */
+        @Override
+        public HttpResponse handleRequest(HttpRequest request) {
+            String uri = request.getUri();
+            File file = new File(this.rootDirectory + uri);
+            if (file.exists()) {
+                file.delete();
+                return (new HttpResponseBuilder(200, this.protocol)).setFile(file).generateResponse();
+            }
+            return (new HttpResponseBuilder(404, this.protocol)).generateResponse();
+        }
+
+    }
 }

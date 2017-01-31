@@ -12,6 +12,7 @@ import org.junit.Test;
 
 import protocol.HttpResponse;
 import protocol.ProtocolConfiguration;
+import protocol.ProtocolElements;
 
 public class HttpResponseTest {
 	private String version;
@@ -24,7 +25,7 @@ public class HttpResponseTest {
 	@Before
 	public void setUp() {
 		this.protocol = new ProtocolConfiguration();
-		version = this.protocol.getProtocolElement(ProtocolConfiguration.ProtocolElements.VERSION);
+		version = this.protocol.getProtocolElement(ProtocolElements.VERSION);
 		status = 200;
 		phrase = this.protocol.getPhrase(this.status);
 		header = new HashMap<>();
