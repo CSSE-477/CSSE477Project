@@ -8,19 +8,15 @@ import java.util.Scanner;
 import protocol.HttpRequest;
 import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
-import protocol.ProtocolConfiguration;
-import protocol.ProtocolElements;
 
 public abstract class AServletManager {
 
 	protected HashMap<String, IHttpServlet> servletMap;
 	protected String filePath;
-	protected ProtocolConfiguration protocol;
 
-	public AServletManager(String filePath, ProtocolConfiguration protocol) {
+	public AServletManager(String filePath) {
 		this.servletMap = new HashMap<String, IHttpServlet>();
 		this.filePath = filePath;
-		this.protocol = protocol;
 		this.init();
 	}
 
@@ -49,8 +45,8 @@ public abstract class AServletManager {
 				String servletClassName = scanner.next();
 				
 				Class<?> servletClass = Class.forName(servletClassName);
-				Constructor<?> servletConstructor = servletClass.getConstructor(String.class, ProtocolConfiguration.class);
-				IHttpServlet servletInstance = (IHttpServlet) servletConstructor.newInstance(this.filePath, this.protocol);
+				Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
+				IHttpServlet servletInstance = (IHttpServlet) servletConstructor.newInstance(this.filePath);
 				this.servletMap.put(relativeUri, servletInstance);
 			}
 			
@@ -67,24 +63,23 @@ public abstract class AServletManager {
 		String servletKey = uri.split("/")[2];
 		
 		IHttpServlet servlet = this.servletMap.get(servletKey);
-		HttpResponseBuilder rb = new HttpResponseBuilder(this.protocol);
-		HttpResponse response = rb.generateResponse();
+		HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
 
 		// TODO: refactor pls
-		if (request.getMethod() == this.protocol.getProtocolElement(ProtocolElements.GET)) {
-			servlet.doGet(request, response);
-		} else if (request.getMethod() == this.protocol.getProtocolElement(ProtocolElements.HEAD)) {
-			servlet.doHead(request, response);
-		} else if (request.getMethod() == this.protocol.getProtocolElement(ProtocolElements.POST)) {
-			servlet.doPost(request, response);
-		} else if (request.getMethod() == this.protocol.getProtocolElement(ProtocolElements.PUT)) {
-			servlet.doPut(request, response);
-		} else if (request.getMethod() == this.protocol.getProtocolElement(ProtocolElements.DELETE)) {
-			servlet.doDelete(request, response);
+		if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.GET)) {
+			servlet.doGet(request, responseBuilder);
+		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.HEAD)) {
+			servlet.doHead(request, responseBuilder);
+		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.POST)) {
+			servlet.doPost(request, responseBuilder);
+		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.PUT)) {
+			servlet.doPut(request, responseBuilder);
+		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.DELETE)) {
+			servlet.doDelete(request, responseBuilder);
 		}
 		
 		// TODO: verify that response is okay?
 		
-		return response;
+		return responseBuilder.generateResponse();
 	}
 }
