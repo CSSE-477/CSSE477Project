@@ -55,6 +55,7 @@ public class ConnectionHandler implements Runnable {
 		HttpResponse response = null;
 		try {
 			request = HttpRequest.read(inStream, this.protocol);
+			SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
 		} catch (ProtocolException pe) {
 			// We have some sort of protocol exception. Get its status code and
 			// create response
