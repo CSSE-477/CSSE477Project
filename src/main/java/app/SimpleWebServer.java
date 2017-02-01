@@ -13,7 +13,6 @@ import utils.PluginDirectoryMonitor;
 import utils.ServerProperties;
 import utils.SwsLogger;
 
-import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Properties;
 
