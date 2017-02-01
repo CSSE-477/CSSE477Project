@@ -79,8 +79,9 @@ public class PluginDirectoryMonitor {
      */
     private void handleJarUpserted(String pathToJar) {
     	String entryPointClassName = "";
+    	JarFile jar = null;
     	try {
-    		JarFile jar = new JarFile(pathToJar);
+    		jar = new JarFile(pathToJar);
     		Manifest manifest = null;
     		Enumeration<JarEntry> e = jar.entries();
     		URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
@@ -98,7 +99,7 @@ public class PluginDirectoryMonitor {
   
     		// if the manifest file succeeded
     		if (!entryPointClassName.equals("")) {
-    			Class c = cl.loadClass(entryPointClassName);
+    			Class<?> c = cl.loadClass(entryPointClassName);
     			Constructor<?> constructor = c.getConstructor(String.class);
     			String pluginPathDirectory = "/home/csse/" + this.jarPathToContextRoot.get(pathToJar);
     			Object result = constructor.newInstance(pluginPathDirectory);
@@ -117,6 +118,12 @@ public class PluginDirectoryMonitor {
 
     	} catch (Exception e) {
     		SwsLogger.errorLogger.log(Level.INFO, "Error loading jar file " + pathToJar);
+    	} finally {
+    		try {
+    			jar.close();
+    		} catch (Exception er) {
+    			SwsLogger.errorLogger.log(Level.INFO, "Error closing jar file " + pathToJar);
+    		}
     	}
     }
 
@@ -190,7 +197,9 @@ public class PluginDirectoryMonitor {
                 Path child = dir.resolve(name);
 
                 // handle event
-                if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+            	if (!child.endsWith(".jar")) {
+            		SwsLogger.accessLogger.log(Level.INFO, "Plugin directory didn't process: " + child + " file");
+            	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
                 	handleJarUpserted(child.toString());
                 } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 //                	handleJarDeleted(child.toString());
