@@ -81,10 +81,8 @@ publishing {
     repositories {
         maven {
             credentials {
-                //username System.getenv('MAVEN_USER')
-                //password System.getenv('MAVEN_PASSWORD')
-                username "csse477"
-                password "csse477@2016"
+                username System.getenv('MAVEN_USER')
+                password System.getenv('MAVEN_PASSWORD')
             }
             url "https://maven.csse.rose-hulman.edu/artifactory/student-release-local"
         }
