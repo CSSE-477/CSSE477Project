@@ -24,8 +24,17 @@ staging-deploy:
   only:
     - master
 
-deploy:
+maven-deploy:
   stage: maven-deploy
+  script:
+    - gradle publish
+  tags:
+    - 'Team #YOLOSWAG *dabs* SWS'
+  only:
+    - tags
+
+deploy:
+  stage: deploy
   variables:
     SSH_HOST: '477-06.csse.rose-hulman.edu'
   script:
