@@ -5,14 +5,15 @@ import static org.junit.Assert.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.nio.file.Paths;
 import java.util.Map;
+import java.util.jar.Manifest;
 
 import org.junit.Before;
 import org.junit.Test;
 
 import protocol.ProtocolConfiguration;
 import server.Server;
+import utils.FakeManifest;
 import utils.PluginDirectoryMonitor;
 
 public class PluginDirectoryMonitorTests {
@@ -24,7 +25,7 @@ public class PluginDirectoryMonitorTests {
 	public void setUp() throws IOException {
 		server = new Server(100, new ProtocolConfiguration());
 		directory = "./web";
-		monitor = new PluginDirectoryMonitor(Paths.get(directory), server);
+		monitor = new PluginDirectoryMonitor(directory, server);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -40,10 +41,43 @@ public class PluginDirectoryMonitorTests {
 	}
 	
 	@Test
-	public void testDirectoryMonitorJarUpserted() throws Exception {
-		Method handleJar = monitor.getClass().getDeclaredMethod("handleJarUpserted", String.class);
-		handleJar.setAccessible(true);
-		handleJar.invoke(monitor, "./web/YoloSwagDefddaultPlugin-1.0.1-SNAPSHOT.jar");
-		
+	public void testDirectoryMonitorReadManifestNoContextRoot() throws Exception {
+		Method readManifest = monitor.getClass().getDeclaredMethod("initializeManifestValues", Manifest.class, String.class);
+		readManifest.setAccessible(true);
+
+		FakeManifest fm = new FakeManifest("client.Person", "");
+		String expected = "";
+		String entryPoint = (String) readManifest.invoke(monitor, fm, "path/to/jar");
+		assertEquals(expected, entryPoint);
 	}
+	
+	@Test
+	public void testDirectoryMonitorReadManifestNoEntryPoint() throws Exception {
+		Method readManifest = monitor.getClass().getDeclaredMethod("initializeManifestValues", Manifest.class, String.class);
+		readManifest.setAccessible(true);
+
+		FakeManifest fm = new FakeManifest("", "userapp");
+		String expected = "";
+		String entryPoint = (String) readManifest.invoke(monitor, fm, "path/to/jar");
+		assertEquals(expected, entryPoint);
+	}
+
+	@Test
+	public void testDirectoryMonitorReadManifestSuccess() throws Exception {
+		Method readManifest = monitor.getClass().getDeclaredMethod("initializeManifestValues", Manifest.class, String.class);
+		readManifest.setAccessible(true);
+
+		String expected = "client.Person";
+		FakeManifest fm = new FakeManifest(expected, "userapp");
+		String entryPoint = (String) readManifest.invoke(monitor, fm, "path/to/jar");
+		assertEquals(expected, entryPoint);
+	}
+
+//	@Test
+//	public void testDirectoryMonitorJarUpserted() throws Exception {
+//		Method handleJar = monitor.getClass().getDeclaredMethod("handleJarUpserted", String.class);
+//		handleJar.setAccessible(true);
+//		handleJar.invoke(monitor, "./web/YoloSwagDefaultPlugin-1.0.1-SNAPSHOT.jar");
+//		
+//	}
 }

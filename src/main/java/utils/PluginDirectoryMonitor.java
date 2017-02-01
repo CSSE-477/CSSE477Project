@@ -32,18 +32,20 @@ public class PluginDirectoryMonitor implements Runnable {
 	private final Map<WatchKey, Path> keys;
 	private Map<String, String> jarPathToContextRoot;
 	private IDirectoryListener listener;
+	private String directoryPath;
 
 	public static void main(String[] args) throws IOException {
-		new PluginDirectoryMonitor(Paths.get("./web"), new Server(100, new ProtocolConfiguration())).processEvents();
+		new PluginDirectoryMonitor("./web", new Server(100, new ProtocolConfiguration())).processEvents();
 	}
 
-	public PluginDirectoryMonitor(Path dir, IDirectoryListener listener) throws IOException {
+	public PluginDirectoryMonitor(String directoryPath, IDirectoryListener listener) throws IOException {
+		this.directoryPath = directoryPath;
 		this.watcher = FileSystems.getDefault().newWatchService();
 		this.keys = new HashMap<WatchKey, Path>();
 		this.jarPathToContextRoot = new HashMap<String, String>();
 		this.listener = listener;
 		
-		register(dir);
+		register(Paths.get(this.directoryPath));
 	}
 
 	@SuppressWarnings("unchecked")
@@ -61,8 +63,7 @@ public class PluginDirectoryMonitor implements Runnable {
     }
 
     /**
-     * Read the jar and load its entry class
-     * Custom code
+     * Read the jar's manifest file and load its entry class
      */
     private void handleJarUpserted(String pathToJar) {
     	String entryPointClassName = "";
@@ -89,7 +90,7 @@ public class PluginDirectoryMonitor implements Runnable {
     		if (!entryPointClassName.equals("")) {
     			Class<?> c = cl.loadClass(entryPointClassName);
     			Constructor<?> constructor = c.getConstructor(String.class);
-    			String pluginPathDirectory = "/home/csse/" + this.jarPathToContextRoot.get(pathToJar);
+    			String pluginPathDirectory = this.directoryPath + "/" + this.jarPathToContextRoot.get(pathToJar);
     			Object result = constructor.newInstance(pluginPathDirectory);
 
     			// TODO: create this directory on the VM
@@ -141,7 +142,7 @@ public class PluginDirectoryMonitor implements Runnable {
 				entryPoint = attributes.getValue(key.toString());
 			}
 		}
-		
+
 		if (contextRoot.equals("") || entryPoint.equals("")) {
 			SwsLogger.errorLogger.log(Level.INFO, "manifest file does not contain contextRoot or entryPoint: " + jarPath);
 			return "";
@@ -185,13 +186,12 @@ public class PluginDirectoryMonitor implements Runnable {
                 Path child = dir.resolve(name);
 
                 // handle event
-            	if (!child.endsWith(".jar")) {
+            	if (!child.toString().endsWith(".jar")) {
             		SwsLogger.accessLogger.log(Level.INFO, "Plugin directory didn't process: " + child + " file");
             	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
                 	try {
                 		handleJarUpserted(child.toString());
                 	} catch (Exception e) {
-                		
                 	}
                 } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 //                	handleJarDeleted(child.toString());

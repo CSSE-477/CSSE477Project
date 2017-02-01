@@ -40,7 +40,7 @@ public class SimpleWebServer {
 		runner.start();
 
 		// Create and run the directory monitor
-		PluginDirectoryMonitor monitor = new PluginDirectoryMonitor(Paths.get(pluginDirectory), server);
+		PluginDirectoryMonitor monitor = new PluginDirectoryMonitor(pluginDirectory, server);
 		Thread monitorRunner = new Thread(monitor);
 		monitorRunner.start();
 
