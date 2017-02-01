@@ -121,13 +121,8 @@ jacocoTestReport.finalizedBy(codeCoverageInfo)
 ssh.settings { knownHosts = allowAnyHosts }
 
 remotes {
-	staging {
-		host = '477-19.csse.rose-hulman.edu'
-		user = System.getenv('SSH_USER')
-		password = System.getenv('SSH_PASSWORD')
-	}
 	deployment {
-		host = '477-06.csse.rose-hulman.edu'
+		host = System.getenv('SSH_HOST')
 		user = System.getenv('SSH_USER')
 		password = System.getenv('SSH_PASSWORD')
 	}
@@ -135,48 +130,6 @@ remotes {
 
 task publishToWebServer(dependsOn: jar) << {
 	ssh.run {
-		session(remotes.staging) {
-			println "Checking if remote /tmp/YoloSwagSWS exists ..."
-			def result = execute('if test -d /tmp/YoloSwagSWS; then echo "exists"; fi')						
-			if(result != "exists") {
-				println("Remote /tmp/YoloSwagSWS does not exist, creating a new one...")
-				execute('mkdir -p /tmp/YoloSwagSWS')
-				println("Remote /tmp/YoloSwagSWS created!")
-			}
-			println "Transfering file from local build/distributions to remote /tmp/YoloSwagSWS ..."
-			put from: "${buildDir}/libs/*", into: '/tmp/YoloSwagSWS'
-			println "Files transfer complete now setting up the web server ..."
-			
-			println "Checking if remote /var/www/html/YoloSwagSWS exists ..."
-			result = execute('if test -d /var/www/html/YoloSwagSWS; then echo "exists"; fi')
-			if(result == "exists") {
-				println("Remote /var/www/html/YoloSwagSWS is being removed...")
-				executeSudo('rm -rf /var/www/html/YoloSwagSWS', pty: true)
-				println("Remote /var/www/html/YoloSwagSWS removed!")
-			}
-			println("Remote /var/www/html/YoloSwagSWS is being created...")
-			executeSudo('mkdir -p /var/www/html/YoloSwagSWS', pty: true)
-			println("Remote /var/www/html/YoloSwagSWS created!")
-
-			println "Copying data from the temp folder to the web folder ..."
-			executeSudo('cp /tmp/YoloSwagSWS/* /var/www/html/YoloSwagSWS', pty: true)
-			println "Done! Clearing the tmp folder ..."
-			execute('rm -rf /tmp/YoloSwagSWS')
-			println "All done!" 
-
-			//sleep(3 * 1000)
-			//println "Stopping YoloSwagWebServer service"
-			//executeSudo('/etc/init.d/webserver stop')
-
-			//sleep(3 * 1000)
-			//println "Starting YoloSwagWebServer service"
-			//executeSudo('/etc/init.d/webserver start')
-			//println "Running curl command to see if server is started"
-
-			//sleep(3 * 1000)
-			//execute('curl localhost:8080')
-			println "YoloSwagSWS has been deployed to http://477-19.csse.rose-hulman.edu/YoloSwagSWS/"
-		}
 		session(remotes.deployment) {
 			println "Checking if remote /tmp/YoloSwagSWS exists ..."
 			def result = execute('if test -d /tmp/YoloSwagSWS; then echo "exists"; fi')						
@@ -188,10 +141,15 @@ task publishToWebServer(dependsOn: jar) << {
 			println "Transfering file from local build/distributions to remote /tmp/YoloSwagSWS ..."
 			put from: "${buildDir}/libs/*", into: '/tmp/YoloSwagSWS'
 			println "Files transfer complete now setting up the web server ..."
-			
+
 			println "Checking if remote /var/www/html/YoloSwagSWS exists ..."
 			result = execute('if test -d /var/www/html/YoloSwagSWS; then echo "exists"; fi')
 			if(result == "exists") {
+				println("Remote /var/www/html/YoloSwagSWS is being copied to /var/www/html/tmp for rollback...")
+				executeSudo('mkdir -p /var/www/html/tmp/YoloSwagSWS', pty: true)
+				executeSudo('cp /var/www/html/YoloSwagSWS/* /var/www/html/tmp/YoloSwagSWS', pty: true)
+				println("Remote /var/www/html/YoloSwagSWS copied!")
+
 				println("Remote /var/www/html/YoloSwagSWS is being removed...")
 				executeSudo('rm -rf /var/www/html/YoloSwagSWS', pty: true)
 				println("Remote /var/www/html/YoloSwagSWS removed!")
@@ -204,20 +162,18 @@ task publishToWebServer(dependsOn: jar) << {
 			executeSudo('cp /tmp/YoloSwagSWS/* /var/www/html/YoloSwagSWS', pty: true)
 			println "Done! Clearing the tmp folder ..."
 			execute('rm -rf /tmp/YoloSwagSWS')
-			println "All done!" 
 
-			//sleep(3 * 1000)
-			//println "Stopping YoloSwagWebServer service"
-			//executeSudo('/etc/init.d/webserver stop')
+			println "Stopping YoloSwagWebServer service"
+			executeSudo('service webserver stop', pty: true)
 
-			//sleep(3 * 1000)
-			//println "Starting YoloSwagWebServer service"
-			//executeSudo('/etc/init.d/webserver start')
-			//println "Running curl command to see if server is started"
+			sleep(3 * 1000)
+			println "Starting YoloSwagWebServer service"
+			executeSudo('service webserver start', pty: true)
 
-			//sleep(3 * 1000)
-			//execute('curl localhost:8080')
-			println "YoloSwagSWS has been deployed to http://477-06.csse.rose-hulman.edu/YoloSwagSWS/"
+			sleep(3 * 1000)
+			println "Running curl command to see if server is started"
+			executeSudo('/bin/bash /home/csse/e2e.sh', pty: true)
+			println("YoloSwagSWS has been deployed to " + System.getenv('SSH_HOST'))
 		}
 	}
 }

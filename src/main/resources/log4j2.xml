@@ -4,10 +4,10 @@
     <Console name="Console" target="SYSTEM_OUT">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %l: %msg%n"/>
     </Console>
-    <File name="ErrorAppender" FileName="logs/error.log">
+    <File name="ErrorAppender" FileName="/home/csse/logs/error.log">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %l: %msg%n"/>
     </File>
-    <File name="AccessAppender" FileName="logs/access.log">
+    <File name="AccessAppender" FileName="/home/csse/logs/access.log">
       <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %l: %msg%n"/>
     </File>
   </Appenders>
