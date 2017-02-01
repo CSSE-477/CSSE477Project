@@ -21,7 +21,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - deployment-fixes
+    - master
 
 deploy:
   stage: deploy
