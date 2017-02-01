@@ -13,9 +13,9 @@ import protocol.ProtocolElements;
 
 public abstract class AServletManager {
 
-	private HashMap<String, IHttpServlet> servletMap;
-	private String filePath;
-	private ProtocolConfiguration protocol;
+	protected HashMap<String, IHttpServlet> servletMap;
+	protected String filePath;
+	protected ProtocolConfiguration protocol;
 
 	public AServletManager(String filePath, ProtocolConfiguration protocol) {
 		this.servletMap = new HashMap<String, IHttpServlet>();
