@@ -16,7 +16,7 @@ import utils.FileCreationUtility;
 @RunWith(Suite.class)
 @Suite.SuiteClasses({
         UnitSuite.class,
-        IntegrationSuite.class
+//        IntegrationSuite.class
 })
 public class MasterSuite {
 
