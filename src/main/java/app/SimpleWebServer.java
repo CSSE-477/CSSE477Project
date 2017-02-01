@@ -9,9 +9,11 @@ import protocol.ProtocolConfiguration;
 import protocol.ProtocolElements;
 import server.Server;
 import handlers.IRequestHandlerFactory;
+import utils.PluginDirectoryMonitor;
 import utils.ServerProperties;
 import utils.SwsLogger;
 
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Properties;
 
@@ -27,6 +29,7 @@ public class SimpleWebServer {
 		Properties properties = config.getProperties("config.properties");
 
 		String rootDirectory = properties.getProperty("rootDirectory");
+		String pluginDirectory = properties.getProperty("pluginDirectory");
 		int port = Integer.parseInt(properties.getProperty("port"));
 
 		ProtocolConfiguration protocol = getProtocolConfiguration();
@@ -35,6 +38,11 @@ public class SimpleWebServer {
 		Server server = new Server(port, protocol);
 		Thread runner = new Thread(server);
 		runner.start();
+
+		// Create and run the directory monitor
+		PluginDirectoryMonitor monitor = new PluginDirectoryMonitor(Paths.get(pluginDirectory), server);
+		Thread monitorRunner = new Thread(monitor);
+		monitorRunner.start();
 
 		// DONE: Instead of just printing to the console, use proper logging mechanism.
 		// SL4J/Log4J are some popular logging framework

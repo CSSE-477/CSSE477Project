@@ -27,10 +27,9 @@ import server.IDirectoryListener;
 import server.Server;
 import servlet.AServletManager;
 
-public class PluginDirectoryMonitor {
+public class PluginDirectoryMonitor implements Runnable {
 	private final WatchService watcher;
 	private final Map<WatchKey, Path> keys;
-	private boolean trace = false;
 	private Map<String, String> jarPathToContextRoot;
 	private IDirectoryListener listener;
 
@@ -45,8 +44,6 @@ public class PluginDirectoryMonitor {
 		this.listener = listener;
 		
 		register(dir);
-		//enable trace after initial registration
-		this.trace = true;
 	}
 
 	@SuppressWarnings("unchecked")
@@ -60,16 +57,6 @@ public class PluginDirectoryMonitor {
      */
     private void register(Path dir) throws IOException {
         WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
-        if (trace) {
-            Path prev = keys.get(key);
-            if (prev == null) {
-                System.out.format("register: %s\n", dir);
-            } else {
-                if (!dir.equals(prev)) {
-                    System.out.format("update: %s -> %s\n", prev, dir);
-                }
-            }
-        }
         keys.put(key, dir);
     }
 
@@ -86,7 +73,8 @@ public class PluginDirectoryMonitor {
     		Enumeration<JarEntry> e = jar.entries();
     		URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
     		URLClassLoader cl = URLClassLoader.newInstance(urls);
-    		
+
+    		// just load the manifest file
     		while (e.hasMoreElements()) {
     			JarEntry je = e.nextElement();
 				if (je.getName().endsWith(".MF")) {
@@ -167,7 +155,7 @@ public class PluginDirectoryMonitor {
      * Process all events for keys queued to the watcher
      * This was from the tutorial...
      */
-    public void processEvents() {
+    private void processEvents() {
         for (;;) {
 
             // wait for key to be signalled
@@ -200,7 +188,11 @@ public class PluginDirectoryMonitor {
             	if (!child.endsWith(".jar")) {
             		SwsLogger.accessLogger.log(Level.INFO, "Plugin directory didn't process: " + child + " file");
             	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
-                	handleJarUpserted(child.toString());
+                	try {
+                		handleJarUpserted(child.toString());
+                	} catch (Exception e) {
+                		
+                	}
                 } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 //                	handleJarDeleted(child.toString());
                 }
@@ -218,4 +210,9 @@ public class PluginDirectoryMonitor {
             }
         }
     }
+
+	@Override
+	public void run() {
+		this.processEvents();
+	}
 }
