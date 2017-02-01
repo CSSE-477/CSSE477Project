@@ -77,7 +77,7 @@ public class DeleteRequestTests {
 		
 		port = 8080;
 		ProtocolConfiguration protocol = SimpleWebServer.getProtocolConfiguration();
-		server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory, protocol), protocol);
+		server = new Server(port, protocol);
 		Thread runner = new Thread(server);
 		runner.start();
 
