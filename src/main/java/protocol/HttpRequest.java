@@ -21,12 +21,11 @@ public class HttpRequest {
 	private String version;
 	private Map<String, String> header;
 	private char[] body;
-	private ProtocolConfiguration protocol;
+	private Protocol protocol;
 	
-	private HttpRequest(ProtocolConfiguration protocol) {
+	private HttpRequest() {
 		this.header = new HashMap<>();
 		this.body = new char[0];
-		this.protocol = protocol;
 	}
 	
 	/**
@@ -78,9 +77,9 @@ public class HttpRequest {
 	 * @throws Exception Throws either {@link ProtocolException} for bad request or 
 	 * {@link IOException} for socket input stream read errors.
 	 */
-	public static HttpRequest read(InputStream inputStream, ProtocolConfiguration protocol) throws Exception {
+	public static HttpRequest read(InputStream inputStream) throws Exception {
 		// We will fill this object with the data from input stream and return it
-		HttpRequest request = new HttpRequest(protocol);
+		HttpRequest request = new HttpRequest();
 		
 		InputStreamReader inStreamReader = new InputStreamReader(inputStream);
 		BufferedReader reader = new BufferedReader(inStreamReader);
@@ -155,7 +154,7 @@ public class HttpRequest {
 		int contentLength = 0;
 		try {
 			contentLength = Integer.parseInt(request.header
-					.get(protocol.getResponseHeader(ResponseHeaders.CONTENT_LENGTH)));
+					.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
 		}
 		catch(Exception e){}
 		
@@ -173,18 +172,18 @@ public class HttpRequest {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("----------- Header ----------------\n");
 		buffer.append(this.method);
-		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
+		buffer.append(Protocol.getProtocol().getStringRep(Keywords.SPACE));
 		buffer.append(this.uri);
-		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
+		buffer.append(Protocol.getProtocol().getStringRep(Keywords.SPACE));
 		buffer.append(this.version);
-		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
+		buffer.append(Protocol.getProtocol().getStringRep(Keywords.LF));
 		
 		for(Map.Entry<String, String> entry : this.header.entrySet()) {
 			buffer.append(entry.getKey());
-			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SEPARATOR));
-			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
+			buffer.append(Protocol.getProtocol().getStringRep(Keywords.SEPARATOR));
+			buffer.append(Protocol.getProtocol().getStringRep(Keywords.SPACE));
 			buffer.append(entry.getValue());
-			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
+			buffer.append(Protocol.getProtocol().getStringRep(Keywords.LF));
 		}
 		buffer.append("------------- Body ---------------\n");
 		buffer.append(this.body);

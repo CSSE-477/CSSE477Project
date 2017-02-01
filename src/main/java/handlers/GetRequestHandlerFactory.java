@@ -11,15 +11,13 @@ import java.io.File;
 public class GetRequestHandlerFactory implements IRequestHandlerFactory{
 
     private String rootDirectory;
-    private ProtocolConfiguration protocol;
 
-    public GetRequestHandlerFactory(String rootDirectory, ProtocolConfiguration protocol){
+    public GetRequestHandlerFactory(String rootDirectory){
         this.rootDirectory = rootDirectory;
-        this.protocol = protocol;
     }
     @Override
     public IRequestHandler getRequestHandler() {
-        return new GetRequestHandler(this.rootDirectory, this.protocol);
+        return new GetRequestHandler(this.rootDirectory);
     }
 
     /**
@@ -29,11 +27,9 @@ public class GetRequestHandlerFactory implements IRequestHandlerFactory{
     public class GetRequestHandler implements IRequestHandler {
 
         private String rootDirectory;
-        private ProtocolConfiguration protocol;
 
-        GetRequestHandler(String rootDirectory, ProtocolConfiguration protocol) {
+        GetRequestHandler(String rootDirectory) {
             this.rootDirectory = rootDirectory;
-            this.protocol = protocol;
         }
 
         @Override
@@ -43,23 +39,23 @@ public class GetRequestHandlerFactory implements IRequestHandlerFactory{
             File file = new File(this.rootDirectory.concat(uri));
 
             if (!file.exists()) {
-                response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
+                response = (new HttpResponseBuilder(404)).generateResponse();
             } else if (file.isDirectory()) {
                 // check for default file before sending 404
                 String location = this.rootDirectory.concat(uri).concat(System.getProperty("file.separator"))
-                        .concat(this.protocol.getServerInfo(ServerInfoFields.DEFAULT_FILE));
+                        .concat(Protocol.getProtocol().getStringRep(Keywords.DEFAULT_FILE));
                 file = new File(location);
                 if(file.exists()) {
-                    response = (new HttpResponseBuilder(200, this.protocol))
-                            .putHeader(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE), "text/html")
+                    response = (new HttpResponseBuilder(200))
+                            .putHeader(Protocol.getProtocol().getStringRep(Keywords.CONTENT_TYPE), "text/html")
                             .setFile(file).generateResponse();
                 }
                 else {
-                    response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
+                    response = (new HttpResponseBuilder(404)).generateResponse();
                 }
             } else {
-                response = (new HttpResponseBuilder(200, this.protocol))
-                        .putHeader(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE), "text/html")
+                response = (new HttpResponseBuilder(200))
+                        .putHeader(Protocol.getProtocol().getStringRep(Keywords.CONTENT_TYPE), "text/html")
                         .setFile(file).generateResponse();
             }
 

@@ -10,7 +10,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import protocol.ProtocolConfiguration;
+import protocol.Protocol;
 import server.Server;
 import utils.FileCreationUtility;
 
@@ -41,8 +41,7 @@ public class PostRequestTests {
         String rootDirectory = "web";
 
         port = 8080;
-        ProtocolConfiguration protocol = SimpleWebServer.getProtocolConfiguration();
-        server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory, protocol), protocol);
+        server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory));
         Thread runner = new Thread(server);
         runner.start();
 

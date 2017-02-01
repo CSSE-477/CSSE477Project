@@ -12,16 +12,13 @@ import org.junit.Test;
 
 import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
-import protocol.ProtocolConfiguration;
-import protocol.ResponseHeaders;
+import protocol.Keywords;
+import protocol.Protocol;
 
 public class HttpResponseBuilderTest {
-
-	private ProtocolConfiguration protocol;
 	
 	@Before
 	public void setUp() {
-		this.protocol = new ProtocolConfiguration();
 	}
 	
 	@Test
@@ -37,18 +34,18 @@ public class HttpResponseBuilderTest {
 	    out.write("this is the file string");
 	    out.close();
 
-	    HttpResponseBuilder builder = new HttpResponseBuilder(200, protocol)
-				.putHeader(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE), "text/html").setFile(temp);
+	    HttpResponseBuilder builder = new HttpResponseBuilder(200)
+				.putHeader(Protocol.getProtocol().getStringRep(Keywords.CONTENT_TYPE), "text/html").setFile(temp);
 	    HttpResponse res = builder.generateResponse();
 
 	    Map<String, String> header = res.getHeader();
-	    assertEquals("text/html", header.get(this.protocol.getResponseHeader(ResponseHeaders.CONTENT_TYPE)));
+	    assertEquals("text/html", header.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_TYPE)));
 	    assertEquals(temp, res.getFile());
 
 		int actualStatus = res.getStatus();
 		int expectedStatus = 200;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
+		String expectedPhrase = Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -57,13 +54,14 @@ public class HttpResponseBuilderTest {
 	@Test
 	public void testCreate400BadRequest() {
 
-		HttpResponseBuilder builder = new HttpResponseBuilder(400, this.protocol);
+		HttpResponseBuilder builder = new HttpResponseBuilder(400);
 		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
 		int expectedStatus = 400;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
+		String expectedPhrase =
+				Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -71,13 +69,14 @@ public class HttpResponseBuilderTest {
 
 	@Test
 	public void testCreate404NotFound() {
-		HttpResponseBuilder builder = new HttpResponseBuilder(404, this.protocol);
+		HttpResponseBuilder builder = new HttpResponseBuilder(404);
 		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
 		int expectedStatus = 404;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
+		String expectedPhrase =
+				Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -85,12 +84,13 @@ public class HttpResponseBuilderTest {
 	
 	@Test
 	public void testCreate505NotSupported() {
-		HttpResponseBuilder builder = new HttpResponseBuilder(505, this.protocol);
+		HttpResponseBuilder builder = new HttpResponseBuilder(505);
 		HttpResponse res = builder.generateResponse();
 		int actualStatus = res.getStatus();
 		int expectedStatus = 505;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
+		String expectedPhrase =
+				Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -98,13 +98,14 @@ public class HttpResponseBuilderTest {
 	
 	@Test
 	public void testCreate304NotModified() {
-		HttpResponseBuilder builder = new HttpResponseBuilder(304, this.protocol);
+		HttpResponseBuilder builder = new HttpResponseBuilder(304);
 		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
 		int expectedStatus = 304;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
+		String expectedPhrase =
+				Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -112,13 +113,14 @@ public class HttpResponseBuilderTest {
 
 	@Test
 	public void testCreate500InternalServerError() {
-		HttpResponseBuilder builder = new HttpResponseBuilder(500, this.protocol);
+		HttpResponseBuilder builder = new HttpResponseBuilder(500);
 		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
 		int expectedStatus = 500;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
+		String expectedPhrase =
+				Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
@@ -126,13 +128,14 @@ public class HttpResponseBuilderTest {
 
 	@Test
 	public void testCreate501NotImplemented() {
-		HttpResponseBuilder builder = new HttpResponseBuilder(501, this.protocol);
+		HttpResponseBuilder builder = new HttpResponseBuilder(501);
 		HttpResponse res = builder.generateResponse();
 
 		int actualStatus = res.getStatus();
 		int expectedStatus = 501;
 		String actualPhrase = res.getPhrase();
-		String expectedPhrase = this.protocol.getPhrase(expectedStatus);
+		String expectedPhrase =
+				Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
 
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);

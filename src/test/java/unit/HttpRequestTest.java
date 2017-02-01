@@ -10,16 +10,14 @@ import org.junit.Before;
 import org.junit.Test;
 
 import protocol.HttpRequest;
-import protocol.ProtocolConfiguration;
+import protocol.Protocol;
 import protocol.ProtocolException;
 
 public class HttpRequestTest {
 	String sampleRequestLine;
-	private ProtocolConfiguration protocol;
 
 	@Before
 	public void setUp() {
-		this.protocol = new ProtocolConfiguration();
 		sampleRequestLine = "GET /somedir/page.html HTTP/1.1\r";
 	}
 	
@@ -27,13 +25,13 @@ public class HttpRequestTest {
 	public void testBadProtocolRequestCode() throws Exception {
 		String requestLine = "GET";
 		InputStream input = new ByteArrayInputStream(requestLine.getBytes());
-		HttpRequest.read(input, this.protocol);
+		HttpRequest.read(input);
 	}
 
 	@Test
 	public void testGetMethod() throws Exception {
 		InputStream input = new ByteArrayInputStream(sampleRequestLine.getBytes());
-		HttpRequest request = HttpRequest.read(input, this.protocol);
+		HttpRequest request = HttpRequest.read(input);
 		
 		String expected = "GET";
 		String actual = request.getMethod();
@@ -43,7 +41,7 @@ public class HttpRequestTest {
 	@Test
 	public void testGetUri() throws Exception {
 		InputStream input = new ByteArrayInputStream(sampleRequestLine.getBytes());
-		HttpRequest request = HttpRequest.read(input, this.protocol);
+		HttpRequest request = HttpRequest.read(input);
 		
 		String expected = "/somedir/page.html";
 		String actual = request.getUri();
@@ -53,7 +51,7 @@ public class HttpRequestTest {
 	@Test
 	public void testGetVersion() throws Exception {
 		InputStream input = new ByteArrayInputStream(sampleRequestLine.getBytes());
-		HttpRequest request = HttpRequest.read(input, this.protocol);
+		HttpRequest request = HttpRequest.read(input);
 		
 		String expected = "HTTP/1.1";
 		String actual = request.getVersion();
@@ -67,7 +65,7 @@ public class HttpRequestTest {
 		String req = sampleRequestLine + key + ": " + value + "\r";
 
 		InputStream input = new ByteArrayInputStream(req.getBytes());
-		HttpRequest request = HttpRequest.read(input, this.protocol);
+		HttpRequest request = HttpRequest.read(input);
 
 		Map<String, String> headers = request.getHeader();
 		String actual = headers.get(key);
@@ -84,7 +82,7 @@ public class HttpRequestTest {
 		String req = sampleRequestLine + key1 + ": " + value1 + "\r" +
 						key2 + ": " + value2 + "\r";
 		InputStream input = new ByteArrayInputStream(req.getBytes());
-		HttpRequest request = HttpRequest.read(input, this.protocol);
+		HttpRequest request = HttpRequest.read(input);
 
 		Map<String, String> headers = request.getHeader();
 		assertEquals(value1, headers.get(key1));
