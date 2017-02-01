@@ -6,6 +6,7 @@ import java.net.Socket;
 import java.util.HashMap;
 
 import protocol.*;
+import servlet.AServletManager;
 import utils.SwsLogger;
 
 /**
@@ -18,11 +19,11 @@ import utils.SwsLogger;
  */
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
-	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
+	private HashMap<String, AServletManager> contextRootToServlet;
 
-	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
+	public ConnectionHandler(Socket socket, HashMap<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
-		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
+		this.contextRootToServlet = contextRootToServlet;
 	}
 
 	/**
@@ -89,11 +90,17 @@ public class ConnectionHandler implements Runnable {
 		if (!request.getVersion().equalsIgnoreCase(Protocol.getProtocol().getStringRep(Keywords.VERSION))) {
 			response = (new HttpResponseBuilder(400)).generateResponse();
 		} else {
-			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
-			if (factory == null) {
+			// strip out /userapp/users/1 => "userapp" as context root
+			String uri = request.getUri();
+			int firstSlashIndex = uri.indexOf('/');
+			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
+			String contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
+			System.out.println(contextRoot);
+			AServletManager manager = this.contextRootToServlet.get(contextRoot);
+			if (manager == null) {
                 response = (new HttpResponseBuilder(501)).generateResponse();
 			} else {
-				response = factory.getRequestHandler().handleRequest(request);
+				response = manager.handleRequest(request);
 			}
 		}
 

@@ -15,6 +15,13 @@ The jar file is daemonized as a service using the `/etc/init.d/webserver` file. 
 
 We also have a file called `/home/csse/e2e.sh` which gets called upon deployments and runs an end-to-end curl test on the webserver. If the curl GET request does not return a 200 status code, we roll back the webserver to the previously known working version.
 
+## Plugin Deployment Structure
+For Servlet plugins, there are a few requirements that must be met to stand up your service.
+- The jar's manifest file must include a `Entry-Point` attribute representing the aboslute class name of the AServletManager implementation 
+- The jar's manifest file must include a `Context-Root` attribute representing the context root string for URIs to map to
+- A plugin must be dropped in the `/home/csse/plugin` directory on the server
+- A plugin will have its own directory created for reading and writing located at `/home/csse/"Context-Root-Value"`
+
 ## Architecture Diagram
 ![Architecture Diagram](docs/ArchitectureDiagram.png)
 

@@ -41,7 +41,7 @@ public class GetRequestTests {
 		fileName = "index.html";
 		String rootDirectory = "web";
 		port = 8080;
-		server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory));
+		server = new Server(port);
 		Thread runner = new Thread(server);
 		runner.start();
 

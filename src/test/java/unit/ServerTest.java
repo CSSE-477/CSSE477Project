@@ -37,14 +37,14 @@ public class ServerTest {
 	@Test
 	public void testIsStoppedTrivial() {
 		String fakeDir = "dir";
-		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir));
+		Server server = new Server(0);
 		assertEquals(true, server.isStoped());
 	}
 
 	@Test
 	public void testIsStoppedNontrivial() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
 		String fakeDir = "dir";
-		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir));
+		Server server = new Server(0);
 		Field welcomeSocket = server.getClass().getDeclaredField("welcomeSocket");
 		welcomeSocket.setAccessible(true);
 		ServerSocket socket = new ServerSocket();

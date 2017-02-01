@@ -9,6 +9,7 @@ import protocol.Keywords;
 import protocol.Protocol;
 import server.Server;
 import handlers.IRequestHandlerFactory;
+import utils.PluginDirectoryMonitor;
 import utils.ServerProperties;
 import utils.SwsLogger;
 
@@ -27,12 +28,19 @@ public class SimpleWebServer {
 		Properties properties = config.getProperties("config.properties");
 
 		String rootDirectory = properties.getProperty("rootDirectory");
+		String pluginDirectory = properties.getProperty("pluginDirectory");
 		int port = Integer.parseInt(properties.getProperty("port"));
 
 		// Create a run the server
-		Server server = new Server(port, getPopulatedFactoryHash(rootDirectory));
+		Server server = new Server(port);
+
 		Thread runner = new Thread(server);
 		runner.start();
+
+		// Create and run the directory monitor
+		PluginDirectoryMonitor monitor = new PluginDirectoryMonitor(pluginDirectory, server);
+		Thread monitorRunner = new Thread(monitor);
+		monitorRunner.start();
 
 		// DONE: Instead of just printing to the console, use proper logging mechanism.
 		// SL4J/Log4J are some popular logging framework

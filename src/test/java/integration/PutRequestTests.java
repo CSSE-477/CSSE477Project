@@ -57,7 +57,9 @@ public class PutRequestTests {
 		writer.close();
 		
 		port = 8080;
-		server = new Server(port, SimpleWebServer.getPopulatedFactoryHash(rootDirectory));
+		
+		server = new Server(port);
+
 		Thread runner = new Thread(server);
 		runner.start();
 
