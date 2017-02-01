@@ -18,7 +18,7 @@ import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
-import protocol.ProtocolConfiguration;
+import protocol.Protocol;
 import server.Server;
 
 import java.io.File;
@@ -41,8 +41,7 @@ public class GetRequestTests {
 		fileName = "index.html";
 		String rootDirectory = "web";
 		port = 8080;
-		ProtocolConfiguration protocol = SimpleWebServer.getProtocolConfiguration();
-		server = new Server(port, protocol);
+		server = new Server(port);
 		Thread runner = new Thread(server);
 		runner.start();
 

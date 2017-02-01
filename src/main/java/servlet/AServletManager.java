@@ -8,6 +8,8 @@ import java.util.Scanner;
 import protocol.HttpRequest;
 import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
+import protocol.Keywords;
+import protocol.Protocol;
 
 public abstract class AServletManager {
 
@@ -66,15 +68,15 @@ public abstract class AServletManager {
 		HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
 
 		// TODO: refactor pls
-		if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.GET)) {
+		if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.GET)) {
 			servlet.doGet(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.HEAD)) {
+		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.HEAD)) {
 			servlet.doHead(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.POST)) {
+		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.POST)) {
 			servlet.doPost(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.PUT)) {
+		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.PUT)) {
 			servlet.doPut(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol.getStringRep(Keywords.DELETE)) {
+		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.DELETE)) {
 			servlet.doDelete(request, responseBuilder);
 		}
 		

@@ -7,6 +7,8 @@ apply plugin: 'eclipse'
 apply plugin: 'idea'
 apply plugin: 'jacoco'
 apply plugin: 'application'
+apply plugin: 'maven'
+apply plugin: 'maven-publish'
 
 mainClassName = "app.SimpleWebServer"
 
@@ -53,10 +55,38 @@ jar {
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
 
+uploadArchives {
+	repositories {
+		mavenDeployer {
+			repository(url: "file://${buildDir}/repo")
+		}
+	}
+}
 
 task packageSources(type: Jar, dependsOn: 'classes') {
     from sourceSets.main.allSource
     classifier = 'sources'
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+			artifact packageSources
+        }
+    }
+}
+
+publishing {
+    repositories {
+        maven {
+            credentials {
+                username System.getenv('MAVEN_USER')
+                password System.getenv('MAVEN_PASSWORD')
+            }
+            url "https://maven.csse.rose-hulman.edu/artifactory/student-release-local"
+        }
+    }
 }
 
 

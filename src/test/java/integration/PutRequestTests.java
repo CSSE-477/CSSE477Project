@@ -24,7 +24,7 @@ import com.google.api.client.json.JsonObjectParser;
 import com.google.api.client.json.jackson.JacksonFactory;
 
 import app.SimpleWebServer;
-import protocol.ProtocolConfiguration;
+import protocol.Protocol;
 import server.Server;
 
 public class PutRequestTests {
@@ -57,9 +57,9 @@ public class PutRequestTests {
 		writer.close();
 		
 		port = 8080;
+		
+		server = new Server(port);
 
-		ProtocolConfiguration protocol = SimpleWebServer.getProtocolConfiguration();
-		server = new Server(port, protocol);
 		Thread runner = new Thread(server);
 		runner.start();
 

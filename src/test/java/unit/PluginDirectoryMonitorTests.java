@@ -1,6 +1,6 @@
 package unit;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -11,7 +11,6 @@ import java.util.jar.Manifest;
 import org.junit.Before;
 import org.junit.Test;
 
-import protocol.ProtocolConfiguration;
 import server.Server;
 import utils.FakeManifest;
 import utils.PluginDirectoryMonitor;
@@ -23,7 +22,7 @@ public class PluginDirectoryMonitorTests {
 	
 	@Before
 	public void setUp() throws IOException {
-		server = new Server(100, new ProtocolConfiguration());
+		server = new Server(100);
 		directory = "./web";
 		monitor = new PluginDirectoryMonitor(directory, server);
 	}

@@ -41,7 +41,6 @@ public class HttpResponse {
 	private String phrase;
 	private Map<String, String> header;
 	private File file;
-	private ProtocolConfiguration protocol;
 	
 	/**
 	 * Constructs a HttpResponse object using supplied parameter
@@ -52,13 +51,12 @@ public class HttpResponse {
 	 * @param header The header field map.
 	 * @param file The file to be sent.
 	 */
-	public HttpResponse(String version, int status, String phrase, Map<String, String> header, File file, ProtocolConfiguration protocol) {
+	public HttpResponse(String version, int status, String phrase, Map<String, String> header, File file) {
 		this.version = version;
 		this.status = status;
 		this.phrase = phrase;
 		this.header = header;
 		this.file = file;
-		this.protocol = protocol;
 	}
 
 	/**
@@ -119,10 +117,10 @@ public class HttpResponse {
         BufferedOutputStream out = new BufferedOutputStream(outStream, CHUNK_LENGTH);
 
 		// First status line
-		String line = this.version + this.protocol.getCharsetConstant(CharsetConstants.SPACE) +
-				this.status + this.protocol.getCharsetConstant(CharsetConstants.SPACE) + this.phrase +
-				this.protocol.getCharsetConstant(CharsetConstants.CR) +
-				this.protocol.getCharsetConstant(CharsetConstants.LF);
+		String line = this.version + Protocol.getProtocol().getStringRep(Keywords.SPACE) +
+				this.status + Protocol.getProtocol().getStringRep(Keywords.SPACE) + this.phrase +
+				Protocol.getProtocol().getStringRep(Keywords.CR) +
+				Protocol.getProtocol().getStringRep(Keywords.LF);
 		out.write(line.getBytes());
 		
 		// Write header fields if there is something to write in header field
@@ -132,17 +130,17 @@ public class HttpResponse {
 				String value = entry.getValue();
 
 				// Write each header field line
-				line = key + this.protocol.getCharsetConstant(CharsetConstants.SEPARATOR) +
-						this.protocol.getCharsetConstant(CharsetConstants.SPACE) + value +
-						this.protocol.getCharsetConstant(CharsetConstants.CR) +
-						this.protocol.getCharsetConstant(CharsetConstants.LF);
+				line = key + Protocol.getProtocol().getStringRep(Keywords.SEPARATOR) +
+						Protocol.getProtocol().getStringRep(Keywords.SPACE) + value +
+						Protocol.getProtocol().getStringRep(Keywords.CR) +
+						Protocol.getProtocol().getStringRep(Keywords.LF);
 				out.write(line.getBytes());
 			}
 		}
 
 		// Write a blank line
-		out.write(("" + this.protocol.getCharsetConstant(CharsetConstants.CR) +
-				this.protocol.getCharsetConstant(CharsetConstants.LF)).getBytes());
+		out.write(("" + Protocol.getProtocol().getStringRep(Keywords.CR) +
+				Protocol.getProtocol().getStringRep(Keywords.LF)).getBytes());
 
 		// We are reading a file
 		if(this.getStatus() == OK_CODE && file != null && file.exists()) {
@@ -169,21 +167,21 @@ public class HttpResponse {
 		StringBuffer buffer = new StringBuffer();
 		buffer.append("----------------------------------\n");
 		buffer.append(this.version);
-		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
+		buffer.append(Protocol.getProtocol().getStringRep(Keywords.SPACE));
 		buffer.append(this.status);
-		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
+		buffer.append(Protocol.getProtocol().getStringRep(Keywords.SPACE));
 		buffer.append(this.phrase);
-		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
+		buffer.append(Protocol.getProtocol().getStringRep(Keywords.LF));
 		
 		for(Map.Entry<String, String> entry : this.header.entrySet()) {
 			buffer.append(entry.getKey());
-			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SEPARATOR));
-			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.SPACE));
+			buffer.append(Protocol.getProtocol().getStringRep(Keywords.SEPARATOR));
+			buffer.append(Protocol.getProtocol().getStringRep(Keywords.SPACE));
 			buffer.append(entry.getValue());
-			buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
+			buffer.append(Protocol.getProtocol().getStringRep(Keywords.LF));
 		}
 		
-		buffer.append(this.protocol.getCharsetConstant(CharsetConstants.LF));
+		buffer.append(Protocol.getProtocol().getStringRep(Keywords.LF));
 		if(file != null) {
 			buffer.append("Data: ");
 			buffer.append(this.file.getAbsolutePath());

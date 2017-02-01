@@ -9,8 +9,8 @@ import java.io.IOException;
  */
 public class FileCreationUtility {
 
-    private static final String RESOURCE_DIR = "." + File.separator + "src" + File.separator + "test" + File.separator + "resource";
-    private static final String EXTENSION_SEP = ".";
+    public static final String RESOURCE_DIR = "." + File.separator + "src" + File.separator + "test" + File.separator + "resource";
+    public static final String EXTENSION_SEP = ".";
     public enum Extension { html, txt }
 
     public static boolean createResourceFile(String fileName, Extension extension) {

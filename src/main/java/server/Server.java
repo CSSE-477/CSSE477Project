@@ -27,7 +27,6 @@ import java.net.Socket;
 import java.util.HashMap;
 
 import handlers.ConnectionHandler;
-import protocol.ProtocolConfiguration;
 import servlet.AServletManager;
 import utils.SwsLogger;
 
@@ -43,17 +42,15 @@ public class Server implements Runnable, IDirectoryListener {
 	private boolean stop;
 	private ServerSocket welcomeSocket;
 	private boolean readyState;
-	private ProtocolConfiguration protocol;
 	private HashMap<String, AServletManager> pluginRootToServlet;
 
 	/**
 	 * @param port
 	 */
-	public Server(int port, ProtocolConfiguration protocol) {
+	public Server(int port) {
 		this.port = port;
 		this.stop = false;
 		this.readyState = false;
-		this.protocol = protocol;
 		this.pluginRootToServlet = new HashMap<String, AServletManager>();
 	}
 	
@@ -79,7 +76,7 @@ public class Server implements Runnable, IDirectoryListener {
                 }
 				
 				// Create a handler for this incoming connection and start the handler in a new thread
-				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.pluginRootToServlet, this.protocol);
+				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.pluginRootToServlet);
 				new Thread(handler).start();
 			}
 			this.welcomeSocket.close();
