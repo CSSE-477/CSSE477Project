@@ -2,6 +2,7 @@ stages:
   - build
   - deploy
   - staging-deploy
+  - maven-deploy
 
 build:
   stage: build
@@ -34,13 +35,11 @@ deploy:
   only:
     - tags
     
-deploy:
+maven-deploy:
   stage: deploy
   script:
     - gradle publish
   tags:
-    - gradle
-    - linux
-    - java
+    - 'Team #YOLOSWAG *dabs* SWS'
   only:
     - master
