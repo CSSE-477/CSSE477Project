@@ -72,7 +72,7 @@ publishing {
     publications {
         mavenJava(MavenPublication) {
             from components.java
-				artifact packageSources
+			artifact packageSources
         }
     }
 }
