@@ -27,8 +27,8 @@ import java.net.Socket;
 import java.util.HashMap;
 
 import handlers.ConnectionHandler;
-import handlers.IRequestHandlerFactory;
 import protocol.ProtocolConfiguration;
+import servlet.AServletManager;
 import utils.SwsLogger;
 
 
@@ -38,23 +38,23 @@ import utils.SwsLogger;
  * 
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
-public class Server implements Runnable {
+public class Server implements Runnable, IDirectoryListener {
 	private int port;
 	private boolean stop;
 	private ServerSocket welcomeSocket;
 	private boolean readyState;
-	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
 	private ProtocolConfiguration protocol;
+	private HashMap<String, AServletManager> pluginRootToServlet;
 
 	/**
 	 * @param port
 	 */
-	public Server(int port, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap, ProtocolConfiguration protocol) {
+	public Server(int port, ProtocolConfiguration protocol) {
 		this.port = port;
 		this.stop = false;
 		this.readyState = false;
-		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
 		this.protocol = protocol;
+		this.pluginRootToServlet = new HashMap<String, AServletManager>();
 	}
 	
 	/**
@@ -79,7 +79,7 @@ public class Server implements Runnable {
                 }
 				
 				// Create a handler for this incoming connection and start the handler in a new thread
-				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.requestHandlerFactoryMap, this.protocol);
+				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.pluginRootToServlet, this.protocol);
 				new Thread(handler).start();
 			}
 			this.welcomeSocket.close();
@@ -112,7 +112,7 @@ public class Server implements Runnable {
 	public synchronized boolean isReady() {
 	    return this.readyState;
     }
-	
+
 	/**
 	 * Checks if the server is stopeed or not.
 	 * @return
@@ -121,5 +121,19 @@ public class Server implements Runnable {
 		if(this.welcomeSocket != null)
 			return this.welcomeSocket.isClosed();
 		return true;
+	}
+
+	@Override
+	public void addPlugin(String contextRoot, AServletManager manager) {
+		this.pluginRootToServlet.put(contextRoot, manager);
+	}
+
+	@Override
+	public void removePlugin(String contextRoot) {
+		AServletManager manager = this.pluginRootToServlet.get(contextRoot);
+		if (manager != null) {
+			manager.destroy();
+		}
+		this.pluginRootToServlet.put(contextRoot, null);
 	}
 }

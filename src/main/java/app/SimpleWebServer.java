@@ -32,7 +32,7 @@ public class SimpleWebServer {
 		ProtocolConfiguration protocol = getProtocolConfiguration();
 
 		// Create a run the server
-		Server server = new Server(port, getPopulatedFactoryHash(rootDirectory, protocol), protocol);
+		Server server = new Server(port, protocol);
 		Thread runner = new Thread(server);
 		runner.start();
 
