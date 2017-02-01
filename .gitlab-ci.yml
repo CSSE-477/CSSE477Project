@@ -25,7 +25,7 @@ staging-deploy:
     - master
 
 deploy:
-  stage: deploy
+  stage: maven-deploy
   variables:
     SSH_HOST: '477-06.csse.rose-hulman.edu'
   script:
