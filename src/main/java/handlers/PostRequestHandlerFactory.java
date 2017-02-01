@@ -13,15 +13,13 @@ import java.io.IOException;
 public class PostRequestHandlerFactory implements IRequestHandlerFactory {
 
     private String rootDirectory;
-    private ProtocolConfiguration protocol;
 
-    public PostRequestHandlerFactory(String rootDirectory, ProtocolConfiguration protocol){
+    public PostRequestHandlerFactory(String rootDirectory){
         this.rootDirectory = rootDirectory;
-        this.protocol = protocol;
     }
     @Override
     public IRequestHandler getRequestHandler() {
-        return new PostRequestHandler(this.rootDirectory, this.protocol);
+        return new PostRequestHandler(this.rootDirectory);
     }
 
     /**
@@ -31,11 +29,9 @@ public class PostRequestHandlerFactory implements IRequestHandlerFactory {
     public class PostRequestHandler implements IRequestHandler {
 
         private String rootDirectory;
-        private ProtocolConfiguration protocol;
 
-        PostRequestHandler(String rootDirectory, ProtocolConfiguration protocol) {
+        PostRequestHandler(String rootDirectory) {
             this.rootDirectory = rootDirectory;
-            this.protocol = protocol;
         }
 
         @Override
@@ -47,24 +43,24 @@ public class PostRequestHandlerFactory implements IRequestHandlerFactory {
                 try {
                     testFile.createNewFile();
                 } catch (IOException e) {
-                    return (new HttpResponseBuilder(500, this.protocol)).generateResponse();
+                    return (new HttpResponseBuilder(500)).generateResponse();
                 }
             }
             else if(testFile.isDirectory()){
-                return (new HttpResponseBuilder(400, this.protocol)).generateResponse();
+                return (new HttpResponseBuilder(400)).generateResponse();
             }
             FileWriter fw;
             try {
                 fw = new FileWriter(testFile, true);
                 System.out.println(request.getHeader());
-                int amount = Integer.parseInt(request.getHeader().get(this.protocol
-                        .getResponseHeader(ResponseHeaders.CONTENT_LENGTH)));
+                int amount = Integer.parseInt(request.getHeader()
+                        .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
                 fw.write(new String(request.getBody()), 0, amount);
                 fw.close();
             } catch (IOException e) {
-                return (new HttpResponseBuilder(500, this.protocol)).generateResponse();
+                return (new HttpResponseBuilder(500)).generateResponse();
             }
-            return (new HttpResponseBuilder(200, this.protocol)).setFile(testFile).generateResponse();
+            return (new HttpResponseBuilder(200)).setFile(testFile).generateResponse();
         }
     }
 }

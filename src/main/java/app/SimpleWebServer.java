@@ -5,8 +5,8 @@ import handlers.GetRequestHandlerFactory;
 import handlers.HeadRequestHandlerFactory;
 import handlers.PostRequestHandlerFactory;
 import handlers.PutRequestHandlerFactory;
-import protocol.ProtocolConfiguration;
-import protocol.ProtocolElements;
+import protocol.Keywords;
+import protocol.Protocol;
 import server.Server;
 import handlers.IRequestHandlerFactory;
 import utils.ServerProperties;
@@ -29,10 +29,8 @@ public class SimpleWebServer {
 		String rootDirectory = properties.getProperty("rootDirectory");
 		int port = Integer.parseInt(properties.getProperty("port"));
 
-		ProtocolConfiguration protocol = getProtocolConfiguration();
-
 		// Create a run the server
-		Server server = new Server(port, getPopulatedFactoryHash(rootDirectory, protocol), protocol);
+		Server server = new Server(port, getPopulatedFactoryHash(rootDirectory));
 		Thread runner = new Thread(server);
 		runner.start();
 
@@ -45,23 +43,19 @@ public class SimpleWebServer {
 		runner.join();
 	}
 
-	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(String rootDirectory, ProtocolConfiguration protocol){
+	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(String rootDirectory){
 		// Add factories to the map or create them in-line if that is preferable, then return below
 		HashMap<String, IRequestHandlerFactory> factoryMap = new HashMap<>();
-		factoryMap.put(protocol.getProtocolElement(ProtocolElements.GET),
-				new GetRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolElements.HEAD),
-				new HeadRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolElements.POST),
-				new PostRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolElements.PUT),
-				new PutRequestHandlerFactory(rootDirectory, protocol));
-		factoryMap.put(protocol.getProtocolElement(ProtocolElements.DELETE),
-				new DeleteRequestHandlerFactory(rootDirectory, protocol));
+		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.GET),
+				new GetRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD),
+				new HeadRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.POST),
+				new PostRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT),
+				new PutRequestHandlerFactory(rootDirectory));
+		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE),
+				new DeleteRequestHandlerFactory(rootDirectory));
 		return factoryMap;
-	}
-
-	public static ProtocolConfiguration getProtocolConfiguration(){
-		return new ProtocolConfiguration();
 	}
 }

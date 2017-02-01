@@ -14,15 +14,13 @@ import java.util.Date;
 public class HeadRequestHandlerFactory implements IRequestHandlerFactory {
 
 	private String rootDirectory;
-	private ProtocolConfiguration protocol;
 
-	public HeadRequestHandlerFactory(String rootDirectory, ProtocolConfiguration protocol){
+	public HeadRequestHandlerFactory(String rootDirectory){
 		this.rootDirectory = rootDirectory;
-		this.protocol = protocol;
 	}
 	@Override
 	public IRequestHandler getRequestHandler() {
-		return new HeadRequestHandler(this.rootDirectory, this.protocol);
+		return new HeadRequestHandler(this.rootDirectory);
 	}
 
 	/**
@@ -32,11 +30,9 @@ public class HeadRequestHandlerFactory implements IRequestHandlerFactory {
 	public class HeadRequestHandler implements IRequestHandler {
 
 		private String rootDirectory;
-		private ProtocolConfiguration protocol;
 
-		HeadRequestHandler(String rootDirectory, ProtocolConfiguration protocol) {
+		HeadRequestHandler(String rootDirectory) {
 			this.rootDirectory = rootDirectory;
-			this.protocol = protocol;
 		}
 
 		@Override
@@ -48,11 +44,11 @@ public class HeadRequestHandlerFactory implements IRequestHandlerFactory {
 			File file = new File(fullPath);
 
 			if (!file.exists()) {
-				response = (new HttpResponseBuilder(404, this.protocol)).generateResponse();
+				response = (new HttpResponseBuilder(404)).generateResponse();
 			} else if (file.isDirectory()) {
 				// check for default file before sending 400
 				String location = fullPath.concat(System.getProperty("file.separator"))
-						.concat(this.protocol.getServerInfo(ServerInfoFields.DEFAULT_FILE));
+						.concat(Protocol.getProtocol().getStringRep(Keywords.DEFAULT_FILE));
 				file = new File(location);
 
 				if (file.exists()) {
@@ -62,7 +58,7 @@ public class HeadRequestHandlerFactory implements IRequestHandlerFactory {
 				} else {
 					SwsLogger.errorLogger
 							.error("HEAD to file " + file.getAbsolutePath() + ". Sending 400 Bad Request");
-					response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
+					response = (new HttpResponseBuilder(400)).generateResponse();
 				}
 			} else {
 				// file exists; return last modified, file size, file type
@@ -78,7 +74,7 @@ public class HeadRequestHandlerFactory implements IRequestHandlerFactory {
 			String lastModified = new Date(file.lastModified()).toString();
 			String fileSize = String.valueOf(file.length());
 			String fileType = FilenameUtils.getExtension(file.getAbsolutePath());
-			return (new HttpResponseBuilder(200, this.protocol)).setFile(file)
+			return (new HttpResponseBuilder(200)).setFile(file)
 					.putHeader("lastModified", lastModified).putHeader("fileSize", fileSize)
 					.putHeader("fileType", fileType).generateResponse();
 		}

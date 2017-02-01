@@ -19,13 +19,10 @@ import utils.SwsLogger;
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
 	private HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap;
-	private ProtocolConfiguration protocol;
 
-	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap,
-							 ProtocolConfiguration protocol) {
+	public ConnectionHandler(Socket socket, HashMap<String, IRequestHandlerFactory> requestHandlerFactoryMap) {
 		this.socket = socket;
 		this.requestHandlerFactoryMap = requestHandlerFactoryMap;
-		this.protocol = protocol;
 	}
 
 	/**
@@ -54,8 +51,8 @@ public class ConnectionHandler implements Runnable {
 		HttpRequest request = null;
 		HttpResponse response = null;
 		try {
-			request = HttpRequest.read(inStream, this.protocol);
-			SwsLogger.accessLogger.info("Recieved Request:\n" + request.toString());
+			request = HttpRequest.read(inStream);
+			SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
 		} catch (ProtocolException pe) {
 			// We have some sort of protocol exception. Get its status code and
 			// create response
@@ -63,10 +60,10 @@ public class ConnectionHandler implements Runnable {
 			// fromInputStream
 			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
 			int status = pe.getStatus();
-            response = (new HttpResponseBuilder(status, this.protocol)).generateResponse();
+            response = (new HttpResponseBuilder(status)).generateResponse();
 		} catch (Exception e) {
 			// For any other error, we will create bad request response as well
-            response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
+            response = (new HttpResponseBuilder(400)).generateResponse();
 		}
 
 		if (response != null) {
@@ -89,12 +86,12 @@ public class ConnectionHandler implements Runnable {
 		// You may want to use constants such as Protocol.VERSION,
 		// Protocol.NOT_SUPPORTED_CODE, and more.
 		// You can check if the version matches as follows
-		if (!request.getVersion().equalsIgnoreCase(this.protocol.getProtocolElement(ProtocolElements.VERSION))) {
-			response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
+		if (!request.getVersion().equalsIgnoreCase(Protocol.getProtocol().getStringRep(Keywords.VERSION))) {
+			response = (new HttpResponseBuilder(400)).generateResponse();
 		} else {
 			IRequestHandlerFactory factory = this.requestHandlerFactoryMap.get(request.getMethod());
 			if (factory == null) {
-                response = (new HttpResponseBuilder(501, this.protocol)).generateResponse();
+                response = (new HttpResponseBuilder(501)).generateResponse();
 			} else {
 				response = factory.getRequestHandler().handleRequest(request);
 			}
@@ -103,7 +100,7 @@ public class ConnectionHandler implements Runnable {
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if (response == null) {
-            response = (new HttpResponseBuilder(400, this.protocol)).generateResponse();
+            response = (new HttpResponseBuilder(400)).generateResponse();
 		}
 
 		try {

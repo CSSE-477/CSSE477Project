@@ -12,16 +12,14 @@ import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import protocol.ProtocolConfiguration;
+import protocol.Protocol;
 import server.Server;
 
 public class ServerTest {
 
-	private static ProtocolConfiguration protocol;
 
 	@BeforeClass
 	public static void setUpBeforeClass() throws Exception {
-		protocol = new ProtocolConfiguration();
 	}
 
 	@AfterClass
@@ -39,14 +37,14 @@ public class ServerTest {
 	@Test
 	public void testIsStoppedTrivial() {
 		String fakeDir = "dir";
-		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir, protocol), protocol);
+		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir));
 		assertEquals(true, server.isStoped());
 	}
 
 	@Test
 	public void testIsStoppedNontrivial() throws NoSuchFieldException, SecurityException, IllegalArgumentException, IllegalAccessException, IOException {
 		String fakeDir = "dir";
-		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir, protocol), protocol);
+		Server server = new Server(0, SimpleWebServer.getPopulatedFactoryHash(fakeDir));
 		Field welcomeSocket = server.getClass().getDeclaredField("welcomeSocket");
 		welcomeSocket.setAccessible(true);
 		ServerSocket socket = new ServerSocket();
