@@ -15,7 +15,7 @@ import protocol.Protocol;
 import utils.SwsLogger;
 
 public abstract class AServletManager {
-    
+
     private HashMap<String, Method> invokationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
 	protected String filePath;
@@ -114,8 +114,7 @@ public abstract class AServletManager {
 		
 		return true;
 	}
-
-	// With the changes below it will be 1.0.4 - more changes to be made
+    
 	public HttpResponse handleRequest(HttpRequest request) {
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
@@ -127,7 +126,7 @@ public abstract class AServletManager {
             return responseBuilder.generateResponse();
         }
 
-		String servletKey = uriSplit[1];
+		String servletKey = uriSplit[2];
 		
 		AHttpServlet servlet = this.servletMap.get(servletKey);
 
