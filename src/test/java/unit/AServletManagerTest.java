@@ -54,7 +54,7 @@ public class AServletManagerTest {
 
     @Test
     public void testParseConfig() throws Exception {
-        concreteManager = new ConcreteServletManager("fakeFilePath");
+        concreteManager = new ConcreteServletManager("fakeFilePath", null);
         Field f = concreteManager.getClass().getSuperclass().getDeclaredField("servletMap");
         f.setAccessible(true);
         HashMap<String, AHttpServlet> servletMap = (HashMap<String, AHttpServlet>) f.get(concreteManager);
@@ -68,7 +68,7 @@ public class AServletManagerTest {
             this.testFile.delete();
         }
         this.testFile.createNewFile();
-        concreteManager = new ConcreteServletManager("fakeFilePath");
+        concreteManager = new ConcreteServletManager("fakeFilePath", null);
         Field f = concreteManager.getClass().getSuperclass().getDeclaredField("servletMap");
         f.setAccessible(true);
         assertTrue(concreteManager.isValid());
@@ -76,12 +76,12 @@ public class AServletManagerTest {
     }
 
     @Test
-    public void testParseNullConfigFile() throws Exception {
+    public void testParseNotFoundConfigFile() throws Exception {
         if(this.testFile != null && this.testFile.exists()){
             this.testFile.delete();
         }
         this.testFile.createNewFile();
-        concreteManager = new ConcreteServletManager("fakeFilePath");
+        concreteManager = new ConcreteServletManagerBadFile("fakeFilePath", null);
         Field f = concreteManager.getClass().getSuperclass().getDeclaredField("servletMap");
         f.setAccessible(true);
         assertFalse(concreteManager.isValid());
@@ -110,7 +110,7 @@ public class AServletManagerTest {
                 e.printStackTrace();
             }
         }
-        concreteManager = new ConcreteServletManager("fakeFilePath");
+        concreteManager = new ConcreteServletManager("fakeFilePath", null);
         Field f = concreteManager.getClass().getSuperclass().getDeclaredField("servletMap");
         f.setAccessible(true);
         assertFalse(concreteManager.isValid());

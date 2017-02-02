@@ -1,6 +1,8 @@
 package servlet;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -22,12 +24,13 @@ public abstract class AServletManager {
 
 	private boolean validStatus;
 
-	protected File configFile;
 	protected static final String CONFIG_DELIMETER =  ",";
 	protected static final String URI_DELIMETER = "/";
+    protected InputStream configStream;
 
-	public AServletManager(String filePath) {
+	public AServletManager(String filePath, InputStream configStream) {
 	    this.invocationMap = new HashMap<>();
+
         Method getMethod;
         Method putMethod;
         Method postMethod;
@@ -49,6 +52,7 @@ public abstract class AServletManager {
             e.printStackTrace();
         }
         this.servletMap = new HashMap<>();
+		this.configStream = configStream;
 		this.filePath = filePath;
 		this.init();
 		this.validStatus = this.parseConfigFile();
@@ -68,13 +72,13 @@ public abstract class AServletManager {
 		 * Request Type,Relative URI,Servlet Class
 		 * HEAD,/users/{id}/edu.rosehulman.userapp.UserServlet
 		 */
-		if (this.configFile == null) {
-			SwsLogger.accessLogger.info("Did not initialize configFile object in ServletManager.init()");
+		if (this.configStream == null) {
+			SwsLogger.accessLogger.info("Did not initialize configFile at ./config.csv");
 			return false;
 		}
 		Scanner scanner = null;
 		try {
-			scanner = new Scanner(this.configFile);
+			scanner = new Scanner(configStream);
 
 			scanner.useDelimiter(CONFIG_DELIMETER);
 

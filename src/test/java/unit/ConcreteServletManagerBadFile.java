@@ -1,9 +1,7 @@
 package unit;
 
 import servlet.AServletManager;
-import utils.FileCreationUtility;
-
-import java.io.File;
+import java.io.InputStream;
 
 /**
  * Created by TrottaSN on 2/2/2017.
@@ -11,13 +9,13 @@ import java.io.File;
  */
 public class ConcreteServletManagerBadFile extends AServletManager {
 
-    public ConcreteServletManagerBadFile(String filePath) {
-        super(filePath);
+    public ConcreteServletManagerBadFile(String filePath, InputStream configStream) {
+        super(filePath, configStream);
     }
 
     @Override
     public void init() {
-        this.configFile = new File(FileCreationUtility.RESOURCE_DIR, "NOTEVENVALIDWHATAREYOUDOING");
+        this.configStream = null;
     }
 
     @Override
