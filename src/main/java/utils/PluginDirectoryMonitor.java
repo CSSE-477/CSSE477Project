@@ -82,7 +82,13 @@ public class PluginDirectoryMonitor implements Runnable {
     		if (entryPointClassName != null) {
     			Class<?> c = cl.loadClass(entryPointClassName);
     			Constructor<?> constructor = c.getConstructor(String.class);
-    			String pluginPathDirectory = this.directoryPath + "/" + this.jarPathToContextRoot.get(pathToJar);
+    			
+    			String contextRoot = this.jarPathToContextRoot.get(pathToJar);
+    			// DEFAULT plugin gets web as the directory it reads / writes to
+    			if (contextRoot.equals("")) {
+    				contextRoot = "web";
+    			}
+    			String pluginPathDirectory = this.directoryPath + "/" + contextRoot;
     			Object result = constructor.newInstance(pluginPathDirectory);
 
     			// TODO: create this directory on the VM
@@ -98,12 +104,12 @@ public class PluginDirectoryMonitor implements Runnable {
     		}
 
     	} catch (Exception e) {
-    		SwsLogger.errorLogger.error("Error loading jar file " + pathToJar);
+    		SwsLogger.errorLogger.error("Error loading jar file " + pathToJar, e);
     	} finally {
     		try {
     			jar.close();
     		} catch (Exception er) {
-    			SwsLogger.errorLogger.error("Error closing jar file " + pathToJar);
+    			SwsLogger.errorLogger.error("Error closing jar file " + pathToJar, er);
     		}
     	}
     }

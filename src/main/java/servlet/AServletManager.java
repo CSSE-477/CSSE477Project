@@ -1,7 +1,6 @@
 package servlet;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -21,7 +20,7 @@ public abstract class AServletManager {
 	protected HashMap<String, AHttpServlet> servletMap;
 	protected String filePath;
 
-	protected static final String CONFIG_RELATIVE_PATH = "./config.csv";
+	protected File configFile;
 	protected static final String CONFIG_DELIMETER =  ",";
 	protected static final String URI_DELIMETER = "/";
 
@@ -33,15 +32,15 @@ public abstract class AServletManager {
         Method deleteMethod;
         Method headMethod;
         try {
-            getMethod = AHttpServlet.class.getDeclaredMethod("doGet");
+            getMethod = AHttpServlet.class.getDeclaredMethod("doGet", HttpRequest.class, HttpResponseBuilder.class);
             this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), getMethod);
-            putMethod = AHttpServlet.class.getDeclaredMethod("doPut");
+            putMethod = AHttpServlet.class.getDeclaredMethod("doPut", HttpRequest.class, HttpResponseBuilder.class);
             this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), putMethod);
-            postMethod = AHttpServlet.class.getDeclaredMethod("doPost");
+            postMethod = AHttpServlet.class.getDeclaredMethod("doPost", HttpRequest.class, HttpResponseBuilder.class);
             this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), postMethod);
-            deleteMethod = AHttpServlet.class.getDeclaredMethod("doDelete");
+            deleteMethod = AHttpServlet.class.getDeclaredMethod("doDelete", HttpRequest.class, HttpResponseBuilder.class);
             this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), deleteMethod);
-            headMethod = AHttpServlet.class.getDeclaredMethod("doHead");
+            headMethod = AHttpServlet.class.getDeclaredMethod("doHead", HttpRequest.class, HttpResponseBuilder.class);
             this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), headMethod);
         } catch (NoSuchMethodException e) {
             this.invokationMap.clear();
@@ -49,8 +48,8 @@ public abstract class AServletManager {
         }
         this.servletMap = new HashMap<>();
 		this.filePath = filePath;
-		this.parseConfigFile();
 		this.init();
+		this.parseConfigFile();
 	}
 
 	public abstract void init();
@@ -63,9 +62,13 @@ public abstract class AServletManager {
 		 * Request Type,Relative URI,Servlet Class
 		 * HEAD,/users/{id}/edu.rosehulman.userapp.UserServlet
 		 */
-		File config = new File(CONFIG_RELATIVE_PATH);
+		if (this.configFile == null) {
+			SwsLogger.accessLogger.info("Did not initialize configFile object in ServletManager.init()");
+			return false;
+		}
+		Scanner scanner = null;
 		try {
-			Scanner scanner = new Scanner(config);
+			scanner = new Scanner(this.configFile);
 
 			scanner.useDelimiter(CONFIG_DELIMETER);
 
@@ -107,9 +110,12 @@ public abstract class AServletManager {
 
             }
         catch (Exception e) {
-            e.printStackTrace();
-            SwsLogger.errorLogger.error("Exception while parsing config file.");
+            SwsLogger.errorLogger.error("Exception while parsing config file.", e);
             return false;
+        } finally {
+        	if (scanner != null) {
+        		scanner.close();
+        	}
         }
 		return true;
 	}
@@ -135,7 +141,6 @@ public abstract class AServletManager {
         try {
             this.invokationMap.get(request.getMethod()).invoke(servlet, request, responseBuilder);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            e.printStackTrace();
             SwsLogger.errorLogger.error("Invokation Failure.", e);
         }
 
