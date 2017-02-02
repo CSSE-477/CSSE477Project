@@ -2,6 +2,7 @@ package utils;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -100,7 +101,7 @@ public class PluginDirectoryMonitor implements Runnable {
     		// if the manifest file succeeded
     		if (entryPointClassName != null) {
     			Class<?> c = cl.loadClass(entryPointClassName);
-    			Constructor<?> constructor = c.getConstructor(String.class, File.class);
+    			Constructor<?> constructor = c.getConstructor(String.class, InputStream.class);
     			
     			String contextRoot = this.jarPathToContextRoot.get(pathToJar);
     			// DEFAULT plugin gets web as the directory it reads / writes to
@@ -108,15 +109,14 @@ public class PluginDirectoryMonitor implements Runnable {
     				contextRoot = "web";
     			}
    
-    			String configPath = cl.getResource("config.csv").getFile();
-    			File file = new File(configPath);
+    			InputStream configStream = cl.getResourceAsStream("./config.csv");
     			String pluginPathDirectory = this.directoryPath + "/" + contextRoot;
-    			Object result = constructor.newInstance(pluginPathDirectory, file);
+    			Object result = constructor.newInstance(pluginPathDirectory, configStream);
 
     			// create this directory on the VM
     			if (!contextRoot.equals("web")) {
     				File dir = new File(pluginPathDirectory);
-    				if (!file.exists()) {
+    				if (!dir.exists()) {
     					dir.mkdir();
     				}
     			}
