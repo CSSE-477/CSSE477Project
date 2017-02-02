@@ -21,8 +21,6 @@ public class HttpRequest {
 	private String version;
 	private Map<String, String> header;
 	private char[] body;
-	private Protocol protocol;
-	
 	private HttpRequest() {
 		this.header = new HashMap<>();
 		this.body = new char[0];
