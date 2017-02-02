@@ -114,7 +114,7 @@ public abstract class AServletManager {
 		
 		return true;
 	}
-    
+
 	public HttpResponse handleRequest(HttpRequest request) {
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();

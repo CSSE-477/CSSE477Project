@@ -20,6 +20,7 @@ public class HttpResponseTest {
 	private String phrase;
 	private Map<String, String> header;
 	private File file;
+	private String body;
 
 	@Before
 	public void setUp() {
@@ -28,32 +29,33 @@ public class HttpResponseTest {
 		phrase = Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(this.status));
 		header = new HashMap<>();
 		file = null;
+		body = null;
 	}
 
 	@Test
 	public void testGetVersion() {
 		version = "someweirdversion";
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, body);
 		assertEquals(version, res.getVersion());
 	}
 	
 	@Test
 	public void testGetStatus() {
 		status = 404;
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, body);
 		assertEquals(status, res.getStatus());
 	}
 	
 	@Test
 	public void testGetPhrase() {
 		phrase = "Bad Request";
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, body);
 		assertEquals(phrase, res.getPhrase());
 	}
 	
 	@Test
 	public void testGetFile() {
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, body);
 		assertEquals(file, res.getFile());
 	}
 	
@@ -63,7 +65,7 @@ public class HttpResponseTest {
 		String key = "helloWorld".toLowerCase();
 		header.put(key, value);
 
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, body);
 		assertEquals(value, res.getHeader().get(key));
 	}
 	
@@ -74,7 +76,7 @@ public class HttpResponseTest {
 		String value = "testValue";
 		String key = "helloWorld".toLowerCase();
 		header.put(key, value);
-		HttpResponse res = new HttpResponse(version, status, phrase, header, file);
+		HttpResponse res = new HttpResponse(version, status, phrase, header, file, body);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();		
 		String expected = version + " " + status + " " + phrase + "\r\n" +
