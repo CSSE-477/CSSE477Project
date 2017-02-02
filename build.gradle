@@ -194,8 +194,13 @@ task publishToWebServer(dependsOn: jar) << {
 			executeSudo('unzip /tmp/YoloSwagSWS/C*.zip -d /home/csse', pty: true)
 			executeSudo('mv /home/csse/CSSE477Project*/* /home/csse/YoloSwagSWS', pty: true)
 			executeSudo('rm -rf /home/csse/CSSE477Project*/', pty: true)
+
 			println("Creating plugin directory /home/csse/YoloSwagSWS/bin/plugin")
-			executeSudo('sudo mkdir /home/csse/YoloSwagSWS/bin/plugin', pty: true)
+			executeSudo('mkdir /home/csse/YoloSwagSWS/bin/plugin', pty: true)
+			println("Moving static web directory to /home/csse/YoloSwagSWS/bin/plugin/web")
+			execute('rm -rf /tmp/web', pty: true)
+			put from: "${projectDir}/web", into: '/tmp'
+			executeSudo('mv /tmp/web /home/csse/YoloSwagSWS/bin/plugin', pty: true)
 
 			println "Stopping YoloSwagWebServer service"
 			executeSudo('service webserver stop', pty: true)

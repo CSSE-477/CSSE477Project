@@ -180,7 +180,7 @@ public class PluginDirectoryMonitor implements Runnable {
                 // handle event
             	if (!child.toString().endsWith(".jar")) {
             		SwsLogger.accessLogger.info("Plugin directory didn't process: " + child + " file");
-            	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+            	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {// || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
             		handleJarUpserted(child.toString());
                 } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
 //                	handleJarDeleted(child.toString());
