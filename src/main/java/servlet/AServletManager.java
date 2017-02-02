@@ -1,7 +1,10 @@
 package servlet;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -10,11 +13,12 @@ import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
 import protocol.Keywords;
 import protocol.Protocol;
+import utils.SwsLogger;
 
 public abstract class AServletManager {
 
+    protected HashMap<String, Method> invokationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
-    protected HashMap<String, String> typeMap;
 	protected String filePath;
 
 	protected static final String CONFIG_RELATIVE_PATH = "./config.csv";
@@ -22,13 +26,34 @@ public abstract class AServletManager {
 	protected static final String URI_DELIMETER = "/";
 
 	public AServletManager(String filePath) {
-		this.servletMap = new HashMap<>();
-		this.typeMap = new HashMap<>();
+	    this.invokationMap = new HashMap<>();
+        Method getMethod;
+        Method putMethod;
+        Method postMethod;
+        Method deleteMethod;
+        Method headMethod;
+        try {
+            getMethod = AHttpServlet.class.getDeclaredMethod("doGet");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), getMethod);
+            putMethod = AHttpServlet.class.getDeclaredMethod("doPut");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), putMethod);
+            postMethod = AHttpServlet.class.getDeclaredMethod("doPost");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), postMethod);
+            deleteMethod = AHttpServlet.class.getDeclaredMethod("doDelete");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), deleteMethod);
+            headMethod = AHttpServlet.class.getDeclaredMethod("doHead");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), headMethod);
+        } catch (NoSuchMethodException e) {
+            this.invokationMap.clear();
+            e.printStackTrace();
+        }
+        this.servletMap = new HashMap<>();
 		this.filePath = filePath;
+		this.parseConfigFile();
 		this.init();
 	}
 
-	abstract void init();
+	public abstract void init();
 
 	public abstract void destroy();
 
@@ -45,58 +70,50 @@ public abstract class AServletManager {
 			scanner.useDelimiter(CONFIG_DELIMETER);
 
 			int delimited_values = 0;
-			String requestType = null;
 			String relativeUri = null;
 			String servletClassName = null;
 			while(scanner.hasNext()) {
-			    switch(delimited_values){
-                    case(0):
-                        requestType = scanner.next();
-                        break;
-                    case(1):
+                    if(delimited_values == 0) {
                         relativeUri = scanner.next();
                         // extract "users" from "/users/{id}"
                         String[] relativeSplit = relativeUri.split(URI_DELIMETER);
-                        if(relativeSplit.length <= 1){
+                        if (relativeSplit.length < 1) {
                             return false;
                         }
-                        else{
-                            relativeUri = relativeSplit[1];
-                        }
-                        break;
-                    case(2):
+                        relativeUri = relativeSplit[1];
+                    }
+                    else if(delimited_values == 1) {
                         servletClassName = scanner.next();
-                        if(servletClassName == null || servletClassName.isEmpty()){
+                        if (servletClassName == null || servletClassName.isEmpty()) {
                             return false;
                         }
                         Class<?> servletClass = Class.forName(servletClassName);
                         Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
                         AHttpServlet servletInstance = (AHttpServlet) servletConstructor.newInstance(this.filePath);
-                        if(relativeUri == null || relativeUri.isEmpty() || requestType == null || requestType.isEmpty()){
+                        if (relativeUri == null || relativeUri.isEmpty()) {
                             return false;
                         }
-                        this.typeMap.put(relativeUri, requestType);
                         this.servletMap.put(relativeUri, servletInstance);
-                        requestType = null;
                         relativeUri = null;
                         servletClassName = null;
                         delimited_values = 0;
-                        break;
-                    default:
-                        return false;
+                    }
+                    delimited_values++;
                 }
-                delimited_values++;
-			}
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		
+                if(delimited_values != 0) {
+                    SwsLogger.errorLogger.error("CSV file not properly formed");
+                    return false;
+                }
+
+            }
+        catch (Exception e) {
+            e.printStackTrace();
+            SwsLogger.errorLogger.error("Exception while parsing config file.");
+            return false;
+        }
 		return true;
 	}
 
-	// With the changes below it will be 1.0.4 - more changes to be made
 	public HttpResponse handleRequest(HttpRequest request) {
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
@@ -108,25 +125,20 @@ public abstract class AServletManager {
             return responseBuilder.generateResponse();
         }
 
-		String servletKey = uriSplit[1];
+		String servletKey = uriSplit[2];
 		
 		AHttpServlet servlet = this.servletMap.get(servletKey);
 
-		// TODO: refactor pls
-		if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))) {
-			servlet.doGet(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-			servlet.doHead(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))) {
-			servlet.doPost(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))) {
-			servlet.doPut(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.DELETE))) {
-			servlet.doDelete(request, responseBuilder);
-		}
-		
-		// TODO: verify that response is okay?
-		
-		return responseBuilder.generateResponse();
+		/*
+		Below is a definite possible source of error
+		 */
+        try {
+            this.invokationMap.get(request.getMethod()).invoke(servlet, request, responseBuilder);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            SwsLogger.errorLogger.error("Invokation Failure.", e);
+        }
+
+        return responseBuilder.generateResponse();
 	}
 }

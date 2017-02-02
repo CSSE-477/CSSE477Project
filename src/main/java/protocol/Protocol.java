@@ -35,6 +35,7 @@ public class Protocol {
         codeMap.put(500, Keywords.INTERNAL_SERVER_ERROR);
         codeMap.put(501, Keywords.NOT_IMPLEMENTED);
         codeMap.put(505, Keywords.HTTP_VERSION_NOT_SUPPORTED);
+        codeMap.put(204, Keywords.NO_CONTENT);
 
         HashMap<Keywords, String> keyMap = new HashMap<>();
         keyMap.put(Keywords.SPACE, " ");
@@ -63,6 +64,14 @@ public class Protocol {
         keyMap.put(Keywords.OPEN, "Keep-Alive");
         keyMap.put(Keywords.DEFAULT_FILE, "index.html");
         keyMap.put(Keywords.MIME_TEXT, "text");
+        keyMap.put(Keywords.OK, "OK");
+        keyMap.put(Keywords.MOVED_PERMANENTLY, "Moved Permanently");
+        keyMap.put(Keywords.NOT_MODIFIED, "Not Modified");
+        keyMap.put(Keywords.NOT_FOUND, "Not Found");
+        keyMap.put(Keywords.INTERNAL_SERVER_ERROR, "Internal Server Error");
+        keyMap.put(Keywords.NOT_IMPLEMENTED, "Not Implemented");
+        keyMap.put(Keywords.HTTP_VERSION_NOT_SUPPORTED, "Http Version Not Supported");
+        keyMap.put(Keywords.NO_CONTENT, "No Content");
 
         this.keyMap = Collections.unmodifiableMap(keyMap);
         this.codeMap = Collections.unmodifiableMap(codeMap);
