@@ -15,7 +15,7 @@ import protocol.Protocol;
 import utils.SwsLogger;
 
 public abstract class AServletManager {
-
+    
     private HashMap<String, Method> invokationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
 	protected String filePath;
