@@ -95,6 +95,10 @@ public class HttpResponse {
 	public File getFile() {
 		return file;
 	}
+	
+	public String getBody() {
+		return body;
+	}
 
 	/**
 	 * Returns the header fields associated with the response object.
