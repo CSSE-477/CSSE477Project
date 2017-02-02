@@ -7,7 +7,7 @@ case "$status_code" in
 		 && rm -rf /home/csse/tmp
 		 ;;
 	  *) echo 'curl failed!' \
-	  	 && rm -rf /home/csse/YoloSwagSWS
+	  	 && rm -rf /home/csse/YoloSwagSWS \
 	  	 && mv /home/csse/tmp/YoloSwagSWS /home/csse \
 	  	 && rm -rf /home/csse/tmp \
 	  	 && service webserver stop \
