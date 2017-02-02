@@ -96,6 +96,11 @@ public class HttpResponse {
 		return file;
 	}
 	
+	/**
+	 * The body to be sent
+	 * 
+	 * @return the body
+	 */
 	public String getBody() {
 		return body;
 	}
