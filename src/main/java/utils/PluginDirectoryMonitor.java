@@ -55,7 +55,7 @@ public class PluginDirectoryMonitor implements Runnable {
         WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
         keys.put(key, dir);
     }
-    
+
     /**
      * On server startup, look for jars in the plugin directory
      * Load them into the jar to context root map
@@ -100,17 +100,27 @@ public class PluginDirectoryMonitor implements Runnable {
     		// if the manifest file succeeded
     		if (entryPointClassName != null) {
     			Class<?> c = cl.loadClass(entryPointClassName);
-    			Constructor<?> constructor = c.getConstructor(String.class);
+    			Constructor<?> constructor = c.getConstructor(String.class, File.class);
     			
     			String contextRoot = this.jarPathToContextRoot.get(pathToJar);
     			// DEFAULT plugin gets web as the directory it reads / writes to
     			if (contextRoot.equals("")) {
     				contextRoot = "web";
     			}
+   
+    			String configPath = cl.getResource("config.csv").getFile();
+    			File file = new File(configPath);
     			String pluginPathDirectory = this.directoryPath + "/" + contextRoot;
-    			Object result = constructor.newInstance(pluginPathDirectory);
+    			Object result = constructor.newInstance(pluginPathDirectory, file);
 
-    			// TODO: create this directory on the VM
+    			// create this directory on the VM
+    			if (!contextRoot.equals("web")) {
+    				File dir = new File(pluginPathDirectory);
+    				if (!file.exists()) {
+    					dir.mkdir();
+    				}
+    			}
+
     			if (result instanceof AServletManager) {
     				SwsLogger.accessLogger.info("Successfully loaded plugin jar: " + pathToJar);
     				AServletManager manager = (AServletManager) result;

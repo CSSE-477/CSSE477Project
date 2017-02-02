@@ -24,7 +24,7 @@ public abstract class AServletManager {
 	protected static final String CONFIG_DELIMETER =  ",";
 	protected static final String URI_DELIMETER = "/";
 
-	public AServletManager(String filePath) {
+	public AServletManager(String filePath, File configFile) {
 	    this.invokationMap = new HashMap<>();
         Method getMethod;
         Method putMethod;
@@ -47,6 +47,7 @@ public abstract class AServletManager {
             e.printStackTrace();
         }
         this.servletMap = new HashMap<>();
+		this.configFile = configFile;
 		this.filePath = filePath;
 		this.init();
 		this.parseConfigFile();
@@ -63,7 +64,7 @@ public abstract class AServletManager {
 		 * HEAD,/users/{id}/edu.rosehulman.userapp.UserServlet
 		 */
 		if (this.configFile == null) {
-			SwsLogger.accessLogger.info("Did not initialize configFile object in ServletManager.init()");
+			SwsLogger.accessLogger.info("Did not initialize configFile at ./config.csv");
 			return false;
 		}
 		Scanner scanner = null;
