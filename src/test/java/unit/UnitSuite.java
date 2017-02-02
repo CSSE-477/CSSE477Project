@@ -1,8 +1,7 @@
 package unit;
-import java.io.IOException;
-
-/**
+import java.io.IOException; /**
  * Created by TrottaSN on 1/19/2017.
+ *
  */
 
 import org.junit.AfterClass;
@@ -17,7 +16,8 @@ import org.junit.runners.Suite;
         HttpResponseBuilderTest.class,
         HttpResponseTest.class,
         ServerPropertiesTest.class,
-        ServerTest.class
+        ServerTest.class,
+        AServletManagerTest.class
 })
 public class UnitSuite {
 

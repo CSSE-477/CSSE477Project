@@ -22,6 +22,7 @@ public class MasterSuite {
 
     @BeforeClass
     public static void setUp() throws IOException {
+        FileCreationUtility.createResourceDir();
     }
 
     @AfterClass

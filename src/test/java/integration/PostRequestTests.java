@@ -91,6 +91,7 @@ public class PostRequestTests {
         assertTrue(madeFile.exists());
         assertTrue(madeFile.isFile());
 
+        /*
         String resourceFileName = "test";
         FileCreationUtility.createResourceFile(resourceFileName, FileCreationUtility.Extension.txt);
         FileCreationUtility.writeToTestFile(requestBody, false, resourceFileName, FileCreationUtility.Extension.txt);
@@ -98,6 +99,7 @@ public class PostRequestTests {
         assert testFile != null;
 
         assertTrue(FileUtils.contentEquals(testFile, madeFile));
+        */
 
         madeFile.delete();
     }
@@ -142,6 +144,7 @@ public class PostRequestTests {
         assertTrue(madeFile.exists());
         assertTrue(madeFile.isFile());
 
+        /*
         String resourceFileName = "test";
         FileCreationUtility.createResourceFile(resourceFileName, FileCreationUtility.Extension.txt);
         FileCreationUtility.writeToTestFile(previousContent, false, resourceFileName, FileCreationUtility.Extension.txt);
@@ -150,6 +153,7 @@ public class PostRequestTests {
         assert testFile != null;
 
         assertTrue(FileUtils.contentEquals(testFile, madeFile));
+        */
 
         madeFile.delete();
     }

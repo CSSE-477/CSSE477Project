@@ -16,16 +16,18 @@ import utils.SwsLogger;
 
 public abstract class AServletManager {
 
-    protected HashMap<String, Method> invokationMap;
+    protected HashMap<String, Method> invocationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
 	protected String filePath;
+
+	private boolean validStatus;
 
 	protected File configFile;
 	protected static final String CONFIG_DELIMETER =  ",";
 	protected static final String URI_DELIMETER = "/";
 
 	public AServletManager(String filePath) {
-	    this.invokationMap = new HashMap<>();
+	    this.invocationMap = new HashMap<>();
         Method getMethod;
         Method putMethod;
         Method postMethod;
@@ -33,30 +35,34 @@ public abstract class AServletManager {
         Method headMethod;
         try {
             getMethod = AHttpServlet.class.getDeclaredMethod("doGet", HttpRequest.class, HttpResponseBuilder.class);
-            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), getMethod);
+            this.invocationMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), getMethod);
             putMethod = AHttpServlet.class.getDeclaredMethod("doPut", HttpRequest.class, HttpResponseBuilder.class);
-            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), putMethod);
+            this.invocationMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), putMethod);
             postMethod = AHttpServlet.class.getDeclaredMethod("doPost", HttpRequest.class, HttpResponseBuilder.class);
-            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), postMethod);
+            this.invocationMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), postMethod);
             deleteMethod = AHttpServlet.class.getDeclaredMethod("doDelete", HttpRequest.class, HttpResponseBuilder.class);
-            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), deleteMethod);
+            this.invocationMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), deleteMethod);
             headMethod = AHttpServlet.class.getDeclaredMethod("doHead", HttpRequest.class, HttpResponseBuilder.class);
-            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), headMethod);
+            this.invocationMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), headMethod);
         } catch (NoSuchMethodException e) {
-            this.invokationMap.clear();
+            this.invocationMap.clear();
             e.printStackTrace();
         }
         this.servletMap = new HashMap<>();
 		this.filePath = filePath;
 		this.init();
-		this.parseConfigFile();
+		this.validStatus = this.parseConfigFile();
 	}
+
+	public final boolean isValid() {
+	    return this.validStatus;
+    }
 
 	public abstract void init();
 
 	public abstract void destroy();
 
-	public boolean parseConfigFile() {
+	public final boolean parseConfigFile() {
 		/*
 		 * Config file:
 		 * Request Type,Relative URI,Servlet Class
@@ -99,7 +105,7 @@ public abstract class AServletManager {
                         this.servletMap.put(relativeUri, servletInstance);
                         relativeUri = null;
                         servletClassName = null;
-                        delimited_values = 0;
+                        delimited_values = -1;
                     }
                     delimited_values++;
                 }
@@ -107,7 +113,6 @@ public abstract class AServletManager {
                     SwsLogger.errorLogger.error("CSV file not properly formed");
                     return false;
                 }
-
             }
         catch (Exception e) {
             SwsLogger.errorLogger.error("Exception while parsing config file.", e);
@@ -139,9 +144,9 @@ public abstract class AServletManager {
 		Below is a definite possible source of error
 		 */
         try {
-            this.invokationMap.get(request.getMethod()).invoke(servlet, request, responseBuilder);
+            this.invocationMap.get(request.getMethod()).invoke(servlet, request, responseBuilder);
         } catch (IllegalAccessException | InvocationTargetException e) {
-            SwsLogger.errorLogger.error("Invokation Failure.", e);
+            SwsLogger.errorLogger.error("Invocation Failure.", e);
         }
 
         return responseBuilder.generateResponse();
