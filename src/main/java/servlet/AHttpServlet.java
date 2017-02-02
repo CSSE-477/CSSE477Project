@@ -9,6 +9,7 @@ public abstract class AHttpServlet {
 
 	public AHttpServlet(String resourcePath) {
 		this.resourcePath = resourcePath;
+		this.init();
 	}
 
 	public abstract void init();

@@ -41,6 +41,7 @@ public class HttpResponse {
 	private String phrase;
 	private Map<String, String> header;
 	private File file;
+	private String body;
 	
 	/**
 	 * Constructs a HttpResponse object using supplied parameter
@@ -51,12 +52,13 @@ public class HttpResponse {
 	 * @param header The header field map.
 	 * @param file The file to be sent.
 	 */
-	public HttpResponse(String version, int status, String phrase, Map<String, String> header, File file) {
+	public HttpResponse(String version, int status, String phrase, Map<String, String> header, File file, String body) {
 		this.version = version;
 		this.status = status;
 		this.phrase = phrase;
 		this.header = header;
 		this.file = file;
+		this.body = body;
 	}
 
 	/**
@@ -157,7 +159,9 @@ public class HttpResponse {
 			// Close the file input stream, we are done reading
 			inStream.close();
 		}
-		
+		else if(this.getStatus() == OK_CODE && body != null){
+			out.write(body.getBytes());
+		}
 		// Flush the data so that outStream sends everything through the socket 
 		out.flush();
 	}

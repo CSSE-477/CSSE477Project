@@ -2,6 +2,8 @@ package servlet;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -10,12 +12,12 @@ import protocol.HttpResponse;
 import protocol.HttpResponseBuilder;
 import protocol.Keywords;
 import protocol.Protocol;
+import utils.SwsLogger;
 
 public abstract class AServletManager {
 
-    // private HashMap<String, RequestInvoker> invokationMap;
+    private HashMap<String, Method> invokationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
-    protected HashMap<String, String> typeMap;
 	protected String filePath;
 
 	protected static final String CONFIG_RELATIVE_PATH = "./config.csv";
@@ -24,9 +26,29 @@ public abstract class AServletManager {
 
 	public AServletManager(String filePath) {
 	    this.invokationMap = new HashMap<>();
-		this.servletMap = new HashMap<>();
-		this.typeMap = new HashMap<>();
+        Method getMethod;
+        Method putMethod;
+        Method postMethod;
+        Method deleteMethod;
+        Method headMethod;
+        try {
+            getMethod = AHttpServlet.class.getDeclaredMethod("doGet");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), getMethod);
+            putMethod = AHttpServlet.class.getDeclaredMethod("doPut");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), putMethod);
+            postMethod = AHttpServlet.class.getDeclaredMethod("doPost");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), postMethod);
+            deleteMethod = AHttpServlet.class.getDeclaredMethod("doDelete");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), deleteMethod);
+            headMethod = AHttpServlet.class.getDeclaredMethod("doHead");
+            this.invokationMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), headMethod);
+        } catch (NoSuchMethodException e) {
+            this.invokationMap.clear();
+            e.printStackTrace();
+        }
+        this.servletMap = new HashMap<>();
 		this.filePath = filePath;
+		this.parseConfigFile();
 		this.init();
 	}
 
@@ -47,26 +69,20 @@ public abstract class AServletManager {
 			scanner.useDelimiter(CONFIG_DELIMETER);
 
 			int delimited_values = 0;
-			String requestType = null;
 			String relativeUri = null;
 			String servletClassName = null;
 			while(scanner.hasNext()) {
 			    switch(delimited_values){
                     case(0):
-                        requestType = scanner.next();
-                        break;
-                    case(1):
                         relativeUri = scanner.next();
                         // extract "users" from "/users/{id}"
                         String[] relativeSplit = relativeUri.split(URI_DELIMETER);
-                        if(relativeSplit.length <= 1){
+                        if(relativeSplit.length < 1){
                             return false;
                         }
-                        else{
-                            relativeUri = relativeSplit[1];
-                        }
+                        relativeUri = relativeSplit[1];
                         break;
-                    case(2):
+                    case(1):
                         servletClassName = scanner.next();
                         if(servletClassName == null || servletClassName.isEmpty()){
                             return false;
@@ -74,12 +90,10 @@ public abstract class AServletManager {
                         Class<?> servletClass = Class.forName(servletClassName);
                         Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
                         AHttpServlet servletInstance = (AHttpServlet) servletConstructor.newInstance(this.filePath);
-                        if(relativeUri == null || relativeUri.isEmpty() || requestType == null || requestType.isEmpty()){
+                        if(relativeUri == null || relativeUri.isEmpty()){
                             return false;
                         }
-                        this.typeMap.put(relativeUri, requestType);
                         this.servletMap.put(relativeUri, servletInstance);
-                        requestType = null;
                         relativeUri = null;
                         servletClassName = null;
                         delimited_values = 0;
@@ -89,6 +103,9 @@ public abstract class AServletManager {
                 }
                 delimited_values++;
 			}
+			if(delimited_values != 0) {
+			    return false;
+            }
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -114,21 +131,13 @@ public abstract class AServletManager {
 		
 		AHttpServlet servlet = this.servletMap.get(servletKey);
 
-		// TODO: refactor pls
-		if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))) {
-			servlet.doGet(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-			servlet.doHead(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))) {
-			servlet.doPost(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))) {
-			servlet.doPut(request, responseBuilder);
-		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.DELETE))) {
-			servlet.doDelete(request, responseBuilder);
-		}
-		
-		// TODO: verify that response is okay?
-		
-		return responseBuilder.generateResponse();
+        try {
+            this.invokationMap.get(request.getMethod()).invoke(servlet, request, responseBuilder);
+        } catch (IllegalAccessException | InvocationTargetException e) {
+            e.printStackTrace();
+            SwsLogger.errorLogger.error("Invokation Failure.");
+        }
+
+        return responseBuilder.generateResponse();
 	}
 }

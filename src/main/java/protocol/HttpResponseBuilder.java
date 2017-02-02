@@ -21,8 +21,9 @@ public class HttpResponseBuilder {
     private String phrase;
     private Map<String, String> header;
     private File file;
+    private String body;
 
-    private HttpResponseBuilder(String version, int status, String phrase, Map<String, String> header, File file) {
+    private HttpResponseBuilder(String version, int status, String phrase, Map<String, String> header, File file, String body) {
 
         if(version == null){
             this.version = Protocol.getProtocol().getStringRep(Keywords.VERSION);
@@ -63,16 +64,17 @@ public class HttpResponseBuilder {
             this.header = header;
         }
         this.file = file;
+        this.body = body;
     }
 
     public HttpResponseBuilder(){
         this(null, -1, null, null,
-                null);
+                null, null);
     }
 
     public HttpResponseBuilder(int status){
         this(null, status, null, null,
-                null);
+                null, null);
     }
 
     public HttpResponseBuilder setVersion(String version){
@@ -129,7 +131,12 @@ public class HttpResponseBuilder {
         return this;
     }
 
+    public HttpResponseBuilder setBody(String body) {
+        this.body = body;
+        return this;
+    }
+
     public HttpResponse generateResponse() {
-        return new HttpResponse(this.version, this.status, this.phrase, this.header, this.file);
+        return new HttpResponse(this.version, this.status, this.phrase, this.header, this.file, this.body);
     }
 }
