@@ -1,6 +1,7 @@
 package servlet;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -16,7 +17,7 @@ import utils.SwsLogger;
 
 public abstract class AServletManager {
 
-    private HashMap<String, Method> invokationMap;
+    protected HashMap<String, Method> invokationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
 	protected String filePath;
 
@@ -52,7 +53,7 @@ public abstract class AServletManager {
 		this.init();
 	}
 
-	abstract void init();
+	public abstract void init();
 
 	public abstract void destroy();
 
@@ -72,46 +73,44 @@ public abstract class AServletManager {
 			String relativeUri = null;
 			String servletClassName = null;
 			while(scanner.hasNext()) {
-			    switch(delimited_values){
-                    case(0):
+                    if(delimited_values == 0) {
                         relativeUri = scanner.next();
                         // extract "users" from "/users/{id}"
                         String[] relativeSplit = relativeUri.split(URI_DELIMETER);
-                        if(relativeSplit.length < 1){
+                        if (relativeSplit.length < 1) {
                             return false;
                         }
                         relativeUri = relativeSplit[1];
-                        break;
-                    case(1):
+                    }
+                    else if(delimited_values == 1) {
                         servletClassName = scanner.next();
-                        if(servletClassName == null || servletClassName.isEmpty()){
+                        if (servletClassName == null || servletClassName.isEmpty()) {
                             return false;
                         }
                         Class<?> servletClass = Class.forName(servletClassName);
                         Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
                         AHttpServlet servletInstance = (AHttpServlet) servletConstructor.newInstance(this.filePath);
-                        if(relativeUri == null || relativeUri.isEmpty()){
+                        if (relativeUri == null || relativeUri.isEmpty()) {
                             return false;
                         }
                         this.servletMap.put(relativeUri, servletInstance);
                         relativeUri = null;
                         servletClassName = null;
                         delimited_values = 0;
-                        break;
-                    default:
-                        return false;
+                    }
+                    delimited_values++;
                 }
-                delimited_values++;
-			}
-			if(delimited_values != 0) {
-			    return false;
+                if(delimited_values != 0) {
+                    SwsLogger.errorLogger.error("CSV file not properly formed");
+                    return false;
+                }
+
             }
-			
-		} catch (Exception e) {
-			e.printStackTrace();
-			return false;
-		}
-		
+        catch (Exception e) {
+            e.printStackTrace();
+            SwsLogger.errorLogger.error("Exception while parsing config file.");
+            return false;
+        }
 		return true;
 	}
 
@@ -134,7 +133,7 @@ public abstract class AServletManager {
             this.invokationMap.get(request.getMethod()).invoke(servlet, request, responseBuilder);
         } catch (IllegalAccessException | InvocationTargetException e) {
             e.printStackTrace();
-            SwsLogger.errorLogger.error("Invokation Failure.");
+            SwsLogger.errorLogger.error("Invokation Failure.", e);
         }
 
         return responseBuilder.generateResponse();
