@@ -6,13 +6,11 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.ServerSocket;
 
-import app.SimpleWebServer;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import protocol.Protocol;
 import server.Server;
 
 public class ServerTest {
@@ -38,7 +36,7 @@ public class ServerTest {
 	public void testIsStoppedTrivial() {
 		String fakeDir = "dir";
 		Server server = new Server(0);
-		assertEquals(true, server.isStoped());
+		assertEquals(true, server.isStopped());
 	}
 
 	@Test
@@ -49,7 +47,7 @@ public class ServerTest {
 		welcomeSocket.setAccessible(true);
 		ServerSocket socket = new ServerSocket();
 		welcomeSocket.set(server, socket);
-		assertEquals(false, server.isStoped());
+		assertEquals(false, server.isStopped());
 		socket.close();
 	}
 }

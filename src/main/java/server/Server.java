@@ -51,7 +51,7 @@ public class Server implements Runnable, IDirectoryListener {
 		this.port = port;
 		this.stop = false;
 		this.readyState = false;
-		this.pluginRootToServlet = new HashMap<String, AServletManager>();
+		this.pluginRootToServlet = new HashMap<>();
 	}
 	
 	/**
@@ -68,8 +68,8 @@ public class Server implements Runnable, IDirectoryListener {
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
 				Socket connectionSocket = this.welcomeSocket.accept();
-
 				// Come out of the loop if the stop flag is set
+
 				if(this.stop){
 				    this.readyState = false;
 				    break;
@@ -114,10 +114,8 @@ public class Server implements Runnable, IDirectoryListener {
 	 * Checks if the server is stopeed or not.
 	 * @return
 	 */
-	public boolean isStoped() {
-		if(this.welcomeSocket != null)
-			return this.welcomeSocket.isClosed();
-		return true;
+	public boolean isStopped() {
+		return this.welcomeSocket == null || this.welcomeSocket.isClosed();
 	}
 
 	@Override

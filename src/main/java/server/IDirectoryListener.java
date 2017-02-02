@@ -8,11 +8,11 @@ public interface IDirectoryListener {
 	 * @param contextRoot
 	 * @param manager
 	 */
-	public void addPlugin(String contextRoot, AServletManager manager);
+	void addPlugin(String contextRoot, AServletManager manager);
 	
 	/**
 	 * Remove plugin after being deleted from the directory
 	 * @param contextRoot
 	 */
-	public void removePlugin(String contextRoot);
+	void removePlugin(String contextRoot);
 }

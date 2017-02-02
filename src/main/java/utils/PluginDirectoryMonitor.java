@@ -33,8 +33,8 @@ public class PluginDirectoryMonitor implements Runnable {
 	public PluginDirectoryMonitor(String directoryPath, IDirectoryListener listener) throws IOException {
 		this.directoryPath = directoryPath;
 		this.watcher = FileSystems.getDefault().newWatchService();
-		this.keys = new HashMap<WatchKey, Path>();
-		this.jarPathToContextRoot = new HashMap<String, String>();
+		this.keys = new HashMap<>();
+		this.jarPathToContextRoot = new HashMap<>();
 		this.listener = listener;
 		
 		register(Paths.get(this.directoryPath));
