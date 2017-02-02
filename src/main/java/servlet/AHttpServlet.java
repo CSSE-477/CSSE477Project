@@ -5,7 +5,7 @@ import protocol.HttpResponseBuilder;
 
 public abstract class AHttpServlet {
 
-	private String resourcePath;
+	protected String resourcePath;
 
 	public AHttpServlet(String resourcePath) {
 		this.resourcePath = resourcePath;

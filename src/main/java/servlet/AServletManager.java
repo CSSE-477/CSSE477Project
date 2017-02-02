@@ -13,13 +13,13 @@ import protocol.Protocol;
 
 public abstract class AServletManager {
 
-	private HashMap<String, AHttpServlet> servletMap;
-	private HashMap<String, String> typeMap;
-	private String filePath;
+	protected HashMap<String, AHttpServlet> servletMap;
+    protected HashMap<String, String> typeMap;
+	protected String filePath;
 
-	private static final String CONFIG_RELATIVE_PATH = "./config.csv";
-	private static final String CONFIG_DELIMETER =  ",";
-	private static final String URI_DELIMETER = "/";
+	protected static final String CONFIG_RELATIVE_PATH = "./config.csv";
+	protected static final String CONFIG_DELIMETER =  ",";
+	protected static final String URI_DELIMETER = "/";
 
 	public AServletManager(String filePath) {
 		this.servletMap = new HashMap<>();
@@ -60,7 +60,7 @@ public abstract class AServletManager {
                         if(relativeSplit.length <= 1){
                             return false;
                         }
-                        relativeUri = relativeUri.split(URI_DELIMETER)[1];
+                        relativeUri = relativeSplit[1];
                         break;
                     case(2):
                         servletClassName = scanner.next();
@@ -96,12 +96,19 @@ public abstract class AServletManager {
 
 	// With the changes below it will be 1.0.4 - more changes to be made
 	public HttpResponse handleRequest(HttpRequest request) {
+
+        HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+
 		String uri = request.getUri();
 		// should look like "/userapp/users/{id}"
-		String servletKey = uri.split(URI_DELIMETER)[2];
+        String[] uriSplit = uri.split(URI_DELIMETER);
+        if(uriSplit.length <= 1){
+            return responseBuilder.generateResponse();
+        }
+
+		String servletKey = uriSplit[1];
 		
 		AHttpServlet servlet = this.servletMap.get(servletKey);
-		HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
 
 		// TODO: refactor pls
 		if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.GET)) {
