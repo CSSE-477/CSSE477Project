@@ -1,5 +1,6 @@
 package utils;
 
+import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -38,6 +39,7 @@ public class PluginDirectoryMonitor implements Runnable {
 		this.listener = listener;
 		
 		register(Paths.get(this.directoryPath));
+		loadExistingJars();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -52,6 +54,23 @@ public class PluginDirectoryMonitor implements Runnable {
     private void register(Path dir) throws IOException {
         WatchKey key = dir.register(watcher, StandardWatchEventKinds.ENTRY_CREATE, StandardWatchEventKinds.ENTRY_DELETE, StandardWatchEventKinds.ENTRY_MODIFY);
         keys.put(key, dir);
+    }
+    
+    /**
+     * On server startup, look for jars in the plugin directory
+     * Load them into the jar to context root map
+     */
+    private void loadExistingJars() {
+    	File f = new File(this.directoryPath);
+    	if (f.isDirectory()) {
+    		for (File jar : f.listFiles()) {
+    			if (jar.getName().endsWith(".jar")) {
+    				this.handleJarUpserted(jar.getAbsolutePath());
+    			}
+    		}
+    	} else {
+    		SwsLogger.errorLogger.error("Cannot read directory for jars: " + this.directoryPath);
+    	}
     }
 
     /**
