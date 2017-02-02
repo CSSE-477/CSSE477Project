@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -26,9 +27,9 @@ public abstract class AServletManager {
 
 	protected static final String CONFIG_DELIMETER =  ",";
 	protected static final String URI_DELIMETER = "/";
-    protected InputStream configStream;
+    protected URLClassLoader classLoader;
 
-	public AServletManager(String filePath, InputStream configStream) {
+	public AServletManager(String filePath, URLClassLoader classLoader) {
 	    this.invocationMap = new HashMap<>();
 
         Method getMethod;
@@ -52,7 +53,7 @@ public abstract class AServletManager {
             e.printStackTrace();
         }
         this.servletMap = new HashMap<>();
-		this.configStream = configStream;
+		this.classLoader = classLoader;
 		this.filePath = filePath;
 		this.init();
 		this.validStatus = this.parseConfigFile();
@@ -72,7 +73,9 @@ public abstract class AServletManager {
 		 * Request Type,Relative URI,Servlet Class
 		 * HEAD,/users/{id}/edu.rosehulman.userapp.UserServlet
 		 */
-		if (this.configStream == null) {
+        InputStream configStream = this.classLoader.getResourceAsStream("./config.csv");
+
+		if (configStream == null) {
 			SwsLogger.accessLogger.info("Did not initialize configFile at ./config.csv");
 			return false;
 		}
@@ -100,7 +103,7 @@ public abstract class AServletManager {
                         if (servletClassName == null || servletClassName.isEmpty()) {
                             return false;
                         }
-                        Class<?> servletClass = Class.forName(servletClassName);
+                        Class<?> servletClass = this.classLoader.loadClass(servletClassName);
                         Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
                         AHttpServlet servletInstance = (AHttpServlet) servletConstructor.newInstance(this.filePath);
                         if (relativeUri == null || relativeUri.isEmpty()) {

@@ -16,8 +16,7 @@ import org.junit.runners.Suite;
         HttpResponseBuilderTest.class,
         HttpResponseTest.class,
         ServerPropertiesTest.class,
-        ServerTest.class,
-        AServletManagerTest.class
+        ServerTest.class
 })
 public class UnitSuite {
 
