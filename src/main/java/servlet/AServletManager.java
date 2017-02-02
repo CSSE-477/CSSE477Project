@@ -94,6 +94,7 @@ public abstract class AServletManager {
 		return true;
 	}
 
+	// With the changes below it will be 1.0.4 - more changes to be made
 	public HttpResponse handleRequest(HttpRequest request) {
 		String uri = request.getUri();
 		// should look like "/userapp/users/{id}"
