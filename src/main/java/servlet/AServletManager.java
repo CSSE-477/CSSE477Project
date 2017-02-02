@@ -13,6 +13,7 @@ import protocol.Protocol;
 
 public abstract class AServletManager {
 
+    // private HashMap<String, RequestInvoker> invokationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
     protected HashMap<String, String> typeMap;
 	protected String filePath;
@@ -22,6 +23,7 @@ public abstract class AServletManager {
 	protected static final String URI_DELIMETER = "/";
 
 	public AServletManager(String filePath) {
+	    this.invokationMap = new HashMap<>();
 		this.servletMap = new HashMap<>();
 		this.typeMap = new HashMap<>();
 		this.filePath = filePath;
@@ -60,7 +62,9 @@ public abstract class AServletManager {
                         if(relativeSplit.length <= 1){
                             return false;
                         }
-                        relativeUri = relativeSplit[1];
+                        else{
+                            relativeUri = relativeSplit[1];
+                        }
                         break;
                     case(2):
                         servletClassName = scanner.next();
@@ -111,15 +115,15 @@ public abstract class AServletManager {
 		AHttpServlet servlet = this.servletMap.get(servletKey);
 
 		// TODO: refactor pls
-		if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.GET)) {
+		if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))) {
 			servlet.doGet(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.HEAD)) {
+		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
 			servlet.doHead(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.POST)) {
+		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))) {
 			servlet.doPost(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.PUT)) {
+		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))) {
 			servlet.doPut(request, responseBuilder);
-		} else if (request.getMethod() == Protocol.getProtocol().getStringRep(Keywords.DELETE)) {
+		} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.DELETE))) {
 			servlet.doDelete(request, responseBuilder);
 		}
 		
