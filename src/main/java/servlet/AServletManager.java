@@ -13,7 +13,6 @@ import protocol.Protocol;
 
 public abstract class AServletManager {
 
-    // private HashMap<String, RequestInvoker> invokationMap;
 	protected HashMap<String, AHttpServlet> servletMap;
     protected HashMap<String, String> typeMap;
 	protected String filePath;
@@ -23,7 +22,6 @@ public abstract class AServletManager {
 	protected static final String URI_DELIMETER = "/";
 
 	public AServletManager(String filePath) {
-	    this.invokationMap = new HashMap<>();
 		this.servletMap = new HashMap<>();
 		this.typeMap = new HashMap<>();
 		this.filePath = filePath;
