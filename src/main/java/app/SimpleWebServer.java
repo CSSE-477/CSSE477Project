@@ -1,20 +1,11 @@
 package app;
 
-import handlers.DeleteRequestHandlerFactory;
-import handlers.GetRequestHandlerFactory;
-import handlers.HeadRequestHandlerFactory;
-import handlers.PostRequestHandlerFactory;
-import handlers.PutRequestHandlerFactory;
-import protocol.Keywords;
-import protocol.Protocol;
+import java.util.Properties;
+
 import server.Server;
-import handlers.IRequestHandlerFactory;
 import utils.PluginDirectoryMonitor;
 import utils.ServerProperties;
 import utils.SwsLogger;
-
-import java.util.HashMap;
-import java.util.Properties;
 
 /**
  * The entry point of the Simple Web Server (SWS).
@@ -49,21 +40,5 @@ public class SimpleWebServer {
 		
 		// Wait for the unit.server thread to terminate
 		runner.join();
-	}
-
-	public static HashMap<String, IRequestHandlerFactory> getPopulatedFactoryHash(String rootDirectory){
-		// Add factories to the map or create them in-line if that is preferable, then return below
-		HashMap<String, IRequestHandlerFactory> factoryMap = new HashMap<>();
-		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.GET),
-				new GetRequestHandlerFactory(rootDirectory));
-		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD),
-				new HeadRequestHandlerFactory(rootDirectory));
-		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.POST),
-				new PostRequestHandlerFactory(rootDirectory));
-		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT),
-				new PutRequestHandlerFactory(rootDirectory));
-		factoryMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE),
-				new DeleteRequestHandlerFactory(rootDirectory));
-		return factoryMap;
 	}
 }
