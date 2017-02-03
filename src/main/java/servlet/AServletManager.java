@@ -27,6 +27,7 @@ public abstract class AServletManager {
 
 	protected static final String CONFIG_DELIMETER =  ",";
 	protected static final String URI_DELIMETER = "/";
+	protected static final String PATH_REPLACEMENT_DELIMETER = ".";
     protected URLClassLoader classLoader;
 
 	public AServletManager(String filePath, URLClassLoader classLoader) {
@@ -103,6 +104,7 @@ public abstract class AServletManager {
                         if (servletClassName == null || servletClassName.isEmpty()) {
                             return false;
                         }
+                        servletClassName = servletClassName.replace(URI_DELIMETER, PATH_REPLACEMENT_DELIMETER).trim();
                         Class<?> servletClass = this.classLoader.loadClass(servletClassName);
                         Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
                         AHttpServlet servletInstance = (AHttpServlet) servletConstructor.newInstance(this.filePath);
