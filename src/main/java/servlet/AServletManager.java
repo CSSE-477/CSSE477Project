@@ -6,7 +6,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.net.URLClassLoader;
 import java.util.HashMap;
-import java.util.Scanner;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
@@ -64,11 +63,7 @@ public abstract class AServletManager {
 	    return this.validStatus;
     }
 
-	public final void init(){
-	    for(AHttpServlet servlet : this.servletMap.values()){
-	        servlet.init();
-        }
-    }
+	public abstract void init();
 
 	public abstract void destroy();
 
