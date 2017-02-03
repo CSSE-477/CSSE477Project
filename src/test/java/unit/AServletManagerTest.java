@@ -3,6 +3,8 @@ package unit;
 import org.junit.Before;
 import org.junit.Test;
 
+import protocol.HttpRequest;
+import protocol.HttpResponseBuilder;
 import servlet.AHttpServlet;
 import servlet.AServletManager;
 import utils.FileCreationUtility;
@@ -11,6 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URLClassLoader;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -115,5 +118,88 @@ public class AServletManagerTest {
         f.setAccessible(true);
         assertFalse(concreteManager.isValid());
         assertTrue(((HashMap<String, AHttpServlet>) f.get(concreteManager)).isEmpty());
+    }
+
+    public class ConcreteServletManager extends AServletManager {
+
+        public ConcreteServletManager(String filePath, URLClassLoader classLoader) {
+            super(filePath, classLoader);
+        }
+
+        @Override
+        public void init() {
+        /*
+        File initialFile =  new File(FileCreationUtility.RESOURCE_DIR, "testFile.csv");
+        try {
+            this.classLoader = new FileInputStream(initialFile);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        */
+        }
+
+        @Override
+        public void destroy() {
+
+        }
+    }
+
+    public class ConcreteServletManagerBadFile extends AServletManager {
+
+        public ConcreteServletManagerBadFile(String filePath, URLClassLoader classLoader) {
+            super(filePath, classLoader);
+        }
+
+        @Override
+        public void init() {
+            // this.configStream = null;
+        }
+
+        @Override
+        public void destroy() {
+
+        }
+    }
+
+    public class ServletMock extends AHttpServlet {
+
+        public ServletMock(String resourcePath) {
+            super(resourcePath);
+        }
+
+        @Override
+        public void init() {
+
+        }
+
+        @Override
+        public void destroy() {
+
+        }
+
+        @Override
+        public void doGet(HttpRequest request, HttpResponseBuilder responseBuilder) {
+
+        }
+
+        @Override
+        public void doHead(HttpRequest request, HttpResponseBuilder responseBuilder) {
+
+        }
+
+        @Override
+        public void doPost(HttpRequest request, HttpResponseBuilder responseBuilder) {
+
+        }
+
+        @Override
+        public void doPut(HttpRequest request, HttpResponseBuilder responseBuilder) {
+
+        }
+
+        @Override
+        public void doDelete(HttpRequest request, HttpResponseBuilder responseBuilder) {
+
+        }
     }
 }

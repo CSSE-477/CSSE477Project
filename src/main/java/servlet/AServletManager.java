@@ -1,8 +1,6 @@
 package servlet;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
@@ -28,6 +26,8 @@ public abstract class AServletManager {
 	protected static final String CONFIG_DELIMETER =  ",";
 	protected static final String URI_DELIMETER = "/";
 	protected static final String PATH_REPLACEMENT_DELIMETER = ".";
+	protected static final String ENCODING = "UTF-8";
+
     protected URLClassLoader classLoader;
 
 	public AServletManager(String filePath, URLClassLoader classLoader) {
@@ -56,15 +56,19 @@ public abstract class AServletManager {
         this.servletMap = new HashMap<>();
 		this.classLoader = classLoader;
 		this.filePath = filePath;
-		this.init();
 		this.validStatus = this.parseConfigFile();
+        this.init();
 	}
 
 	public final boolean isValid() {
 	    return this.validStatus;
     }
 
-	public abstract void init();
+	public final void init(){
+	    for(AHttpServlet servlet : this.servletMap.values()){
+	        servlet.init();
+        }
+    }
 
 	public abstract void destroy();
 
@@ -80,56 +84,68 @@ public abstract class AServletManager {
 			SwsLogger.accessLogger.info("Did not initialize configFile at ./config.csv");
 			return false;
 		}
-		Scanner scanner = null;
+        String  thisLine;
+        String relativeUri;
+        String servletClassName;
+        BufferedReader br = null;
 		try {
-			scanner = new Scanner(configStream);
+            // open input stream test.txt for reading purpose.
+            br = new BufferedReader(new InputStreamReader(configStream, ENCODING));
+            while ((thisLine = br.readLine()) != null) {
 
-			scanner.useDelimiter(CONFIG_DELIMETER);
+                thisLine = thisLine.trim();
+                String[] lineSplit = thisLine.split(CONFIG_DELIMETER);
 
-			int delimited_values = 0;
-			String relativeUri = null;
-			String servletClassName = null;
-			while(scanner.hasNext()) {
-                    if(delimited_values == 0) {
-                        relativeUri = scanner.next();
-                        // extract "users" from "/users/{id}"
-                        String[] relativeSplit = relativeUri.split(URI_DELIMETER);
-                        if (relativeSplit.length < 1) {
-                            return false;
-                        }
-                        relativeUri = relativeSplit[1];
-                    }
-                    else if(delimited_values == 1) {
-                        servletClassName = scanner.next();
-                        if (servletClassName == null || servletClassName.isEmpty()) {
-                            return false;
-                        }
-                        servletClassName = servletClassName.replace(URI_DELIMETER, PATH_REPLACEMENT_DELIMETER).trim();
-                        Class<?> servletClass = this.classLoader.loadClass(servletClassName);
-                        Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
-                        AHttpServlet servletInstance = (AHttpServlet) servletConstructor.newInstance(this.filePath);
-                        if (relativeUri == null || relativeUri.isEmpty()) {
-                            return false;
-                        }
-                        this.servletMap.put(relativeUri, servletInstance);
-                        relativeUri = null;
-                        servletClassName = null;
-                        delimited_values = -1;
-                    }
-                    delimited_values++;
-                }
-                if(delimited_values != 0) {
-                    SwsLogger.errorLogger.error("CSV file not properly formed");
+                if(lineSplit.length != 2){
                     return false;
                 }
+
+                relativeUri = lineSplit[0];
+
+                if (relativeUri == null) {
+                    return false;
+                }
+
+                // extract "users" from "/users/{id}"
+                String[] relativeSplit = relativeUri.split(URI_DELIMETER);
+
+                if (relativeSplit.length < 1) {
+                    return false;
+                }
+
+                relativeUri = relativeSplit[1];
+
+                servletClassName = lineSplit[1];
+
+                if (servletClassName == null || servletClassName.isEmpty()) {
+                    return false;
+                }
+
+                servletClassName = servletClassName.replace(URI_DELIMETER, PATH_REPLACEMENT_DELIMETER).trim();
+
+                Class<?> servletClass = this.classLoader.loadClass(servletClassName);
+                Constructor<?> servletConstructor = servletClass.getConstructor(String.class);
+                AHttpServlet servletInstance = (AHttpServlet) servletConstructor.newInstance(this.filePath);
+
+                if (relativeUri == null || relativeUri.isEmpty()) {
+                    return false;
+                }
+
+                this.servletMap.put(relativeUri, servletInstance);
             }
+        }
         catch (Exception e) {
             SwsLogger.errorLogger.error("Exception while parsing config file.", e);
             return false;
         } finally {
-        	if (scanner != null) {
-        		scanner.close();
-        	}
+        	if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    SwsLogger.errorLogger.error("Exception closing BufferedReader", e);
+                    return false;
+                }
+            }
         }
 		return true;
 	}
@@ -153,7 +169,8 @@ public abstract class AServletManager {
 		Below is a definite possible source of error
 		 */
         try {
-            this.invocationMap.get(request.getMethod()).invoke(servlet, request, responseBuilder);
+            Method methodToInvoke = this.invocationMap.get(request.getMethod());
+            methodToInvoke.invoke(servlet, request, responseBuilder);
         } catch (IllegalAccessException | InvocationTargetException e) {
             SwsLogger.errorLogger.error("Invocation Failure.", e);
         }

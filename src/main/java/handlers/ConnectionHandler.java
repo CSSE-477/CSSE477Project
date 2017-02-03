@@ -92,10 +92,10 @@ public class ConnectionHandler implements Runnable {
 		} else {
 			// strip out /userapp/users/1 => "userapp" as context root
 			String uri = request.getUri();
-			int firstSlashIndex = uri.indexOf('/');
+			int firstSlashIndex = uri.indexOf('/') + 1;
 			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
 			String contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
-			System.out.println(contextRoot);
+			SwsLogger.accessLogger.info(contextRoot);
 			AServletManager manager = this.contextRootToServlet.get(contextRoot);
 			if (manager == null) {
                 response = (new HttpResponseBuilder(501)).generateResponse();
