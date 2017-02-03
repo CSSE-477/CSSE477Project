@@ -23,7 +23,7 @@ For Servlet plugins, there are a few requirements that must be met to stand up y
 - A plugin will have its own directory created for reading and writing located at `/home/csse/"Context-Root-Value"`
 
 ## Architecture Diagram
-![Architecture Diagram](docs/ArchitectureDiagram.png)
+![Architecture Diagram](docs/2017-02-02 SWS UML Diagram.png)
 
 ## Module Diagram
 ![Module Diagram](docs/ModuleDiagram.png)
