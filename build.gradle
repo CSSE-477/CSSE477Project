@@ -158,17 +158,22 @@ remotes {
 	}
 }
 
-task publishToWebServer(dependsOn: jar) << {
+task publishToWebServer(dependsOn: distZip) << {
 	ssh.run {
 		session(remotes.deployment) {
 			println "Checking if remote /tmp/YoloSwagSWS exists ..."
 			def result = execute('if test -d /tmp/YoloSwagSWS; then echo "exists"; fi')						
-			if(result != "exists") {
-				println("Remote /tmp/YoloSwagSWS does not exist, creating a new one...")
-				execute('mkdir -p /tmp/YoloSwagSWS')
-				println("Remote /tmp/YoloSwagSWS created!")
+			if(result == "exists") {
+				println("Removing /tmp/YoloSwagSWS")
+				execute('rm -rf /tmp/YoloSwagSWS')
+				println("Remote /tmp/YoloSwagSWS removed!")
 			}
-			println "Transfering file from local build/distributions to remote /tmp/YoloSwagSWS ..."
+
+			println("Creating /tmp/YoloSwagSWS")
+			execute('mkdir -p /tmp/YoloSwagSWS')
+			println("Remote /tmp/YoloSwagSWS created!")
+
+			println "Transfering file from local ${buildDir}/distributions to remote /tmp/YoloSwagSWS ..."
 			put from: "${buildDir}/distributions/*.zip", into: '/tmp/YoloSwagSWS'
 			println "Files transfer complete now setting up the web server ..."
 
