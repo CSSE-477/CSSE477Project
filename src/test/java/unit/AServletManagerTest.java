@@ -27,6 +27,7 @@ public class AServletManagerTest {
 
     @Before
     public void setUp() {
+        /*
         this.testFile = new File(FileCreationUtility.RESOURCE_DIR, "testFile.csv");
         if(testFile.exists()){
             testFile.delete();
@@ -53,8 +54,10 @@ public class AServletManagerTest {
                 e.printStackTrace();
             }
         }
+        */
     }
 
+    /*
     @Test
     public void testParseConfig() throws Exception {
         concreteManager = new ConcreteServletManager("fakeFilePath", null);
@@ -185,4 +188,5 @@ public class AServletManagerTest {
 
         }
     }
+    */
 }
