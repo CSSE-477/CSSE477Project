@@ -29,8 +29,8 @@ public class AServletManagerTest {
     @Before
     public void setUp() {
         this.testFile = new File(FileCreationUtility.RESOURCE_DIR, "testFile.csv");
-        // URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
-        // URLClassLoader cl = URLClassLoader.newInstance(urls);
+//        URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
+//        URLClassLoader cl = URLClassLoader.newInstance(urls);
         if(testFile.exists()){
             testFile.delete();
         }
