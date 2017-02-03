@@ -13,6 +13,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.HashMap;
 
@@ -27,8 +28,9 @@ public class AServletManagerTest {
 
     @Before
     public void setUp() {
-        /*
         this.testFile = new File(FileCreationUtility.RESOURCE_DIR, "testFile.csv");
+        URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
+        URLClassLoader cl = URLClassLoader.newInstance(urls);
         if(testFile.exists()){
             testFile.delete();
         }
@@ -54,10 +56,8 @@ public class AServletManagerTest {
                 e.printStackTrace();
             }
         }
-        */
     }
 
-    /*
     @Test
     public void testParseConfig() throws Exception {
         concreteManager = new ConcreteServletManager("fakeFilePath", null);
@@ -130,6 +130,11 @@ public class AServletManagerTest {
         }
 
         @Override
+        public void init() {
+
+        }
+
+        @Override
         public void destroy() {
 
         }
@@ -139,6 +144,11 @@ public class AServletManagerTest {
 
         public ConcreteServletManagerBadFile(String filePath, URLClassLoader classLoader) {
             super(filePath, classLoader);
+        }
+
+        @Override
+        public void init() {
+
         }
 
         @Override
@@ -188,5 +198,4 @@ public class AServletManagerTest {
 
         }
     }
-    */
 }

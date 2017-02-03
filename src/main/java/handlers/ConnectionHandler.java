@@ -94,7 +94,10 @@ public class ConnectionHandler implements Runnable {
 			String uri = request.getUri();
 			int firstSlashIndex = uri.indexOf('/') + 1;
 			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
-			String contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
+			String contextRoot = "";
+			if(secondSlashIndex != -1){
+                contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
+            }
 			SwsLogger.accessLogger.info(contextRoot);
 			AServletManager manager = this.contextRootToServlet.get(contextRoot);
 			if (manager == null) {
