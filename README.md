@@ -1,11 +1,11 @@
-# Simple Web Server
-by Team #YoloSwag *dabs* - Jesse Shellabarger, Tayler How, Collin Trowbridge, Steve Trotta.
+# Simple Web Server for Team #YOLOSWAG *dabs*
+Jesse Shellabarger, Tayler How, Collin Trowbridge, Steve Trotta.
 
 [![build status](https://ada.csse.rose-hulman.edu/shellajt/CSSE477Project/badges/master/build.svg)](https://ada.csse.rose-hulman.edu/shellajt/CSSE477Project/commits/master)
 [![coverage report](https://ada.csse.rose-hulman.edu/shellajt/CSSE477Project/badges/master/coverage.svg)](https://ada.csse.rose-hulman.edu/shellajt/CSSE477Project/commits/master)
 
+## Description
 The project is a web server that can handle GET, HEAD, PUT, DELETE, and POST requests. The web server, at the moment, does not handle any other requests. 
-
 The project can be run by downloading the jar and running `java -jar YoloSwagSws-1.0.x.jar`.
 
 ## Infrastructure Details
