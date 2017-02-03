@@ -42,4 +42,4 @@ deploy:
   tags:
     - 'Team #YOLOSWAG *dabs* SWS'
   only:
-    - tags
+    - changebacktotags
