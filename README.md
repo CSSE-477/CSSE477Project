@@ -27,3 +27,6 @@ For Servlet plugins, there are a few requirements that must be met to stand up y
 
 ## Module Diagram
 ![Module Diagram](docs/ModuleDiagram.png)
+
+## Production Environment Allocation Structure
+![Allocation Diagram](docs/AllocationDiagram.png)
