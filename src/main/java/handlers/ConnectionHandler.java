@@ -21,6 +21,8 @@ public class ConnectionHandler implements Runnable {
 	private Socket socket;
 	private HashMap<String, AServletManager> contextRootToServlet;
 
+	private static final String DEFAULT_ROOT = "";
+
 	public ConnectionHandler(Socket socket, HashMap<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
@@ -94,12 +96,16 @@ public class ConnectionHandler implements Runnable {
 			String uri = request.getUri();
 			int firstSlashIndex = uri.indexOf('/') + 1;
 			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
-			String contextRoot = "";
+			String contextRoot = DEFAULT_ROOT;
 			if(secondSlashIndex != -1){
                 contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
             }
 			SwsLogger.accessLogger.info(contextRoot);
 			AServletManager manager = this.contextRootToServlet.get(contextRoot);
+			// fall back to the default manager if contextRoot doesn't match
+			if (manager == null) {
+			    manager = this.contextRootToServlet.get(DEFAULT_ROOT);
+            }
 			if (manager == null) {
                 response = (new HttpResponseBuilder(501)).generateResponse();
 			} else {
