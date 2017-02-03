@@ -127,18 +127,6 @@ public class AServletManagerTest {
         }
 
         @Override
-        public void init() {
-        /*
-        File initialFile =  new File(FileCreationUtility.RESOURCE_DIR, "testFile.csv");
-        try {
-            this.classLoader = new FileInputStream(initialFile);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        */
-        }
-
-        @Override
         public void destroy() {
 
         }
@@ -148,11 +136,6 @@ public class AServletManagerTest {
 
         public ConcreteServletManagerBadFile(String filePath, URLClassLoader classLoader) {
             super(filePath, classLoader);
-        }
-
-        @Override
-        public void init() {
-            // this.configStream = null;
         }
 
         @Override
