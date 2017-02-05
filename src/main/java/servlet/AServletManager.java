@@ -159,11 +159,17 @@ public abstract class AServletManager {
 
 		AHttpServlet servlet = this.servletMap.get(servletKey);
 
-		/*
-		Below is a definite possible source of error
-		 */
+		if(servlet == null){
+            SwsLogger.errorLogger.error("Could not find associated servlet. Caught Null.");
+            return responseBuilder.generateResponse();
+        }
+
         try {
             Method methodToInvoke = this.invocationMap.get(request.getMethod());
+            if(methodToInvoke == null){
+                SwsLogger.errorLogger.error("Invocation Failure Due to Lack of Method Support - AKA no Get or Post or etc. Caught Null.");
+                return responseBuilder.generateResponse();
+            }
             methodToInvoke.invoke(servlet, request, responseBuilder);
         } catch (IllegalAccessException | InvocationTargetException e) {
             SwsLogger.errorLogger.error("Invocation Failure.", e);
