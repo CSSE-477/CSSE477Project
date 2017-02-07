@@ -101,7 +101,7 @@ public class PluginDirectoryMonitor implements Runnable {
     		// if the manifest file succeeded
     		if (entryPointClassName != null) {
     			Class<?> c = cl.loadClass(entryPointClassName);
-    			Constructor<?> constructor = c.getConstructor(String.class, URLClassLoader.class);
+    			Constructor<?> constructor = c.getConstructor(String.class, ClassLoader.class);
     			
     			String contextRoot = this.jarPathToContextRoot.get(pathToJar);
     			// DEFAULT plugin gets web as the directory it reads / writes to

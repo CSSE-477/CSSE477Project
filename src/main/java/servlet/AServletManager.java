@@ -4,7 +4,6 @@ import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URLClassLoader;
 import java.util.HashMap;
 
 import protocol.HttpRequest;
@@ -27,9 +26,9 @@ public abstract class AServletManager {
 	protected static final String PATH_REPLACEMENT_DELIMETER = ".";
 	protected static final String ENCODING = "UTF-8";
 
-    protected URLClassLoader classLoader;
+    protected ClassLoader classLoader;
 
-	public AServletManager(String filePath, URLClassLoader classLoader) {
+	public AServletManager(String filePath, ClassLoader classLoader) {
 	    this.invocationMap = new HashMap<>();
 
         Method getMethod;
@@ -157,14 +156,20 @@ public abstract class AServletManager {
         }
 
 		String servletKey = uriSplit[2];
-		
+
 		AHttpServlet servlet = this.servletMap.get(servletKey);
 
-		/*
-		Below is a definite possible source of error
-		 */
+		if(servlet == null){
+            SwsLogger.errorLogger.error("Could not find associated servlet. Caught Null.");
+            return responseBuilder.generateResponse();
+        }
+
         try {
             Method methodToInvoke = this.invocationMap.get(request.getMethod());
+            if(methodToInvoke == null){
+                SwsLogger.errorLogger.error("Invocation Failure Due to Lack of Method Support - AKA no Get or Post or etc. Caught Null.");
+                return responseBuilder.generateResponse();
+            }
             methodToInvoke.invoke(servlet, request, responseBuilder);
         } catch (IllegalAccessException | InvocationTargetException e) {
             SwsLogger.errorLogger.error("Invocation Failure.", e);
