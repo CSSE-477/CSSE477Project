@@ -34,6 +34,7 @@ public class ConnectionHandler implements Runnable {
 	 * {@link HttpResponse} object and sends the response back to the client
 	 * (web browser).
 	 */
+	@SuppressWarnings("null")
 	public void run() {
 		InputStream inStream = null;
 		OutputStream outStream = null;
@@ -94,6 +95,13 @@ public class ConnectionHandler implements Runnable {
 		} else {
 			// strip out /userapp/users/1 => "userapp" as context root
 			String uri = request.getUri();
+
+			// FIXME: after benchmarking, fix this garbage code - collin
+			if (uri.equals("/serverexplosion.bat")) {
+				String collin = null;
+				collin.indexOf("explosion");
+			}
+
 			int firstSlashIndex = uri.indexOf('/') + 1;
 			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
 			String contextRoot = DEFAULT_ROOT;
