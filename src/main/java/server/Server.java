@@ -21,12 +21,18 @@
  
 package server;
 
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.PriorityQueue;
 
 import handlers.ConnectionHandler;
+import protocol.*;
 import servlet.AServletManager;
 import utils.SwsLogger;
 
@@ -43,6 +49,8 @@ public class Server implements Runnable, IDirectoryListener {
 	private ServerSocket welcomeSocket;
 	private boolean readyState;
 	private HashMap<String, AServletManager> pluginRootToServlet;
+    private PriorityQueue<HttpPriorityElement> requestQueue;
+    private HashMap<String, Integer> valueMap;
 
 	/**
 	 * @param port
@@ -52,6 +60,71 @@ public class Server implements Runnable, IDirectoryListener {
 		this.stop = false;
 		this.readyState = false;
 		this.pluginRootToServlet = new HashMap<>();
+        this.valueMap = new HashMap<>();
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), 5);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), 5);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), 5);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), 2);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), 2);
+        this.requestQueue = new PriorityQueue<>(10, new Comparator<HttpPriorityElement>() {
+            @Override
+            public int compare(HttpPriorityElement o1, HttpPriorityElement o2) {
+                HttpRequest o1Req = o1.getRequest();
+                HttpRequest o2Req = o2.getRequest();
+                LocalDateTime now = LocalDateTime.now();
+                if(o1.getTime().minusSeconds(1).isAfter(now) && !o2.getTime().minusSeconds(1).isAfter(now)) {
+                    return 1;
+                }
+                int o1Total = getMethodVal(o1Req.getMethod());
+                int o2Total = getMethodVal(o2Req.getMethod());
+                int o1Length;
+                try{
+                    o1Length = Integer.parseInt(o1Req.getHeader()
+                            .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
+                } catch (Exception e){
+                    o1Length = 0;
+                }
+                int o2Length;
+                try{
+                    o2Length = Integer.parseInt(o2Req.getHeader()
+                            .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
+                } catch (Exception e){
+                    o2Length = 0;
+                }
+                o2Length += 1;
+                o1Length += 1;
+                o1Total = o1Total * getPayloadSizeFactor(o1Req.getMethod(), o1Length);
+                o2Total = o2Total * getPayloadSizeFactor(o2Req.getMethod(), o2Length);
+                if(o1Total < o2Total) {
+                    return 1;
+                }
+                if(o1Total > o2Total) {
+                    return -1;
+                }
+                return 0;
+            }
+
+            int getMethodVal(String method){
+                if(method == null){
+                    return 10;
+                }
+                Integer value = valueMap.get(method);
+                if(value == null){
+                    return 10;
+                }
+                return value;
+            }
+
+            int getPayloadSizeFactor(String method, int payloadSize){
+                if(method == null) {
+                    return payloadSize * 10;
+                }
+                if(method.equals(Protocol.getProtocol().getStringRep(Keywords.POST)) || method.equals(Protocol.getProtocol().getStringRep(Keywords.PUT))){
+                    return payloadSize;
+                }
+                return 0;
+            }
+        });
 	}
 	
 	/**
@@ -74,10 +147,63 @@ public class Server implements Runnable, IDirectoryListener {
 				    this.readyState = false;
 				    break;
                 }
-				
-				// Create a handler for this incoming connection and start the handler in a new thread
-				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.pluginRootToServlet);
+
+                InputStream inStream = null;
+                OutputStream outStream = null;
+
+                try {
+                    inStream = connectionSocket.getInputStream();
+                    outStream = connectionSocket.getOutputStream();
+                } catch (Exception e) {
+                    // Cannot do anything if we have exception reading input or output
+                    // stream
+                    // May be have text to log this for further analysis?
+                    SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
+                    return;
+                }
+
+                // At this point we have the input and output stream of the socket
+                // Now lets create a HttpRequest object
+                HttpRequest request = null;
+                HttpResponse response = null;
+                try {
+                    request = HttpRequest.read(inStream);
+                    SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
+                } catch (ProtocolException pe) {
+                    // We have some sort of protocol exception. Get its status code and
+                    // create response
+                    // We know only two kind of exception is possible inside
+                    // fromInputStream
+                    // Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
+                    int status = pe.getStatus();
+                    response = (new HttpResponseBuilder(status)).generateResponse();
+                } catch (Exception e) {
+                    // For any other error, we will create bad request response as well
+                    response = (new HttpResponseBuilder(400)).generateResponse();
+                }
+
+                if (response != null) {
+                    // Means there was an error, now write the response object to the
+                    // socket
+                    try {
+                        response.write(outStream);
+                        // System.out.println(response);
+                    } catch (Exception e) {
+                        // We will ignore this exception
+                        SwsLogger.errorLogger.error("Exception occured while sending HTTP resonponse!\n" + e.toString());
+                    }
+                }
+
+				HttpPriorityElement newElement = new HttpPriorityElement(request,
+                        new ConnectionHandler(connectionSocket, request, this.pluginRootToServlet));
+
+				this.requestQueue.add(newElement);
+
+				ConnectionHandler handler = this.requestQueue.poll().getHandler();
+
 				new Thread(handler).start();
+
+				System.out.println(this.requestQueue);
 			}
 			this.welcomeSocket.close();
 		}
