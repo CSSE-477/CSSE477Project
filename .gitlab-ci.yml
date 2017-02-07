@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - master
+    - server-time-to-restart-baseline-testing
 
 maven-deploy:
   stage: maven-deploy
