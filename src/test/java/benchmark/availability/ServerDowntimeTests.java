@@ -30,20 +30,41 @@ public class ServerDowntimeTests {
 
 	@Test
 	public void testServerDowntimeToRestart() throws Exception {
-		GenericUrl url = new GenericUrl("http://477-19.csse.rose-hulman.edu:8080/serverexplosion.bat");
-		HttpRequest request = requestFactory.buildGetRequest(url);
-		Future<HttpResponse> f = request.executeAsync();
-		
-		try {
-			long failedRequestSentTime = System.currentTimeMillis();
-			f.get(35, TimeUnit.MILLISECONDS);			
-		} catch (TimeoutException e) {
-			// swallow whole
-			// no spitting
+		int attempts = 10;
+		double totalTimeToRespond = 0.0;
+
+		for (int i = 0; i < attempts; i++) {
+			String hostPort = "http://477-19.csse.rose-hulman.edu:8080";
+			GenericUrl url = new GenericUrl(hostPort + "/serverexplosion.bat");
+			HttpRequest request = requestFactory.buildGetRequest(url);
+			Future<HttpResponse> f = request.executeAsync();
+	
+			long failedRequestSentTime = System.nanoTime();
+			try {
+				f.get(35, TimeUnit.MILLISECONDS);
+			} catch (TimeoutException e) {
+				// swallow whole
+				// no spitting
+			}
+	
+			// build a valid request to test response
+			url = new GenericUrl(hostPort);
+			request = requestFactory.buildGetRequest(url);
+			long successRequestSentTime = System.nanoTime();
+	
+			while (true) {
+				try {
+					successRequestSentTime = System.nanoTime();
+					request.execute();
+					break;
+				} catch (Exception e) {
+					// failed because server was still down
+				}
+			}
+	
+			totalTimeToRespond += (successRequestSentTime - failedRequestSentTime) / Math.pow(10.0, 9.0);
 		}
 		
-//		while (true) {
-//			
-//		}
+		System.out.println("It took " + totalTimeToRespond / attempts + " seconds on average to respond in " + attempts + " trials.");
 	}
 }
