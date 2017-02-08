@@ -211,7 +211,8 @@ public class Server implements Runnable, IDirectoryListener {
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
-			SwsLogger.errorLogger.error(e.getMessage());
+			SwsLogger.errorLogger.error("Server exception accepting connection...", e);
+			System.exit(-1);
 		}
 	}
 	
