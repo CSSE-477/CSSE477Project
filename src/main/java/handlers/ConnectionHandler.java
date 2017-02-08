@@ -1,11 +1,8 @@
 package handlers;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.PriorityQueue;
 
 import protocol.*;
 import servlet.AServletManager;
@@ -38,7 +35,6 @@ public class ConnectionHandler implements Runnable {
 	 * {@link HttpResponse} object and sends the response back to the client
 	 * (web browser).
 	 */
-	@SuppressWarnings("null")
 	public void run() {
 		OutputStream outStream = null;
 
@@ -65,12 +61,6 @@ public class ConnectionHandler implements Runnable {
 		} else {
 			// strip out /userapp/users/1 => "userapp" as context root
 			String uri = request.getUri();
-
-			// FIXME: after benchmarking, fix this garbage code - collin
-			if (uri.equals("/serverexplosion.bat")) {
-				String collin = null;
-				collin.indexOf("explosion");
-			}
 
 			int firstSlashIndex = uri.indexOf('/') + 1;
 			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
