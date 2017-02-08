@@ -201,7 +201,9 @@ public class Server implements Runnable, IDirectoryListener {
 
 				ConnectionHandler handler = this.requestQueue.poll().getHandler();
 
-				new Thread(handler).start();
+				if(this.requestQueue.size() < 10) {
+                    new Thread(handler).start();
+                }
 			}
 			this.welcomeSocket.close();
 		}
