@@ -1,5 +1,7 @@
 package handlers;
 
+import utils.SwsLogger;
+
 public class Counter {
 
 	public int numRequests;
@@ -15,10 +17,9 @@ public class Counter {
 		if (currTime - this.timeStamp > 60 * 1000) {
 			this.numRequests = 0;
 			this.timeStamp = currTime;
-			System.err.println("Reset");
+			SwsLogger.accessLogger.info("60 seconds has passed. Resetting rejection counter");
 		}
 		this.numRequests++;
-		System.err.println(numRequests + ": " + (numRequests < 100));
 		return numRequests < 100;
 	}
 
