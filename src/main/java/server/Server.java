@@ -96,6 +96,7 @@ public class Server implements Runnable, IDirectoryListener {
                 try{
                     SSLSocket sslSocket = (SSLSocket) this.welcomeSocket.accept();
                     sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+                    //TODO: Put this back in after testing - it was severly throwing off things
                     //sslSocket.startHandshake();
 
                     // Come out of the loop if the stop flag is set
