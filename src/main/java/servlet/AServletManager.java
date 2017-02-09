@@ -197,12 +197,12 @@ public abstract class AServletManager {
 	}
 	
 	
-	private void enableBorkMode() {
+	protected void enableBorkMode() {
 		SwsLogger.accessLogger.info("***Easter egg detected, enabling BORK MODE!***");
 		this.borkMode = true;
 	}
 	
-	private void disableBorkMode() {
+	protected void disableBorkMode() {
 		SwsLogger.accessLogger.info("***Polite fix request detected, disabling BORK MODE!***");
 		this.borkMode = false;
 	}
