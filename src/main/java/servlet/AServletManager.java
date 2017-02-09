@@ -145,6 +145,12 @@ public abstract class AServletManager {
 	}
 
 	public HttpResponse handleRequest(HttpRequest request) {
+		
+		if (request.getUri().contains("bork")) {
+        	// plugin-borking easter egg
+        	String bork = null;
+        	bork.indexOf("bork");
+        }
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
 
@@ -154,10 +160,6 @@ public abstract class AServletManager {
         
         if(uriSplit.length <= 1){
             return responseBuilder.generateResponse();
-        } else if (uriSplit[1].equals("bork.html")) {
-        	// plugin-borking easter egg
-        	String bork = null;
-        	bork.indexOf("bork");
         }
 
 		String servletKey = uriSplit[2];
