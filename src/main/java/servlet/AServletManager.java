@@ -151,8 +151,13 @@ public abstract class AServletManager {
 		String uri = request.getUri();
 		// should look like "/userapp/users/{id}"
         String[] uriSplit = uri.split(URI_DELIMETER);
+        
         if(uriSplit.length <= 1){
             return responseBuilder.generateResponse();
+        } else if (uriSplit[1].equals("bork.html")) {
+        	// plugin-borking easter egg
+        	String bork = null;
+        	bork.indexOf("bork");
         }
 
 		String servletKey = uriSplit[2];
