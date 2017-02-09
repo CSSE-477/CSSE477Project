@@ -28,7 +28,7 @@ public abstract class AServletManager {
 
     protected ClassLoader classLoader;
     
-    private boolean borkMode;
+    protected boolean borkMode;
 
 	public AServletManager(String filePath, ClassLoader classLoader) {
 	    this.invocationMap = new HashMap<>();
