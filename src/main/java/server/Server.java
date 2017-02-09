@@ -72,6 +72,7 @@ public class Server implements Runnable, IDirectoryListener {
 				// This method block until somebody makes a request
 				Socket connectionSocket = this.welcomeSocket.accept();
 				InetAddress address = connectionSocket.getInetAddress();
+				System.err.println(address.toString());
 				
 				Counter counter = addressMap.get(address);
 				boolean serviceRequest = false;
