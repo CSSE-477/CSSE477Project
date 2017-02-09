@@ -78,8 +78,7 @@ public class Server implements Runnable, IDirectoryListener {
 				boolean serviceRequest = false;
 				if(counter == null) {
 					System.err.println("new user");
-					counter = new Counter();
-					addressMap.put(address, counter);
+					addressMap.put(address, new Counter());
 					serviceRequest = true;
 				} else {
 					serviceRequest = counter.increment();
