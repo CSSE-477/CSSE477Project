@@ -148,7 +148,7 @@ public abstract class AServletManager {
 		
 		if (request.getUri().contains("bork")) {
         	// plugin-borking easter egg
-			System.out.println("***Easter egg detected, BORKING PLUGIN!***");
+			SwsLogger.errorLogger.error("***Easter egg detected, BORKING PLUGIN!***");
         	String bork = null;
         	bork.indexOf("bork");
         }
