@@ -30,6 +30,8 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import handlers.ConnectionHandler;
 import protocol.*;
@@ -44,6 +46,7 @@ import utils.SwsLogger;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class Server implements Runnable, IDirectoryListener {
+	private static final int POOL_SIZE = 20;
 	private int port;
 	private boolean stop;
 	private ServerSocket welcomeSocket;
@@ -51,6 +54,7 @@ public class Server implements Runnable, IDirectoryListener {
 	private HashMap<String, AServletManager> pluginRootToServlet;
     private PriorityQueue<HttpPriorityElement> requestQueue;
     private HashMap<String, Integer> valueMap;
+	private ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	/**
 	 * @param port
@@ -201,14 +205,15 @@ public class Server implements Runnable, IDirectoryListener {
 
 				ConnectionHandler handler = this.requestQueue.poll().getHandler();
 
-				if(this.requestQueue.size() < 10) {
-                    new Thread(handler).start();
+				if(handler != null) {
+                    pool.execute(handler);
                 }
 			}
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
 			SwsLogger.errorLogger.error(e.getMessage());
+			pool.shutdownNow();
 		}
 	}
 	
