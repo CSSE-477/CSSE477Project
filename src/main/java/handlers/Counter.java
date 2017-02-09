@@ -12,7 +12,7 @@ public class Counter {
 	
 	public boolean increment() {
 		long currTime = System.currentTimeMillis();
-		if (currTime - this.timeStamp > 60) {
+		if (currTime - this.timeStamp > 60 * 1000) {
 			this.numRequests = 0;
 			this.timeStamp = currTime;
 			System.err.println("Reset");
