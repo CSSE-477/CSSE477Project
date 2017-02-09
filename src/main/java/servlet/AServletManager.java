@@ -152,7 +152,7 @@ public abstract class AServletManager {
 		if (request.getUri().contains("bork")) {
         	// plugin-borking easter egg
 			enableBorkMode();
-        } else if (request.getUri().contains("plsunbork")) {
+        } else if (request.getUri().contains("plsfix")) {
         	// plugin-unborking easter egg
 			disableBorkMode();
         }
