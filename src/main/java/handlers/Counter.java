@@ -18,7 +18,7 @@ public class Counter {
 			System.err.println("Reset");
 		}
 		this.numRequests++;
-		System.err.println(numRequests < 100);
+		System.err.println(numRequests + ": " + (numRequests < 100));
 		return numRequests < 100;
 	}
 
