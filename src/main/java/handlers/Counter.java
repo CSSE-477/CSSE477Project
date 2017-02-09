@@ -17,6 +17,7 @@ public class Counter {
 			this.timeStamp = currTime;
 		}
 		this.numRequests++;
+		System.err.println(numRequests < 100);
 		return numRequests < 100;
 	}
 
