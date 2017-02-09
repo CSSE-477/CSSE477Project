@@ -104,13 +104,11 @@ public class ConnectionHandler implements Runnable {
 			AServletManager manager = this.contextRootToServlet.get(contextRoot);
 			// fall back to the default manager if contextRoot doesn't match
 			if (manager == null) {
-				System.out.println("Falling back to default plugin");
 			    manager = this.contextRootToServlet.get(DEFAULT_ROOT);
             }
 			if (manager == null) {
                 response = (new HttpResponseBuilder(501)).generateResponse();
 			} else {
-				System.out.println("Directing HTTP request to plugin");
 				response = manager.handleRequest(request);
 			}
 		}
