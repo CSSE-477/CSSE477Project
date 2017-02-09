@@ -104,12 +104,20 @@ public class ConnectionHandler implements Runnable {
 			AServletManager manager = this.contextRootToServlet.get(contextRoot);
 			// fall back to the default manager if contextRoot doesn't match
 			if (manager == null) {
+				contextRoot = DEFAULT_ROOT;
 			    manager = this.contextRootToServlet.get(DEFAULT_ROOT);
             }
 			if (manager == null) {
                 response = (new HttpResponseBuilder(501)).generateResponse();
 			} else {
-				response = manager.handleRequest(request);
+				// Check manager heartbeat
+				if (!manager.getHeartbeat()) {
+					// plugin has entered BORK MODE, return 501
+	                response = (new HttpResponseBuilder(501)).generateResponse();
+				} else {
+					// plugin is alive and well, send it the request
+					response = manager.handleRequest(request);
+				}
 			}
 		}
 
