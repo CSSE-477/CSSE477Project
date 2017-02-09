@@ -21,13 +21,18 @@
  
 package protocol;
 
-import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.OutputStream;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Map;
+import java.util.zip.GZIPOutputStream;
+
+import utils.SwsLogger;
 
 /**
  * Represents a response object for HTTP.
@@ -121,12 +126,20 @@ public class HttpResponse {
 	 * @throws Exception
 	 */
 	public void write(OutputStream outStream) throws Exception {
-
-        int CHUNK_LENGTH = 4096;
         int OK_CODE = 200;
+        BufferedOutputStream out = new BufferedOutputStream(outStream);
 
-        BufferedOutputStream out = new BufferedOutputStream(outStream, CHUNK_LENGTH);
-
+        // Check to see if/what the body is & set the headers
+        byte[] bodyBytes = null;
+		// We are reading a file
+		if (this.getStatus() == OK_CODE && file != null && file.exists()) {
+			// Process text documents
+			String fileContents = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
+			bodyBytes = compressBody(fileContents);
+		} else if (this.getStatus() == OK_CODE && body != null) {
+			bodyBytes = compressBody(body);
+		}
+        
 		// First status line
 		String line = this.version + Protocol.getProtocol().getStringRep(Keywords.SPACE) +
 				this.status + Protocol.getProtocol().getStringRep(Keywords.SPACE) + this.phrase +
@@ -153,28 +166,42 @@ public class HttpResponse {
 		out.write(("" + Protocol.getProtocol().getStringRep(Keywords.CR) +
 				Protocol.getProtocol().getStringRep(Keywords.LF)).getBytes());
 
-		// We are reading a file
-		if(this.getStatus() == OK_CODE && file != null && file.exists()) {
-			// Process text documents
-			FileInputStream fileInStream = new FileInputStream(file);
-			BufferedInputStream inStream = new BufferedInputStream(fileInStream, CHUNK_LENGTH);
-			
-			byte[] buffer = new byte[CHUNK_LENGTH];
-			int bytesRead = 0;
-			// While there is some bytes to read from file, read each chunk and send to the socket out stream
-			while((bytesRead = inStream.read(buffer)) != -1) {
-				out.write(buffer, 0, bytesRead);
-			}
-			// Close the file input stream, we are done reading
-			inStream.close();
-		}
-		else if(this.getStatus() == OK_CODE && body != null){
-			out.write(body.getBytes());
+		// Write body *as gzip* if necessary
+		if (bodyBytes != null) {
+			out.write(bodyBytes);
 		}
 		// Flush the data so that outStream sends everything through the socket 
 		out.flush();
 	}
-	
+
+	/**
+	 * Compress the body to gzip format
+	 * @param the body as a string
+	 * @return the body as a gzip byte[]
+	 */
+	private byte[] compressBody(String str) {
+		// check to see if header map exists, if not return null since body cannot be processed
+		if (header == null) {
+			return null;
+		}
+
+		ByteArrayOutputStream bos = new ByteArrayOutputStream();
+		try {
+			GZIPOutputStream gzip = new GZIPOutputStream(bos);
+			gzip.write(str.getBytes());
+			gzip.close();
+			bos.close();
+		} catch (IOException e) {
+			SwsLogger.errorLogger.error("Error writing body as gzip.", e);
+		}
+
+		byte[] compressed = bos.toByteArray();
+		// update headers that are relevant
+		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING), "gzip");
+		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), compressed.length + "");
+		return compressed;
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
