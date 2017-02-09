@@ -76,17 +76,23 @@ public class HttpRequest {
 	 * {@link IOException} for socket input stream read errors.
 	 */
 	public static HttpRequest read(InputStream inputStream) throws Exception {
+
+		int dataAvailable = inputStream.available();
+		System.out.println("Data Available: " + dataAvailable);
+
 		// We will fill this object with the data from input stream and return it
 		HttpRequest request = new HttpRequest();
 		
 		InputStreamReader inStreamReader = new InputStreamReader(inputStream);
 		BufferedReader reader = new BufferedReader(inStreamReader);
-		
+
 		//First Request Line: GET /somedir/page.html HTTP/1.1
 		String line = reader.readLine(); // A line ends with either a \r, or a \n, or both
 
+
         int BAD_REQUEST_CODE = 400;
         String BAD_REQUEST_TEXT = "Bad Request";
+
         if(line == null) {
 			throw new ProtocolException(BAD_REQUEST_CODE, BAD_REQUEST_TEXT);
 		}

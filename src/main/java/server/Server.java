@@ -21,14 +21,18 @@
  
 package server;
 
+import java.io.*;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.security.KeyStore;
 import java.util.HashMap;
 
 import handlers.ConnectionHandler;
 import servlet.AServletManager;
 import utils.SwsLogger;
+
+import javax.net.ssl.*;
 
 
 /**
@@ -38,9 +42,10 @@ import utils.SwsLogger;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class Server implements Runnable, IDirectoryListener {
+
 	private int port;
 	private boolean stop;
-	private ServerSocket welcomeSocket;
+	private SSLServerSocket welcomeSocket;
 	private boolean readyState;
 	private HashMap<String, AServletManager> pluginRootToServlet;
 
@@ -61,28 +66,55 @@ public class Server implements Runnable, IDirectoryListener {
 	 */
 	public void run() {
 		try {
-			this.welcomeSocket = new ServerSocket(port);
-			// Now keep welcoming new connections until stop flag is set to true
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(new FileInputStream(".\\src\\main\\resources\\keystore.jks"),"password".toCharArray());
+
+            // Create key manager
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+            keyManagerFactory.init(keyStore, "password".toCharArray());
+            KeyManager[] km = keyManagerFactory.getKeyManagers();
+
+            // Create trust manager
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+            trustManagerFactory.init(keyStore);
+            TrustManager[] tm = trustManagerFactory.getTrustManagers();
+
+            // Initialize SSLContext
+            SSLContext sslContext = SSLContext.getInstance("TLSv1");
+            sslContext.init(km,  tm, null);
+
+            SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
+
+            // Create server socket
+            this.welcomeSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(this.port);
+
+            // Now keep welcoming new connections until stop flag is set to true
 			while(true) {
 			    this.readyState = true;
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
-				Socket connectionSocket = this.welcomeSocket.accept();
-				// Come out of the loop if the stop flag is set
+                try{
+                    SSLSocket sslSocket = (SSLSocket) this.welcomeSocket.accept();
+                    sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
+                    //sslSocket.startHandshake();
 
-				if(this.stop){
-				    this.readyState = false;
-				    break;
+                    // Come out of the loop if the stop flag is set
+                    if(this.stop){
+                        this.readyState = false;
+                        break;
+                    }
+
+                    // Create a handler for this incoming connection and start the handler in a new thread
+                    ConnectionHandler handler = new ConnectionHandler(sslSocket, this.pluginRootToServlet);
+                    new Thread(handler).start();
+                } catch (SSLException | SocketException e){
+                    SwsLogger.errorLogger.error(e);
                 }
-				
-				// Create a handler for this incoming connection and start the handler in a new thread
-				ConnectionHandler handler = new ConnectionHandler(connectionSocket, this.pluginRootToServlet);
-				new Thread(handler).start();
 			}
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
-			SwsLogger.errorLogger.error(e.getMessage());
+			SwsLogger.errorLogger.error(e);
 		}
 	}
 	

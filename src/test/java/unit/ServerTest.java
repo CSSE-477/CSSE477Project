@@ -13,6 +13,9 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import server.Server;
 
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLSocket;
+
 public class ServerTest {
 
 
@@ -45,7 +48,77 @@ public class ServerTest {
 		Server server = new Server(0);
 		Field welcomeSocket = server.getClass().getDeclaredField("welcomeSocket");
 		welcomeSocket.setAccessible(true);
-		ServerSocket socket = new ServerSocket();
+		SSLServerSocket socket = new SSLServerSocket() {
+			@Override
+			public String[] getEnabledCipherSuites() {
+				return new String[0];
+			}
+
+			@Override
+			public void setEnabledCipherSuites(String[] strings) {
+
+			}
+
+			@Override
+			public String[] getSupportedCipherSuites() {
+				return new String[0];
+			}
+
+			@Override
+			public String[] getSupportedProtocols() {
+				return new String[0];
+			}
+
+			@Override
+			public String[] getEnabledProtocols() {
+				return new String[0];
+			}
+
+			@Override
+			public void setEnabledProtocols(String[] strings) {
+
+			}
+
+			@Override
+			public void setNeedClientAuth(boolean b) {
+
+			}
+
+			@Override
+			public boolean getNeedClientAuth() {
+				return false;
+			}
+
+			@Override
+			public void setWantClientAuth(boolean b) {
+
+			}
+
+			@Override
+			public boolean getWantClientAuth() {
+				return false;
+			}
+
+			@Override
+			public void setUseClientMode(boolean b) {
+
+			}
+
+			@Override
+			public boolean getUseClientMode() {
+				return false;
+			}
+
+			@Override
+			public void setEnableSessionCreation(boolean b) {
+
+			}
+
+			@Override
+			public boolean getEnableSessionCreation() {
+				return false;
+			}
+		};
 		welcomeSocket.set(server, socket);
 		assertEquals(false, server.isStopped());
 		socket.close();

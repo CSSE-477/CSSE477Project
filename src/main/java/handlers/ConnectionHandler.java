@@ -9,6 +9,8 @@ import protocol.*;
 import servlet.AServletManager;
 import utils.SwsLogger;
 
+import javax.net.ssl.SSLSocket;
+
 /**
  * This class is responsible for handling a incoming request by creating a
  * {@link HttpRequest} object and sending the appropriate response be creating a
@@ -63,6 +65,7 @@ public class ConnectionHandler implements Runnable {
 			// fromInputStream
 			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
 			int status = pe.getStatus();
+			System.out.println("Status: " + status);
             response = (new HttpResponseBuilder(status)).generateResponse();
 		} catch (Exception e) {
 			// For any other error, we will create bad request response as well
