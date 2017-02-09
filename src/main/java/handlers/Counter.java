@@ -15,6 +15,7 @@ public class Counter {
 		if (currTime - this.timeStamp > 60) {
 			this.numRequests = 0;
 			this.timeStamp = currTime;
+			System.err.println("Reset");
 		}
 		this.numRequests++;
 		System.err.println(numRequests < 100);
