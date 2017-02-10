@@ -1,6 +1,5 @@
 package handlers;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
@@ -21,13 +20,15 @@ public class ConnectionHandler implements Runnable {
 	private Socket socket;
 	private HashMap<String, AServletManager> contextRootToServlet;
 	private HashMap<String, HttpResponse> cache;
+	private HttpRequest request;
 
 	private static final String DEFAULT_ROOT = "";
 
-	public ConnectionHandler(Socket socket, HashMap<String, AServletManager> contextRootToServlet) {
+	public ConnectionHandler(Socket socket, HttpRequest httpRequest, HashMap<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
 		this.cache = new HashMap<String, HttpResponse>();
+		this.request = httpRequest;
 	}
 
 	/**
@@ -37,11 +38,9 @@ public class ConnectionHandler implements Runnable {
 	 * (web browser).
 	 */
 	public void run() {
-		InputStream inStream = null;
 		OutputStream outStream = null;
 
 		try {
-			inStream = this.socket.getInputStream();
 			outStream = this.socket.getOutputStream();
 		} catch (Exception e) {
 			// Cannot do anything if we have exception reading input or output
@@ -51,39 +50,8 @@ public class ConnectionHandler implements Runnable {
 			return;
 		}
 
-		// At this point we have the input and output stream of the socket
-		// Now lets create a HttpRequest object
-		HttpRequest request = null;
 		HttpResponse response = null;
-		try {
-			request = HttpRequest.read(inStream);
-			SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
-		} catch (ProtocolException pe) {
-			// We have some sort of protocol exception. Get its status code and
-			// create response
-			// We know only two kind of exception is possible inside
-			// fromInputStream
-			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
-			int status = pe.getStatus();
-			response = (new HttpResponseBuilder(status)).generateResponse();
-		} catch (Exception e) {
-			// For any other error, we will create bad request response as well
-			response = (new HttpResponseBuilder(400)).generateResponse();
-		}
 
-		if (response != null) {
-			// Means there was an error, now write the response object to the
-			// socket
-			try {
-				response.write(outStream);
-				// System.out.println(response);
-			} catch (Exception e) {
-				// We will ignore this exception
-				SwsLogger.errorLogger.error("Exception occured while sending HTTP resonponse!\n" + e.toString());
-			}
-
-			return;
-		}
 
 		// We reached here means no error so far, so lets process further
 
