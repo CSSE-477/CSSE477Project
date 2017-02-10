@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - gunzip-implementation
+    - master
 
 maven-deploy:
   stage: maven-deploy
