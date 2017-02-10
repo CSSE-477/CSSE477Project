@@ -29,6 +29,10 @@ import java.net.Socket;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
+
+import handlers.ConnectionHandler;
+import handlers.Counter;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -138,6 +142,7 @@ public class Server implements Runnable, IDirectoryListener {
 	 */
 	@SuppressWarnings("null")
 	public void run() {
+		Map<InetAddress, Counter> addressMap = new HashMap<InetAddress, Counter>();
 		try {
 			this.welcomeSocket = new ServerSocket(port);
 			// Now keep welcoming new connections until stop flag is set to true
@@ -146,8 +151,23 @@ public class Server implements Runnable, IDirectoryListener {
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
 				Socket connectionSocket = this.welcomeSocket.accept();
+				InetAddress address = connectionSocket.getInetAddress();
+				
+				Counter counter = addressMap.get(address);
+				boolean serviceRequest = false;
+				if(counter == null) {
+					addressMap.put(address, new Counter());
+					serviceRequest = true;
+				} else {
+					serviceRequest = counter.increment();
+				}
+				if (!serviceRequest) {
+					SwsLogger.accessLogger.info(address.toString() + " has sent too many requests too quickly. Denying access.");
+					connectionSocket.close();
+					continue;
+				}
+				
 				// Come out of the loop if the stop flag is set
-
 				if(this.stop){
 				    this.readyState = false;
 				    break;
