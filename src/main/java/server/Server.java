@@ -21,24 +21,40 @@
  
 package server;
 
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketException;
+import java.security.KeyStore;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-
-import handlers.ConnectionHandler;
-import handlers.Counter;
 import java.util.PriorityQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
+
 import handlers.ConnectionHandler;
-import protocol.*;
+import handlers.Counter;
+import protocol.HttpPriorityElement;
+import protocol.HttpRequest;
+import protocol.HttpResponse;
+import protocol.HttpResponseBuilder;
+import protocol.Keywords;
+import protocol.Protocol;
+import protocol.ProtocolException;
 import servlet.AServletManager;
 import utils.SwsLogger;
 
@@ -53,7 +69,7 @@ public class Server implements Runnable, IDirectoryListener {
 	private static final int POOL_SIZE = 20;
 	private int port;
 	private boolean stop;
-	private ServerSocket welcomeSocket;
+	private SSLServerSocket welcomeSocket;
 	private boolean readyState;
 	private HashMap<String, AServletManager> pluginRootToServlet;
     private PriorityQueue<HttpPriorityElement> requestQueue;
@@ -144,13 +160,41 @@ public class Server implements Runnable, IDirectoryListener {
 	public void run() {
 		Map<InetAddress, Counter> addressMap = new HashMap<InetAddress, Counter>();
 		try {
-			this.welcomeSocket = new ServerSocket(port);
-			// Now keep welcoming new connections until stop flag is set to true
+            KeyStore keyStore = KeyStore.getInstance("JKS");
+            keyStore.load(new FileInputStream("/home/csse/keystore.jks"),"password".toCharArray());
+
+            // Create key manager
+            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+            keyManagerFactory.init(keyStore, "password".toCharArray());
+            KeyManager[] km = keyManagerFactory.getKeyManagers();
+
+            // Create trust manager
+            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+            trustManagerFactory.init(keyStore);
+            TrustManager[] tm = trustManagerFactory.getTrustManagers();
+
+            // Initialize SSLContext
+            SSLContext sslContext = SSLContext.getInstance("TLSv1");
+            sslContext.init(km,  tm, null);
+
+            SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
+
+            // Create server socket
+            this.welcomeSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(this.port);
+
+            // Now keep welcoming new connections until stop flag is set to true
 			while(true) {
 			    this.readyState = true;
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
-				Socket connectionSocket = this.welcomeSocket.accept();
+			    SSLSocket connectionSocket = null;
+                try{
+                    connectionSocket = (SSLSocket) this.welcomeSocket.accept();
+                    connectionSocket.setEnabledCipherSuites(connectionSocket.getSupportedCipherSuites());
+                    // sslSocket.startHandshake();
+                } catch (SSLException | SocketException e){
+                    SwsLogger.errorLogger.error(e);
+                }
 				InetAddress address = connectionSocket.getInetAddress();
 				
 				Counter counter = addressMap.get(address);

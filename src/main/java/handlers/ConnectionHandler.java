@@ -4,7 +4,11 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
 
-import protocol.*;
+import protocol.HttpRequest;
+import protocol.HttpResponse;
+import protocol.HttpResponseBuilder;
+import protocol.Keywords;
+import protocol.Protocol;
 import servlet.AServletManager;
 import utils.SwsLogger;
 

@@ -22,6 +22,7 @@ public class SimpleWebServer {
 		String pluginDirectory = properties.getProperty("pluginDirectory");
 		int port = Integer.parseInt(properties.getProperty("port"));
 
+
 		// Create a run the server
 		Server server = new Server(port);
 
