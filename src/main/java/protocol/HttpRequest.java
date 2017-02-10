@@ -1,6 +1,7 @@
 package protocol;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -8,6 +9,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.zip.GZIPInputStream;
 
 /**
  * Represents a request object for HTTP.
@@ -150,21 +152,50 @@ public class HttpRequest {
 		}
 		
 		int contentLength = 0;
+		String contentEncoding = null;
 		try {
 			contentLength = Integer.parseInt(request.header
 					.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
+			// check to see if Content-Encoding is gzip
+			contentEncoding = request.header.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING));
 		}
 		catch(Exception e){}
-		
-		if(contentLength > 0) {
+
+		if (contentLength > 0) {
+			// read in the body, gzip or plain text
 			request.body = new char[contentLength];
 			reader.read(request.body);
+
+			// should we decompress?
+			if (contentEncoding != null && (contentEncoding.equals("gzip") || contentEncoding.equals("application/gzip"))) {
+				String theBody = new String(request.body);
+				char[] decompressedBody = decompressString(theBody);
+
+				// update the content length
+				request.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), decompressedBody.length + "");
+				request.body = new char[decompressedBody.length];
+				request.body = decompressedBody;
+			}
 		}
-		
+
 		return request;
 	}
-	
-	
+
+	private static char[] decompressString(String str) throws Exception {
+		GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(str.getBytes()));
+		BufferedReader br = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
+
+		String outStr = "";
+		String line;
+		while ((line = br.readLine())!=null) {
+			outStr += line + "\n";
+		}
+
+		br.close();
+		gis.close();
+		return outStr.toCharArray();
+	}
+
 	@Override
 	public String toString() {
 		StringBuffer buffer = new StringBuffer();
