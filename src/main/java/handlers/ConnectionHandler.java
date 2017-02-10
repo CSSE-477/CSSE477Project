@@ -1,6 +1,5 @@
 package handlers;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
@@ -20,12 +19,16 @@ import utils.SwsLogger;
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
 	private HashMap<String, AServletManager> contextRootToServlet;
+	private HashMap<String, HttpResponse> cache;
+	private HttpRequest request;
 
 	private static final String DEFAULT_ROOT = "";
 
-	public ConnectionHandler(Socket socket, HashMap<String, AServletManager> contextRootToServlet) {
+	public ConnectionHandler(Socket socket, HttpRequest httpRequest, HashMap<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
+		this.cache = new HashMap<String, HttpResponse>();
+		this.request = httpRequest;
 	}
 
 	/**
@@ -35,11 +38,9 @@ public class ConnectionHandler implements Runnable {
 	 * (web browser).
 	 */
 	public void run() {
-		InputStream inStream = null;
 		OutputStream outStream = null;
 
 		try {
-			inStream = this.socket.getInputStream();
 			outStream = this.socket.getOutputStream();
 		} catch (Exception e) {
 			// Cannot do anything if we have exception reading input or output
@@ -49,39 +50,8 @@ public class ConnectionHandler implements Runnable {
 			return;
 		}
 
-		// At this point we have the input and output stream of the socket
-		// Now lets create a HttpRequest object
-		HttpRequest request = null;
 		HttpResponse response = null;
-		try {
-			request = HttpRequest.read(inStream);
-			SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
-		} catch (ProtocolException pe) {
-			// We have some sort of protocol exception. Get its status code and
-			// create response
-			// We know only two kind of exception is possible inside
-			// fromInputStream
-			// Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
-			int status = pe.getStatus();
-            response = (new HttpResponseBuilder(status)).generateResponse();
-		} catch (Exception e) {
-			// For any other error, we will create bad request response as well
-            response = (new HttpResponseBuilder(400)).generateResponse();
-		}
 
-		if (response != null) {
-			// Means there was an error, now write the response object to the
-			// socket
-			try {
-				response.write(outStream);
-				// System.out.println(response);
-			} catch (Exception e) {
-				// We will ignore this exception
-				SwsLogger.errorLogger.error("Exception occured while sending HTTP resonponse!\n" + e.toString());
-			}
-
-			return;
-		}
 
 		// We reached here means no error so far, so lets process further
 
@@ -92,31 +62,58 @@ public class ConnectionHandler implements Runnable {
 		if (!request.getVersion().equalsIgnoreCase(Protocol.getProtocol().getStringRep(Keywords.VERSION))) {
 			response = (new HttpResponseBuilder(400)).generateResponse();
 		} else {
-			// strip out /userapp/users/1 => "userapp" as context root
-			String uri = request.getUri();
-			int firstSlashIndex = uri.indexOf('/') + 1;
-			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
-			String contextRoot = DEFAULT_ROOT;
-			if(secondSlashIndex != -1){
-                contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
-            }
-			SwsLogger.accessLogger.info(contextRoot);
-			AServletManager manager = this.contextRootToServlet.get(contextRoot);
-			// fall back to the default manager if contextRoot doesn't match
-			if (manager == null) {
-			    manager = this.contextRootToServlet.get(DEFAULT_ROOT);
-            }
-			if (manager == null) {
-                response = (new HttpResponseBuilder(501)).generateResponse();
+			HttpResponse cachedResponse = null;
+
+			// Check cache if it is a GET or HEAD request
+			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
+					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
+				// Retrieve cached response if it is
+				cachedResponse = this.cache.get(request.getUri());
+			} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))
+					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))
+					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.DELETE))) {
+				// Invalidate cache if it is a write operation
+				this.cache.remove(request.getUri());
+			}
+			
+			// Return cached response if it exists
+			if (cachedResponse != null) {
+				response = cachedResponse;
 			} else {
-				response = manager.handleRequest(request);
+				// response not found in cache, do regular plugin lookup
+				// strip out /userapp/users/1 => "userapp" as context root
+				String uri = request.getUri();
+				int firstSlashIndex = uri.indexOf('/') + 1;
+				int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
+				String contextRoot = DEFAULT_ROOT;
+				if (secondSlashIndex != -1) {
+					contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
+				}
+				SwsLogger.accessLogger.info(contextRoot);
+				AServletManager manager = this.contextRootToServlet.get(contextRoot);
+				// fall back to the default manager if contextRoot doesn't match
+				if (manager == null) {
+					manager = this.contextRootToServlet.get(DEFAULT_ROOT);
+				}
+				if (manager == null) {
+					response = (new HttpResponseBuilder(501)).generateResponse();
+				} else {
+					response = manager.handleRequest(request);
+				}
 			}
 		}
 
 		// So this is a temporary patch for that problem and should be removed
 		// after a response object is created for protocol version mismatch.
 		if (response == null) {
-            response = (new HttpResponseBuilder(400)).generateResponse();
+			response = (new HttpResponseBuilder(400)).generateResponse();
+		} else {
+			// response is valid, write it to cache if it is a GET or HEAD
+			// request
+			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
+					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
+				this.cache.put(request.getUri(), response);
+			}
 		}
 
 		try {
