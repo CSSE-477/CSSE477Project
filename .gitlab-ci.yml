@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - master
+    - PriorityQueuePerformanceScenario
 
 maven-deploy:
   stage: maven-deploy
