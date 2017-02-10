@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - HTTPSImplementationTactic
+    - master
 
 maven-deploy:
   stage: maven-deploy
