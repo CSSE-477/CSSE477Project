@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - master
+    - pluginFailure
 
 maven-deploy:
   stage: maven-deploy
