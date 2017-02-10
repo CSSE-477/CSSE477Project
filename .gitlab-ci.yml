@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - dosPrevention
+    - master
 
 maven-deploy:
   stage: maven-deploy
@@ -42,4 +42,4 @@ deploy:
   tags:
     - 'Team #YOLOSWAG *dabs* SWS'
   only:
-    - tags master
+    - tags
