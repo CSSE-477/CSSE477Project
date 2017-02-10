@@ -6,7 +6,8 @@ Jesse Shellabarger, Tayler How, Collin Trowbridge, Steve Trotta.
 
 ## Description
 The project is a web server that can handle GET, HEAD, PUT, DELETE, and POST requests. The web server, at the moment, does not handle any other requests. 
-The project can be run by downloading the jar and running `java -jar YoloSwagSws-1.0.x.jar`.
+The project can be run by downloading the jar and running `java -jar YoloSwagSws-1.0.x.jar`. The server supports HTTPS, Gunzip compressions, Denial of Service protection, a caching layer,
+and automatic server restarts to increase availability.
 
 ## Infrastructure Details
 We have devoted two of our assigned VMs to be staging (19) and production (06) servers. You can visit 477-19.csse.rose-hulman.edu/YoloSwagSWS/ or 477-06.csse.rose-hulman.edu/YoloSwagSWS/ to verify. The jar file is deployed to the `/var/www/html/YoloSwagSWS` directory, and we deploy to staging on pushes to master and to prod on new release tags.
