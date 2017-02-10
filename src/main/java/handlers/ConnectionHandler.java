@@ -47,7 +47,7 @@ public class ConnectionHandler implements Runnable {
 			SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
 			return;
 		}
-		
+
 		HttpResponse response = null;
 
 		// We reached here means no error so far, so lets process further

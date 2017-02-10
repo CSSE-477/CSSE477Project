@@ -30,6 +30,8 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.PriorityQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import handlers.ConnectionHandler;
 import protocol.*;
@@ -44,6 +46,7 @@ import utils.SwsLogger;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class Server implements Runnable, IDirectoryListener {
+	private static final int POOL_SIZE = 20;
 	private int port;
 	private boolean stop;
 	private ServerSocket welcomeSocket;
@@ -51,6 +54,7 @@ public class Server implements Runnable, IDirectoryListener {
 	private HashMap<String, AServletManager> pluginRootToServlet;
     private PriorityQueue<HttpPriorityElement> requestQueue;
     private HashMap<String, Integer> valueMap;
+	private ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	/**
 	 * @param port
@@ -61,11 +65,11 @@ public class Server implements Runnable, IDirectoryListener {
 		this.readyState = false;
 		this.pluginRootToServlet = new HashMap<>();
         this.valueMap = new HashMap<>();
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), 5);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), 5);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), 5);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), 2);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), 2);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), 2);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), 3);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), 1);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), 4);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), 5);
         this.requestQueue = new PriorityQueue<>(10, new Comparator<HttpPriorityElement>() {
             @Override
             public int compare(HttpPriorityElement o1, HttpPriorityElement o2) {
@@ -73,7 +77,7 @@ public class Server implements Runnable, IDirectoryListener {
                 HttpRequest o2Req = o2.getRequest();
                 LocalDateTime now = LocalDateTime.now();
                 if(o1.getTime().minusSeconds(1).isAfter(now) && !o2.getTime().minusSeconds(1).isAfter(now)) {
-                    return 1;
+                    return -1;
                 }
                 int o1Total = getMethodVal(o1Req.getMethod());
                 int o2Total = getMethodVal(o2Req.getMethod());
@@ -96,33 +100,33 @@ public class Server implements Runnable, IDirectoryListener {
                 o1Total = o1Total * getPayloadSizeFactor(o1Req.getMethod(), o1Length);
                 o2Total = o2Total * getPayloadSizeFactor(o2Req.getMethod(), o2Length);
                 if(o1Total < o2Total) {
-                    return 1;
+                    return -1;
                 }
                 if(o1Total > o2Total) {
-                    return -1;
+                    return 1;
                 }
                 return 0;
             }
 
             int getMethodVal(String method){
                 if(method == null){
-                    return 10;
+                    return 1;
                 }
                 Integer value = valueMap.get(method);
                 if(value == null){
-                    return 10;
+                    return 1;
                 }
                 return value;
             }
 
             int getPayloadSizeFactor(String method, int payloadSize){
                 if(method == null) {
-                    return payloadSize * 10;
+                    return 1;
                 }
                 if(method.equals(Protocol.getProtocol().getStringRep(Keywords.POST)) || method.equals(Protocol.getProtocol().getStringRep(Keywords.PUT))){
                     return payloadSize;
                 }
-                return 0;
+                return 1;
             }
         });
 	}
@@ -206,16 +210,20 @@ public class Server implements Runnable, IDirectoryListener {
 				this.requestQueue.add(newElement);
 
 				ConnectionHandler handler = this.requestQueue.poll().getHandler();
-				new Thread(handler).start();
+
+				if(handler != null) {
+                    pool.execute(handler);
+                }
 			}
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
 			SwsLogger.errorLogger.error("Server exception accepting connection...", e);
+			pool.shutdownNow();
 			System.exit(-1);
 		}
 	}
-	
+
 	/**
 	 * Stops the server from listening further.
 	 */
