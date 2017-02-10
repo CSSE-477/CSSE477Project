@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - master
+    - caching
 
 maven-deploy:
   stage: maven-deploy
