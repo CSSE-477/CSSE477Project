@@ -112,7 +112,7 @@ Tested by sending all types of requests through the secure socket connection usi
 
 ## Improvement Results
 
-![Improvement Results](docs/ImprovementResults.png)
+![Improvement Results](docs/ImprovementResults.PNG)
 
 ## Architecture Diagram
 ![Architecture Diagram](docs/2017-02-02 SWS UML Diagram.png)
