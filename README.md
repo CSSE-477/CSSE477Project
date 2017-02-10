@@ -143,3 +143,6 @@ All together, our performance remained very consistent with our baseline. This i
 
 ## Production Environment Allocation Structure
 ![Allocation Diagram](docs/AllocationDiagram.png)
+
+##Component and Connector!
+![Component and Connector](docs/ComponentandConnector.png)
