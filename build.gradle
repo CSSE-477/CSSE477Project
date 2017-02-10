@@ -226,7 +226,7 @@ task publishToWebServer(dependsOn: distZip) << {
 
 			sleep(3 * 1000)
 			println "Running curl command to see if server is started"
-			//executeSudo('/bin/bash /home/csse/serverE2E.sh', pty: true)
+			executeSudo('/bin/bash /home/csse/serverE2E.sh', pty: true)
 			println("YoloSwagSWS has been deployed to " + System.getenv('SSH_HOST'))
 		}
 	}
