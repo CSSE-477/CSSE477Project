@@ -67,7 +67,7 @@ public class Server implements Runnable, IDirectoryListener {
 	public void run() {
 		try {
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream(".\\src\\main\\resources\\keystore.jks"),"password".toCharArray());
+            keyStore.load(new FileInputStream("/home/csse/keystore.jks"),"password".toCharArray());
 
             // Create key manager
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
