@@ -114,6 +114,26 @@ Tested by sending all types of requests through the secure socket connection usi
 
 ![Improvement Results](docs/ImprovementResults.PNG)
 
+We received our load testing results by deploying our application to our staging server and load testing with Locust.
+
+The performance of our Priority Queue tactic was somewhat unexpected. We had anticipated a large performance increase, but we believe that the computational intensity of our plugins is not large enough to benefit from the priority queue.
+
+The service restart tactic performed as expected. It had no impact on our performance metrics, but was successfully able to automatically restart the server once it goes down.
+
+The file checksum tactice also performed as expected. The effects on performance were negligable and we gained the added security for our clients. The client can now check the checksum of any file the request, to verify that it was not corrupted in transmission.
+
+The performance of our caching tactic was also lower than expected. We expected to see a significant performance increase, but instead it stayed consistent with our baseline. We believe this is because our plugins are so lightweight that caching their responses is inconsequential.
+
+Gunzip compression improved performance significantly. The number of requests that we are able to handle at a time did not change, but the responses to the requests are now received much faster. This is because the compressed files are smaller and are faster to send over the network.
+
+The HTTPS tactic had a signifcant performance penalty, which was expected. SSL requires an additional handshake at the beginning of each connection, which increases our overhead significantly. There is also the overhead of encrypting our responces each time. While we have decreased performance, we have gained a great deal of additional security for the users of our application.
+
+Our DoS protection tactic performed about as expected. We experience only a slight decrease in performance during normal operating conditions, but gained the resileance to Denial of Service attacks. Any users sending more than 100 requests per second will now be blacklisted.
+
+The detection of plugin failure tactic allows us to detect plugins in an unusable state via a heartbeat and stop routing requests to them. The number of requests our server can handle in a second stayed about even. The average time to response increased, but we believe this is a fluke due to network traffic. This feature should not deliever such a drastic performance increase.
+
+All together, our performance remained very consistent with our baseline. This is what we expected as a team, as most of our tactics increase our systems security or availability, with must naturally come at the cost of performance. It seems that our performance imporvements offset the additional overhead from the other tactics.
+
 ## Architecture Diagram
 ![Architecture Diagram](docs/2017-02-02 SWS UML Diagram.png)
 
