@@ -22,7 +22,7 @@ staging-deploy:
     - gradle
     - java
   only:
-    - master
+    - Checksum
 
 maven-deploy:
   stage: maven-deploy
