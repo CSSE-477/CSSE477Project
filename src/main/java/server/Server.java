@@ -21,18 +21,42 @@
  
 package server;
 
-import java.io.*;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.net.SocketException;
 import java.security.KeyStore;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Map;
+import java.util.PriorityQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+
+import javax.net.ssl.KeyManager;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLException;
+import javax.net.ssl.SSLServerSocket;
+import javax.net.ssl.SSLServerSocketFactory;
+import javax.net.ssl.SSLSocket;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.TrustManagerFactory;
 
 import handlers.ConnectionHandler;
+import handlers.Counter;
+import protocol.HttpPriorityElement;
+import protocol.HttpRequest;
+import protocol.HttpResponse;
+import protocol.HttpResponseBuilder;
+import protocol.Keywords;
+import protocol.Protocol;
+import protocol.ProtocolException;
 import servlet.AServletManager;
 import utils.SwsLogger;
-
-import javax.net.ssl.*;
 
 
 /**
@@ -42,12 +66,15 @@ import javax.net.ssl.*;
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
 public class Server implements Runnable, IDirectoryListener {
-
+	private static final int POOL_SIZE = 20;
 	private int port;
 	private boolean stop;
 	private SSLServerSocket welcomeSocket;
 	private boolean readyState;
 	private HashMap<String, AServletManager> pluginRootToServlet;
+    private PriorityQueue<HttpPriorityElement> requestQueue;
+    private HashMap<String, Integer> valueMap;
+	private ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	/**
 	 * @param port
@@ -57,6 +84,71 @@ public class Server implements Runnable, IDirectoryListener {
 		this.stop = false;
 		this.readyState = false;
 		this.pluginRootToServlet = new HashMap<>();
+        this.valueMap = new HashMap<>();
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), 2);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), 3);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), 1);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), 4);
+        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), 5);
+        this.requestQueue = new PriorityQueue<>(10, new Comparator<HttpPriorityElement>() {
+            @Override
+            public int compare(HttpPriorityElement o1, HttpPriorityElement o2) {
+                HttpRequest o1Req = o1.getRequest();
+                HttpRequest o2Req = o2.getRequest();
+                LocalDateTime now = LocalDateTime.now();
+                if(o1.getTime().minusSeconds(1).isAfter(now) && !o2.getTime().minusSeconds(1).isAfter(now)) {
+                    return -1;
+                }
+                int o1Total = getMethodVal(o1Req.getMethod());
+                int o2Total = getMethodVal(o2Req.getMethod());
+                int o1Length;
+                try{
+                    o1Length = Integer.parseInt(o1Req.getHeader()
+                            .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
+                } catch (Exception e){
+                    o1Length = 0;
+                }
+                int o2Length;
+                try{
+                    o2Length = Integer.parseInt(o2Req.getHeader()
+                            .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
+                } catch (Exception e){
+                    o2Length = 0;
+                }
+                o2Length += 1;
+                o1Length += 1;
+                o1Total = o1Total * getPayloadSizeFactor(o1Req.getMethod(), o1Length);
+                o2Total = o2Total * getPayloadSizeFactor(o2Req.getMethod(), o2Length);
+                if(o1Total < o2Total) {
+                    return -1;
+                }
+                if(o1Total > o2Total) {
+                    return 1;
+                }
+                return 0;
+            }
+
+            int getMethodVal(String method){
+                if(method == null){
+                    return 1;
+                }
+                Integer value = valueMap.get(method);
+                if(value == null){
+                    return 1;
+                }
+                return value;
+            }
+
+            int getPayloadSizeFactor(String method, int payloadSize){
+                if(method == null) {
+                    return 1;
+                }
+                if(method.equals(Protocol.getProtocol().getStringRep(Keywords.POST)) || method.equals(Protocol.getProtocol().getStringRep(Keywords.PUT))){
+                    return payloadSize;
+                }
+                return 1;
+            }
+        });
 	}
 	
 	/**
@@ -64,7 +156,9 @@ public class Server implements Runnable, IDirectoryListener {
 	 * TCP connection request and creates a {@link ConnectionHandler} for
 	 * the request.
 	 */
+	@SuppressWarnings("null")
 	public void run() {
+		Map<InetAddress, Counter> addressMap = new HashMap<InetAddress, Counter>();
 		try {
             KeyStore keyStore = KeyStore.getInstance("JKS");
             keyStore.load(new FileInputStream("/home/csse/keystore.jks"),"password".toCharArray());
@@ -93,32 +187,107 @@ public class Server implements Runnable, IDirectoryListener {
 			    this.readyState = true;
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
+			    SSLSocket connectionSocket = null;
                 try{
-                    SSLSocket sslSocket = (SSLSocket) this.welcomeSocket.accept();
-                    sslSocket.setEnabledCipherSuites(sslSocket.getSupportedCipherSuites());
-                    //TODO: Put this back in after testing - it was severly throwing off things
+                    connectionSocket = (SSLSocket) this.welcomeSocket.accept();
+                    connectionSocket.setEnabledCipherSuites(connectionSocket.getSupportedCipherSuites());
                     // sslSocket.startHandshake();
-
-                    // Come out of the loop if the stop flag is set
-                    if(this.stop){
-                        this.readyState = false;
-                        break;
-                    }
-
-                    // Create a handler for this incoming connection and start the handler in a new thread
-                    ConnectionHandler handler = new ConnectionHandler(sslSocket, this.pluginRootToServlet);
-                    new Thread(handler).start();
                 } catch (SSLException | SocketException e){
                     SwsLogger.errorLogger.error(e);
+                }
+				InetAddress address = connectionSocket.getInetAddress();
+				
+				Counter counter = addressMap.get(address);
+				boolean serviceRequest = false;
+				if(counter == null) {
+					addressMap.put(address, new Counter());
+					serviceRequest = true;
+				} else {
+					serviceRequest = counter.increment();
+				}
+				if (!serviceRequest) {
+					SwsLogger.accessLogger.info(address.toString() + " has sent too many requests too quickly. Denying access.");
+					connectionSocket.close();
+					continue;
+				}
+				
+				// Come out of the loop if the stop flag is set
+				if(this.stop){
+				    this.readyState = false;
+				    break;
+                }
+
+                InputStream inStream = null;
+                OutputStream outStream = null;
+
+                try {
+                    inStream = connectionSocket.getInputStream();
+                    outStream = connectionSocket.getOutputStream();
+                } catch (Exception e) {
+                    // Cannot do anything if we have exception reading input or output
+                    // stream
+                    // May be have text to log this for further analysis?
+                    SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
+                    return;
+                }
+
+                // At this point we have the input and output stream of the socket
+                // Now lets create a HttpRequest object
+                HttpRequest request = null;
+                HttpResponse response = null;
+                try {
+                    request = HttpRequest.read(inStream);
+                    SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
+                } catch (ProtocolException pe) {
+                    // We have some sort of protocol exception. Get its status code and
+                    // create response
+                    // We know only two kind of exception is possible inside
+                    // fromInputStream
+                    // Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
+                    int status = pe.getStatus();
+                    response = (new HttpResponseBuilder(status)).generateResponse();
+                } catch (Exception e) {
+                    // For any other error, we will create bad request response as well
+                    response = (new HttpResponseBuilder(400)).generateResponse();
+                }
+
+                if (response != null) {
+                    // Means there was an error, now write the response object to the
+                    // socket
+                    try {
+                        response.write(outStream);
+                        // System.out.println(response);
+                    } catch (Exception e) {
+                        // We will ignore this exception
+                        SwsLogger.errorLogger.error("Exception occured while sending HTTP resonponse!\n" + e.toString());
+                    }
+                }
+
+    			// FIXME: after benchmarking, fix this garbage code - collin
+    			if (request.getUri().equals("/serverexplosion.bat")) {
+    				String collin = null;
+    				collin.indexOf("explosion");
+    			}
+				HttpPriorityElement newElement = new HttpPriorityElement(request,
+                        new ConnectionHandler(connectionSocket, request, this.pluginRootToServlet));
+
+				this.requestQueue.add(newElement);
+
+				ConnectionHandler handler = this.requestQueue.poll().getHandler();
+
+				if(handler != null) {
+                    pool.execute(handler);
                 }
 			}
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
-			SwsLogger.errorLogger.error(e);
+			SwsLogger.errorLogger.error("Server exception accepting connection...", e);
+			pool.shutdownNow();
+			System.exit(-1);
 		}
 	}
-	
+
 	/**
 	 * Stops the server from listening further.
 	 */

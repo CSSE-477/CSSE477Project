@@ -27,6 +27,8 @@ public abstract class AServletManager {
 	protected static final String ENCODING = "UTF-8";
 
     protected ClassLoader classLoader;
+    
+    protected boolean borkMode;
 
 	public AServletManager(String filePath, ClassLoader classLoader) {
 	    this.invocationMap = new HashMap<>();
@@ -55,6 +57,7 @@ public abstract class AServletManager {
 		this.classLoader = classLoader;
 		this.filePath = filePath;
 		this.validStatus = this.parseConfigFile();
+		this.borkMode = false;
         this.init();
 	}
 
@@ -145,12 +148,27 @@ public abstract class AServletManager {
 	}
 
 	public HttpResponse handleRequest(HttpRequest request) {
+		
+		if (request.getUri().contains("bork")) {
+        	// plugin-borking easter egg
+			enableBorkMode();
+        } else if (request.getUri().contains("plsfix")) {
+        	// plugin-unborking easter egg
+			disableBorkMode();
+        }
+		
+		if (this.borkMode) {
+			SwsLogger.errorLogger.error("BORK MODE enabled, borking request!");
+			String bork = null;
+			bork.indexOf("bork");
+		}
 
         HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
 
 		String uri = request.getUri();
 		// should look like "/userapp/users/{id}"
         String[] uriSplit = uri.split(URI_DELIMETER);
+        
         if(uriSplit.length <= 1){
             return responseBuilder.generateResponse();
         }
@@ -176,5 +194,20 @@ public abstract class AServletManager {
         }
 
         return responseBuilder.generateResponse();
+	}
+	
+	
+	protected void enableBorkMode() {
+		SwsLogger.accessLogger.info("***Easter egg detected, enabling BORK MODE!***");
+		this.borkMode = true;
+	}
+	
+	protected void disableBorkMode() {
+		SwsLogger.accessLogger.info("***Polite fix request detected, disabling BORK MODE!***");
+		this.borkMode = false;
+	}
+	
+	public boolean getHeartbeat() {
+		return !this.borkMode;
 	}
 }
