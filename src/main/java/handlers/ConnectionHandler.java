@@ -24,7 +24,8 @@ public class ConnectionHandler implements Runnable {
 
 	private static final String DEFAULT_ROOT = "";
 
-	public ConnectionHandler(Socket socket, HttpRequest httpRequest, HashMap<String, AServletManager> contextRootToServlet) {
+	public ConnectionHandler(Socket socket, HttpRequest httpRequest,
+			HashMap<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
 		this.cache = new HashMap<String, HttpResponse>();
@@ -52,7 +53,6 @@ public class ConnectionHandler implements Runnable {
 
 		HttpResponse response = null;
 
-
 		// We reached here means no error so far, so lets process further
 
 		// Fill in the code to create a response for version mismatch.
@@ -75,7 +75,7 @@ public class ConnectionHandler implements Runnable {
 				// Invalidate cache if it is a write operation
 				this.cache.remove(request.getUri());
 			}
-			
+
 			// Return cached response if it exists
 			if (cachedResponse != null) {
 				response = cachedResponse;
@@ -93,12 +93,20 @@ public class ConnectionHandler implements Runnable {
 				AServletManager manager = this.contextRootToServlet.get(contextRoot);
 				// fall back to the default manager if contextRoot doesn't match
 				if (manager == null) {
+					contextRoot = DEFAULT_ROOT;
 					manager = this.contextRootToServlet.get(DEFAULT_ROOT);
 				}
 				if (manager == null) {
 					response = (new HttpResponseBuilder(501)).generateResponse();
 				} else {
-					response = manager.handleRequest(request);
+					// Check manager heartbeat
+					if (!manager.getHeartbeat()) {
+						// plugin has entered BORK MODE, return 501
+						response = (new HttpResponseBuilder(501)).generateResponse();
+					} else {
+						// plugin is alive and well, send it the request
+						response = manager.handleRequest(request);
+					}
 				}
 			}
 		}
