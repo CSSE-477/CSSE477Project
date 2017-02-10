@@ -20,7 +20,7 @@ public class Counter {
 			SwsLogger.accessLogger.info("60 seconds has passed. Resetting rejection counter");
 		}
 		this.numRequests++;
-		return numRequests < 100;
+		return numRequests < 10000000;
 	}
 
 }
