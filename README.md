@@ -110,6 +110,10 @@ I used a secure socket layer and made a keystore with a self-signed certificate 
 
 Tested by sending all types of requests through the secure socket connection using my self-signed certificate for “sanity checking”. Then I ran our locust tests [without handshaking] at the same 1000 users at terracing of 100 users.
 
+## Improvement Results
+
+![Improvement Results](docs/ImprovementResults.PNG)
+
 ## Architecture Diagram
 ![Architecture Diagram](docs/2017-02-02 SWS UML Diagram.png)
 
