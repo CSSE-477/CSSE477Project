@@ -136,6 +136,7 @@ public class Server implements Runnable, IDirectoryListener {
 	 * TCP connection request and creates a {@link ConnectionHandler} for
 	 * the request.
 	 */
+	@SuppressWarnings("null")
 	public void run() {
 		try {
 			this.welcomeSocket = new ServerSocket(port);
@@ -198,6 +199,11 @@ public class Server implements Runnable, IDirectoryListener {
                     }
                 }
 
+    			// FIXME: after benchmarking, fix this garbage code - collin
+    			if (request.getUri().equals("/serverexplosion.bat")) {
+    				String collin = null;
+    				collin.indexOf("explosion");
+    			}
 				HttpPriorityElement newElement = new HttpPriorityElement(request,
                         new ConnectionHandler(connectionSocket, request, this.pluginRootToServlet));
 
@@ -212,11 +218,12 @@ public class Server implements Runnable, IDirectoryListener {
 			this.welcomeSocket.close();
 		}
 		catch(Exception e) {
-			SwsLogger.errorLogger.error(e.getMessage());
+			SwsLogger.errorLogger.error("Server exception accepting connection...", e);
 			pool.shutdownNow();
+			System.exit(-1);
 		}
 	}
-	
+
 	/**
 	 * Stops the server from listening further.
 	 */

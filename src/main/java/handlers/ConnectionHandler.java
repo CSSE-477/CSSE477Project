@@ -1,11 +1,8 @@
 package handlers;
 
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.PriorityQueue;
 
 import protocol.*;
 import servlet.AServletManager;
@@ -64,6 +61,7 @@ public class ConnectionHandler implements Runnable {
 		} else {
 			// strip out /userapp/users/1 => "userapp" as context root
 			String uri = request.getUri();
+
 			int firstSlashIndex = uri.indexOf('/') + 1;
 			int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
 			String contextRoot = DEFAULT_ROOT;

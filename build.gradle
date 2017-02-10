@@ -207,6 +207,16 @@ task publishToWebServer(dependsOn: distZip) << {
 			put from: "${projectDir}/web", into: '/tmp'
 			executeSudo('mv /tmp/web /home/csse/YoloSwagSWS/bin/plugin', pty: true)
 
+			println "Checking if remote /home/csse/tmp/YoloSwagSWS/bin/plugin exists to restore existing plugins..."
+			result = execute('if test -d /home/csse/tmp/YoloSwagSWS/bin/plugin; then echo "exists"; fi')
+			if(result == "exists") {
+				println("Remote plugins are being restored into new server deployment directory...")
+				//remove the web directory we just created
+				executeSudo('rm -rf /home/csse/YoloSwagSWS/bin/plugin/web', pty: true)
+				executeSudo('mv /home/csse/tmp/YoloSwagSWS/bin/plugin/* /home/csse/YoloSwagSWS/bin/plugin', pty: true)
+				println("Remote /home/csse/tmp/YoloSwagSWS/bin/plugin moved!")
+			}
+
 			println "Stopping YoloSwagWebServer service"
 			executeSudo('service webserver stop', pty: true)
 
