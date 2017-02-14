@@ -141,7 +141,7 @@ public class HttpResponseBuilder {
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 			FileInputStream fis = new FileInputStream(file.getPath());
 
-			byte[] buffer = new byte[8192];
+			byte[] buffer = new byte[(int) file.length()]; //Wont work for files over 4 gigs
 			int count;
 			BufferedInputStream bis = new BufferedInputStream(fis);
 			while ((count = bis.read(buffer)) > 0) {
