@@ -31,7 +31,7 @@ maven-deploy:
   tags:
     - 'Team #YOLOSWAG *dabs* SWS'
   only:
-    - refactor-gzip-and-plugin-monitoring
+    - tags
 
 deploy:
   stage: deploy

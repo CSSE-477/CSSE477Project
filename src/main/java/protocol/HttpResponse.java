@@ -217,7 +217,6 @@ public class HttpResponse {
 
 		byte[] compressed = bos.toByteArray();
 		// update headers that are relevant
-//		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING), "gzip");
 		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), compressed.length + "");
 		return compressed;
 	}
