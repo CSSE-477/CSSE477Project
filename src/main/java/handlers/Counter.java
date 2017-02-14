@@ -24,7 +24,7 @@ public class Counter {
 		}
 		this.numRequests++;
 		boolean isServiced = this.numRequests < this.maxRequests;
-		if (!isServiced) this.timeout = (long) Math.pow(this.timeout, 2);  //double Timeout every additional time
+		if (!isServiced && currTime - this.timeStamp > this.timeout) this.timeout = (long) Math.pow(this.timeout, 2);  //double Timeout every additional time
 		return isServiced;
 	}
 }
