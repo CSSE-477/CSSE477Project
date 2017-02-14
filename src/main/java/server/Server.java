@@ -161,7 +161,7 @@ public class Server implements Runnable, IDirectoryListener {
 		Map<InetAddress, Counter> addressMap = new HashMap<InetAddress, Counter>();
 		try {
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream("/home/csse/keystore.jks"),"password".toCharArray());
+            keyStore.load(new FileInputStream("C:\\Users\\trowbrct\\Desktop\\CSSE477\\project\\CSSE477Project\\src\\main\\resources\\keystore.jks"),"password".toCharArray());
 
             // Create key manager
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");

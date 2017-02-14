@@ -272,11 +272,6 @@ public class AServletManagerTest {
         public void init() {
 
         }
-
-        @Override
-        public void destroy() {
-
-        }
     }
 
     public class CustomClassLoader extends ClassLoader {
@@ -315,11 +310,6 @@ public class AServletManagerTest {
 
         @Override
         public void init() {
-
-        }
-
-        @Override
-        public void destroy() {
 
         }
     }

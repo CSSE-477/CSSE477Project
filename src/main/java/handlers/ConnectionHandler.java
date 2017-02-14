@@ -48,21 +48,12 @@ public class ConnectionHandler implements Runnable {
 		try {
 			outStream = this.socket.getOutputStream();
 		} catch (Exception e) {
-			// Cannot do anything if we have exception reading input or output
-			// stream
-			// May be have text to log this for further analysis?
 			SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
 			return;
 		}
 
 		HttpResponse response = null;
 
-		// We reached here means no error so far, so lets process further
-
-		// Fill in the code to create a response for version mismatch.
-		// You may want to use constants such as Protocol.VERSION,
-		// Protocol.NOT_SUPPORTED_CODE, and more.
-		// You can check if the version matches as follows
 		if (!request.getVersion().equalsIgnoreCase(Protocol.getProtocol().getStringRep(Keywords.VERSION))) {
 			response = (new HttpResponseBuilder(400)).generateResponse();
 		} else {
@@ -85,20 +76,13 @@ public class ConnectionHandler implements Runnable {
 				response = cachedResponse;
 			} else {
 				// response not found in cache, do regular plugin lookup
-				// strip out /userapp/users/1 => "userapp" as context root
-				String uri = request.getUri();
-				int firstSlashIndex = uri.indexOf('/') + 1;
-				int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
-				String contextRoot = DEFAULT_ROOT;
-				if (secondSlashIndex != -1) {
-					contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
-				}
-				SwsLogger.accessLogger.info(contextRoot);
+				String contextRoot = getContextRootFromUri(request.getUri());
 				AServletManager manager = this.contextRootToServlet.get(contextRoot);
+
 				// fall back to the default manager if contextRoot doesn't match
 				if (manager == null) {
 					contextRoot = DEFAULT_ROOT;
-					manager = this.contextRootToServlet.get(DEFAULT_ROOT);
+					manager = this.contextRootToServlet.get(contextRoot);
 				}
 				if (manager == null) {
 					response = (new HttpResponseBuilder(501)).generateResponse();
@@ -131,11 +115,25 @@ public class ConnectionHandler implements Runnable {
 		try {
 			// Write response and we are all done so close the socket
 			response.write(outStream);
-			// System.out.println(response);
 			socket.close();
 		} catch (Exception e) {
 			// We will ignore this exception
 			SwsLogger.errorLogger.error("Error while writing to socket! \n" + e.toString());
 		}
+	}
+
+	/**
+	 * Strip out /userapp/users/1 => "userapp"
+	 * @param uri of the request
+	 * @return contextRoot of the request
+	 */
+	private String getContextRootFromUri(String uri) {
+		String contextRoot = DEFAULT_ROOT;
+		int firstSlashIndex = uri.indexOf('/') + 1;
+		int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
+		if (secondSlashIndex != -1) {
+			contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
+		}
+		return contextRoot;
 	}
 }

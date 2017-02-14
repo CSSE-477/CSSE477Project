@@ -126,20 +126,23 @@ public class HttpResponse {
 	 * @throws Exception
 	 */
 	public void write(OutputStream outStream) throws Exception {
-        int OK_CODE = 200;
         BufferedOutputStream out = new BufferedOutputStream(outStream);
 
         // Check to see if/what the body is & set the headers
         byte[] bodyBytes = null;
-		// We are reading a file
-		if (this.getStatus() == OK_CODE && file != null && file.exists()) {
-			// Process text documents
-			String fileContents = new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
-			bodyBytes = compressBody(fileContents);
-		} else if (this.getStatus() == OK_CODE && body != null) {
-			bodyBytes = compressBody(body);
-		}
-        
+        String bodyToWrite = this.getBodyToWrite();
+        if (bodyToWrite != null) {
+        	// we have a body, let's check if we should gzip it
+    		String contentEncoding = header.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING));
+    		// is the content encoding set and gzip?
+    		if (contentEncoding != null && (contentEncoding.equals("gzip") || contentEncoding.equals("application/gzip"))) {
+    			bodyBytes = compressBody(bodyToWrite);
+    		} else {
+    			// content encoding is something besides gzip, oh well we only support plain text or gzip for now
+    			bodyBytes = bodyToWrite.getBytes();
+    		}
+        }
+
 		// First status line
 		String line = this.version + Protocol.getProtocol().getStringRep(Keywords.SPACE) +
 				this.status + Protocol.getProtocol().getStringRep(Keywords.SPACE) + this.phrase +
@@ -175,6 +178,23 @@ public class HttpResponse {
 	}
 
 	/**
+	 * Determines whether we are sending file or body text
+	 * @return String if file or body, null if no body is to be sent
+	 * @throws IOException 
+	 */
+	private String getBodyToWrite() throws IOException {
+		String bodyToWrite = null;
+		int OK_CODE = 200;
+		if (this.getStatus() == OK_CODE && this.file != null && this.file.exists()) {
+			bodyToWrite = new String(Files.readAllBytes(Paths.get(this.file.getAbsolutePath())));
+		} else if (this.getStatus() == OK_CODE && this.body != null) {
+			bodyToWrite = this.body;
+		}
+
+		return bodyToWrite;
+	}
+
+	/**
 	 * Compress the body to gzip format
 	 * @param the body as a string
 	 * @return the body as a gzip byte[]
@@ -197,7 +217,7 @@ public class HttpResponse {
 
 		byte[] compressed = bos.toByteArray();
 		// update headers that are relevant
-		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING), "gzip");
+//		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING), "gzip");
 		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), compressed.length + "");
 		return compressed;
 	}

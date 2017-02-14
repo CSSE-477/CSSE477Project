@@ -25,6 +25,7 @@ public abstract class AServletManager {
 	protected static final String URI_DELIMETER = "/";
 	protected static final String PATH_REPLACEMENT_DELIMETER = ".";
 	protected static final String ENCODING = "UTF-8";
+	protected static final String DEFAULT_SERVLET_KEY = "";
 
     protected ClassLoader classLoader;
     
@@ -67,7 +68,11 @@ public abstract class AServletManager {
 
 	public abstract void init();
 
-	public abstract void destroy();
+	public final void destroy() {
+		for(AHttpServlet servlet : servletMap.values()) {
+			servlet.destroy();
+		}
+	}
 
 	public final boolean parseConfigFile() {
 		/*
@@ -147,7 +152,8 @@ public abstract class AServletManager {
 		return true;
 	}
 
-	public HttpResponse handleRequest(HttpRequest request) {
+	@SuppressWarnings("null")
+	public final HttpResponse handleRequest(HttpRequest request) {
 		
 		if (request.getUri().contains("bork")) {
         	// plugin-borking easter egg
@@ -174,10 +180,15 @@ public abstract class AServletManager {
         }
 
 		String servletKey = uriSplit[2];
-
 		AHttpServlet servlet = this.servletMap.get(servletKey);
 
-		if(servlet == null){
+		// fall back to default servlet if servletKey gives us null
+		if (servlet == null) {
+			servlet = this.servletMap.get(DEFAULT_SERVLET_KEY);
+		}
+
+		// now if it's null, return an error
+		if (servlet == null) {
             SwsLogger.errorLogger.error("Could not find associated servlet. Caught Null.");
             return responseBuilder.generateResponse();
         }

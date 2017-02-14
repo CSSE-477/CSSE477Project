@@ -2,7 +2,6 @@ package utils;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.lang.reflect.Constructor;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -14,11 +13,9 @@ import java.nio.file.WatchEvent;
 import java.nio.file.WatchEvent.Kind;
 import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.jar.Attributes;
-import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
@@ -82,21 +79,12 @@ public class PluginDirectoryMonitor implements Runnable {
     	JarFile jar = null;
     	try {
     		jar = new JarFile(pathToJar);
-    		Manifest manifest = null;
-    		Enumeration<JarEntry> e = jar.entries();
     		URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
     		URLClassLoader cl = URLClassLoader.newInstance(urls);
 
     		// just load the manifest file
-    		while (e.hasMoreElements()) {
-    			JarEntry je = e.nextElement();
-				if (je.getName().endsWith(".MF")) {
-					manifest = new Manifest(jar.getInputStream(je));
-					entryPointClassName = initializeManifestValues(manifest, pathToJar);
-					entryPointClassName = entryPointClassName.replace('/', '.');
-					break;
-				}    			
-    		}
+    		Manifest manifest = jar.getManifest();
+    		entryPointClassName = initializeManifestValues(manifest, pathToJar);
   
     		// if the manifest file succeeded
     		if (entryPointClassName != null) {
@@ -174,7 +162,7 @@ public class PluginDirectoryMonitor implements Runnable {
 			return "";
 		} else {
 			this.jarPathToContextRoot.put(jarPath, contextRoot);
-			return entryPoint;
+			return entryPoint.replace('/', '.');
 		}
 	}
 
@@ -214,10 +202,8 @@ public class PluginDirectoryMonitor implements Runnable {
                 // handle event
             	if (!child.toString().endsWith(".jar")) {
             		SwsLogger.accessLogger.info("Plugin directory didn't process: " + child + " file");
-            	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {// || event.kind() == StandardWatchEventKinds.ENTRY_MODIFY) {
+            	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
             		handleJarUpserted(child.toString());
-                } else if (event.kind() == StandardWatchEventKinds.ENTRY_DELETE) {
-//                	handleJarDeleted(child.toString());
                 }
             }
 
