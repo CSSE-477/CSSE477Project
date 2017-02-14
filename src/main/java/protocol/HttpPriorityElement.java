@@ -31,5 +31,4 @@ public class HttpPriorityElement {
     public ConnectionHandler getHandler() {
         return this.connectionHandler;
     }
-
 }
