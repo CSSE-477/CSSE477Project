@@ -23,10 +23,8 @@ package server;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.security.KeyStore;
 import java.time.LocalDateTime;
 import java.util.Comparator;
@@ -39,7 +37,6 @@ import java.util.concurrent.Executors;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
@@ -50,14 +47,10 @@ import handlers.ConnectionHandler;
 import handlers.Counter;
 import protocol.HttpPriorityElement;
 import protocol.HttpRequest;
-import protocol.HttpResponse;
-import protocol.HttpResponseBuilder;
 import protocol.Keywords;
 import protocol.Protocol;
-import protocol.ProtocolException;
 import servlet.AServletManager;
 import utils.SwsLogger;
-
 
 /**
  * This represents a welcoming server for the incoming
@@ -219,11 +212,9 @@ public class Server implements Runnable, IDirectoryListener {
                 }
 
                 InputStream inStream = null;
-                OutputStream outStream = null;
 
                 try {
                     inStream = connectionSocket.getInputStream();
-                    outStream = connectionSocket.getOutputStream();
                 } catch (Exception e) {
                     // Cannot do anything if we have exception reading input or output
                     // stream

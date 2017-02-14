@@ -41,7 +41,7 @@ group = "edu.rosehulman.csse477.YoloSwagProject"
 if (System.getenv("CI_BUILD_TAG") != null) {
     version = "${System.getenv("CI_BUILD_TAG")}"
 } else {
-    version = '1.0.1-SNAPSHOT'
+    version = '1.0.6-COLLINREFACTOR'
 }
 
 
