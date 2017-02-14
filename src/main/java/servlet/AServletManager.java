@@ -25,7 +25,7 @@ public abstract class AServletManager {
 	protected static final String URI_DELIMETER = "/";
 	protected static final String PATH_REPLACEMENT_DELIMETER = ".";
 	protected static final String ENCODING = "UTF-8";
-	protected static final String DEFAULT_SERVLET_KEY = "";
+	protected static final String DEFAULT_SERVLET_KEY = " ";
 
     protected ClassLoader classLoader;
     
@@ -174,20 +174,14 @@ public abstract class AServletManager {
 		String uri = request.getUri();
 		// should look like "/userapp/users/{id}"
         String[] uriSplit = uri.split(URI_DELIMETER);
-        
-        if(uriSplit.length <= 1){
-            return responseBuilder.generateResponse();
+
+        // if available, pull the servlet key from the uri /{servletmanager}/{servletkey}
+        String servletKey = DEFAULT_SERVLET_KEY;
+        if (uriSplit.length > 2){
+        	servletKey = uriSplit[2];
         }
 
-		String servletKey = uriSplit[2];
 		AHttpServlet servlet = this.servletMap.get(servletKey);
-
-		// fall back to default servlet if servletKey gives us null
-		if (servlet == null) {
-			servlet = this.servletMap.get(DEFAULT_SERVLET_KEY);
-		}
-
-		// now if it's null, return an error
 		if (servlet == null) {
             SwsLogger.errorLogger.error("Could not find associated servlet. Caught Null.");
             return responseBuilder.generateResponse();
