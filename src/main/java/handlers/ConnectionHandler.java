@@ -3,6 +3,7 @@ package handlers;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.Map;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
@@ -22,14 +23,14 @@ import utils.SwsLogger;
  */
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
-	private HashMap<String, AServletManager> contextRootToServlet;
+	private Map<String, AServletManager> contextRootToServlet;
 	private HashMap<String, HttpResponse> cache;
 	private HttpRequest request;
 
 	private static final String DEFAULT_ROOT = "";
 
 	public ConnectionHandler(Socket socket, HttpRequest httpRequest,
-			HashMap<String, AServletManager> contextRootToServlet) {
+			Map<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
 		this.cache = new HashMap<String, HttpResponse>();
@@ -52,10 +53,12 @@ public class ConnectionHandler implements Runnable {
 			return;
 		}
 
+		HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+		interceptResponseForGzip(responseBuilder);
 		HttpResponse response = null;
 
 		if (!request.getVersion().equalsIgnoreCase(Protocol.getProtocol().getStringRep(Keywords.VERSION))) {
-			response = (new HttpResponseBuilder(400)).generateResponse();
+			response = responseBuilder.setStatus(400).generateResponse();
 		} else {
 			HttpResponse cachedResponse = null;
 
@@ -85,31 +88,24 @@ public class ConnectionHandler implements Runnable {
 					manager = this.contextRootToServlet.get(contextRoot);
 				}
 				if (manager == null) {
-					response = (new HttpResponseBuilder(501)).generateResponse();
+					response = responseBuilder.setStatus(501).generateResponse();
 				} else {
 					// Check manager heartbeat
 					if (!manager.getHeartbeat()) {
 						// plugin has entered BORK MODE, return 501
-						response = (new HttpResponseBuilder(501)).generateResponse();
+						response = responseBuilder.setStatus(501).generateResponse();
 					} else {
 						// plugin is alive and well, send it the request
-						response = manager.handleRequest(request);
+						response = manager.handleRequest(request, responseBuilder);
 					}
 				}
 			}
 		}
 
-		// So this is a temporary patch for that problem and should be removed
-		// after a response object is created for protocol version mismatch.
-		if (response == null) {
-			response = (new HttpResponseBuilder(400)).generateResponse();
-		} else {
-			// response is valid, write it to cache if it is a GET or HEAD
-			// request
-			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
-					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-				this.cache.put(request.getUri(), response);
-			}
+		// response is valid, write it to cache if it is a GET or HEAD
+		if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
+				|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
+			this.cache.put(request.getUri(), response);
 		}
 
 		try {
@@ -135,5 +131,18 @@ public class ConnectionHandler implements Runnable {
 			contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
 		}
 		return contextRoot;
+	}
+
+	/**
+	 * Use the HttpRequest to see if Accept-Encoding gzip is included
+	 * If so, attach the Content-Encoding header to the HttpResponse
+	 */
+	private void interceptResponseForGzip(HttpResponseBuilder responseBuilder) {
+		Map<String, String> requestHeaders = this.request.getHeader();
+		String acceptEncoding = requestHeaders.get(Protocol.getProtocol().getStringRep(Keywords.ACCEPT_ENCODING));
+
+		if (acceptEncoding != null && acceptEncoding.contains("gzip")) {
+			responseBuilder.putHeader(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING), "gzip");
+		}
 	}
 }

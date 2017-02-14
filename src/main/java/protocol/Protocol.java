@@ -55,6 +55,7 @@ public class Protocol {
         keyMap.put(Keywords.CONTENT_LENGTH, "Content-Length");
         keyMap.put(Keywords.CONTENT_TYPE, "Content-Type");
         keyMap.put(Keywords.CONTENT_ENCODING, "Content-Encoding");
+        keyMap.put(Keywords.ACCEPT_ENCODING, "Accept-Encoding");
         keyMap.put(Keywords.HOST, "Host");
         keyMap.put(Keywords.CONNECTION, "Connection");
         keyMap.put(Keywords.USER_AGENT, "User-Agent");

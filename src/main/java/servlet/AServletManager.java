@@ -153,7 +153,7 @@ public abstract class AServletManager {
 	}
 
 	@SuppressWarnings("null")
-	public final HttpResponse handleRequest(HttpRequest request) {
+	public final HttpResponse handleRequest(HttpRequest request, HttpResponseBuilder responseBuilder) {
 		
 		if (request.getUri().contains("bork")) {
         	// plugin-borking easter egg
@@ -168,8 +168,6 @@ public abstract class AServletManager {
 			String bork = null;
 			bork.indexOf("bork");
 		}
-
-        HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
 
 		String uri = request.getUri();
 		// should look like "/userapp/users/{id}"
