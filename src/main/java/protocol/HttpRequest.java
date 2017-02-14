@@ -78,10 +78,6 @@ public class HttpRequest {
 	 * {@link IOException} for socket input stream read errors.
 	 */
 	public static HttpRequest read(InputStream inputStream) throws Exception {
-
-		int dataAvailable = inputStream.available();
-		System.out.println("Data Available: " + dataAvailable);
-
 		// We will fill this object with the data from input stream and return it
 		HttpRequest request = new HttpRequest();
 		
@@ -121,10 +117,6 @@ public class HttpRequest {
 		}
 		
 		while(!line.equals("")) {
-			// THIS IS A PATCH 
-			// Instead of a string tokenizer, we are using string split
-			// Lets break the line into two part with first space as a separator 
-			
 			// First lets trim the line to remove escape characters
 			line = line.trim();
 			
@@ -187,6 +179,12 @@ public class HttpRequest {
 		return request;
 	}
 
+	/**
+	 * Takes a gzipped body and decompresses it into a char[]
+	 * @param str
+	 * @return the decompressed string as a char[]
+	 * @throws Exception
+	 */
 	private static char[] decompressString(String str) throws Exception {
 		GZIPInputStream gis = new GZIPInputStream(new ByteArrayInputStream(str.getBytes()));
 		BufferedReader br = new BufferedReader(new InputStreamReader(gis, "UTF-8"));
