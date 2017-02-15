@@ -46,7 +46,11 @@ public class HttpResponseBuilderTest {
 		int expectedStatus = 200;
 		String actualPhrase = res.getPhrase();
 		String expectedPhrase = Protocol.getProtocol().getStringRep(Protocol.getProtocol().getCodeKeyword(expectedStatus));
-
+		
+		String expectedChecksum = "76107C431FC3E0EB362DC6CB7850F90B320C7FD597806DAEC9E1CF541AAFDC8D";
+		String actualChecksum = res.getHeader().get("Checksum");
+		
+		assertEquals(expectedChecksum, actualChecksum);
 		assertEquals(expectedStatus, actualStatus);
 		assertEquals(expectedPhrase, actualPhrase);
 	}
