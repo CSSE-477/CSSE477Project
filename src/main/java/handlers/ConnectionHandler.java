@@ -67,7 +67,9 @@ public class ConnectionHandler implements Runnable {
 			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
 				// Retrieve cached body if it is
-				cachedResponse = new HttpResponseBuilder(200).setBody(this.cache.get(request.getUri())).generateResponse();
+				if (this.cache.get(request.getUri()) != null) {
+					cachedResponse = new HttpResponseBuilder(200).setBody(this.cache.get(request.getUri())).generateResponse();
+				}
 			} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.DELETE))) {
