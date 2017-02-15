@@ -178,7 +178,7 @@ public class AServletManagerTest {
         Field f2 = requestToSend.getClass().getDeclaredField("uri");
         f2.setAccessible(true);
         f2.set(requestToSend, "");
-        HttpResponse handledResponse = concreteManager.handleRequest(requestToSend);
+        HttpResponse handledResponse = concreteManager.handleRequest(requestToSend, new HttpResponseBuilder());
         assertEquals(500, handledResponse.getStatus());
         assertEquals(Protocol.getProtocol().getStringRep(Keywords.INTERNAL_SERVER_ERROR), handledResponse.getPhrase());
     }
@@ -216,7 +216,7 @@ public class AServletManagerTest {
         Field f3 = concreteManager.getClass().getSuperclass().getDeclaredField("invocationMap");
         f3.setAccessible(true);
         f3.set(concreteManager, new HashMap<String, Method>());
-        HttpResponse handledResponse = concreteManager.handleRequest(requestToSend);
+        HttpResponse handledResponse = concreteManager.handleRequest(requestToSend, new HttpResponseBuilder());
         assertEquals(500, handledResponse.getStatus());
         assertEquals(Protocol.getProtocol().getStringRep(Keywords.INTERNAL_SERVER_ERROR), handledResponse.getPhrase());
     }
@@ -256,7 +256,7 @@ public class AServletManagerTest {
         Field f2 = requestToSend.getClass().getDeclaredField("uri");
         f2.setAccessible(true);
         f2.set(requestToSend, "/blah/User");
-        HttpResponse handledResponse = concreteManager.handleRequest(requestToSend);
+        HttpResponse handledResponse = concreteManager.handleRequest(requestToSend, new HttpResponseBuilder());
         assertEquals(200, handledResponse.getStatus());
         assertEquals(Protocol.getProtocol().getStringRep(Keywords.OK), handledResponse.getPhrase());
     }
@@ -270,11 +270,6 @@ public class AServletManagerTest {
 
         @Override
         public void init() {
-
-        }
-
-        @Override
-        public void destroy() {
 
         }
     }
@@ -315,11 +310,6 @@ public class AServletManagerTest {
 
         @Override
         public void init() {
-
-        }
-
-        @Override
-        public void destroy() {
 
         }
     }

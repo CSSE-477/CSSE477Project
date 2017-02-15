@@ -1,14 +1,10 @@
 package handlers;
 
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.OutputStream;
 import java.net.Socket;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.Map;
 
 import protocol.HttpRequest;
 import protocol.HttpResponse;
@@ -28,14 +24,14 @@ import utils.SwsLogger;
  */
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
-	private HashMap<String, AServletManager> contextRootToServlet;
+	private Map<String, AServletManager> contextRootToServlet;
 	private HashMap<String, String> cache;
 	private HttpRequest request;
 
 	private static final String DEFAULT_ROOT = "";
 
 	public ConnectionHandler(Socket socket, HttpRequest httpRequest,
-			HashMap<String, AServletManager> contextRootToServlet) {
+			Map<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
 		this.cache = new HashMap<>();
@@ -54,23 +50,16 @@ public class ConnectionHandler implements Runnable {
 		try {
 			outStream = this.socket.getOutputStream();
 		} catch (Exception e) {
-			// Cannot do anything if we have exception reading input or output
-			// stream
-			// May be have text to log this for further analysis?
 			SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
 			return;
 		}
 
+		HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
+		interceptResponseForGzip(responseBuilder);
 		HttpResponse response = null;
 
-		// We reached here means no error so far, so lets process further
-
-		// Fill in the code to create a response for version mismatch.
-		// You may want to use constants such as Protocol.VERSION,
-		// Protocol.NOT_SUPPORTED_CODE, and more.
-		// You can check if the version matches as follows
 		if (!request.getVersion().equalsIgnoreCase(Protocol.getProtocol().getStringRep(Keywords.VERSION))) {
-			response = (new HttpResponseBuilder(400)).generateResponse();
+			response = responseBuilder.setStatus(400).generateResponse();
 		} else {
 			HttpResponse cachedResponse = null;
 
@@ -91,77 +80,91 @@ public class ConnectionHandler implements Runnable {
 				response = cachedResponse;
 			} else {
 				// response not found in cache, do regular plugin lookup
-				// strip out /userapp/users/1 => "userapp" as context root
-				String uri = request.getUri();
-				int firstSlashIndex = uri.indexOf('/') + 1;
-				int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
-				String contextRoot = DEFAULT_ROOT;
-				if (secondSlashIndex != -1) {
-					contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
-				}
-				SwsLogger.accessLogger.info(contextRoot);
+				String contextRoot = getContextRootFromUri(request.getUri());
 				AServletManager manager = this.contextRootToServlet.get(contextRoot);
+
 				// fall back to the default manager if contextRoot doesn't match
 				if (manager == null) {
 					contextRoot = DEFAULT_ROOT;
-					manager = this.contextRootToServlet.get(DEFAULT_ROOT);
+					manager = this.contextRootToServlet.get(contextRoot);
 				}
 				if (manager == null) {
-					response = (new HttpResponseBuilder(501)).generateResponse();
+					response = responseBuilder.setStatus(501).generateResponse();
 				} else {
 					// Check manager heartbeat
 					if (!manager.getHeartbeat()) {
 						// plugin has entered BORK MODE, return 501
-						response = (new HttpResponseBuilder(501)).generateResponse();
+						response = responseBuilder.setStatus(501).generateResponse();
 					} else {
 						// plugin is alive and well, send it the request
-						response = manager.handleRequest(request);
+						response = manager.handleRequest(request, responseBuilder);
 					}
 				}
 			}
 		}
 
-		// So this is a temporary patch for that problem and should be removed
-		// after a response object is created for protocol version mismatch.
-		if (response == null) {
-			response = (new HttpResponseBuilder(400)).generateResponse();
-		} else {
-			// response is valid, write it to cache if it is a GET or HEAD
-			// request
-			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
-					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-				if (response.getFile() != null) {
-					// write response file contents to cache
-					try {
-						FileInputStream fis = new FileInputStream(response.getFile());
-						byte[] data = new byte[(int) response.getFile().length()];
-						fis.read(data);
-						fis.close();
+		// response is valid, write it to cache if it is a GET or HEAD
+		// request
+		if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
+				|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
+			if (response.getFile() != null) {
+				// write response file contents to cache
+				try {
+					FileInputStream fis = new FileInputStream(response.getFile());
+					byte[] data = new byte[(int) response.getFile().length()];
+					fis.read(data);
+					fis.close();
 
-						String content = new String(data, "UTF-8");
-						this.cache.put(request.getUri(), content);
-					} catch (java.io.IOException e) {
-						// Cache write borked, clear the entry
-						this.cache.remove(request.getUri());
-					}
-				} else if (response.getBody() != null){
-					// Write response body to cache
-					this.cache.put(request.getUri(), response.getBody());
-				} else {
+					String content = new String(data, "UTF-8");
+					this.cache.put(request.getUri(), content);
+				} catch (java.io.IOException e) {
 					// Cache write borked, clear the entry
 					this.cache.remove(request.getUri());
 				}
+			} else if (response.getBody() != null){
+				// Write response body to cache
+				this.cache.put(request.getUri(), response.getBody());
+			} else {
+				// Cache write borked, clear the entry
+				this.cache.remove(request.getUri());
 			}
 		}
 
 		try {
 			// Write response and we are all done so close the socket
 			response.write(outStream);
-			// System.out.println(response);
 			socket.close();
 		} catch (Exception e) {
 			// We will ignore this exception
 			SwsLogger.errorLogger.error("Error while writing to socket! \n" + e.toString());
+		}
+	}
+
+	/**
+	 * Strip out /userapp/users/1 => "userapp"
+	 * @param uri of the request
+	 * @return contextRoot of the request
+	 */
+	private String getContextRootFromUri(String uri) {
+		String contextRoot = DEFAULT_ROOT;
+		int firstSlashIndex = uri.indexOf('/') + 1;
+		int secondSlashIndex = uri.indexOf('/', firstSlashIndex);
+		if (secondSlashIndex != -1) {
+			contextRoot = uri.substring(firstSlashIndex, secondSlashIndex);
+		}
+		return contextRoot;
+	}
+
+	/**
+	 * Use the HttpRequest to see if Accept-Encoding gzip is included
+	 * If so, attach the Content-Encoding header to the HttpResponse
+	 */
+	private void interceptResponseForGzip(HttpResponseBuilder responseBuilder) {
+		Map<String, String> requestHeaders = this.request.getHeader();
+		String acceptEncoding = requestHeaders.get(Protocol.getProtocol().getStringRep(Keywords.ACCEPT_ENCODING));
+
+		if (acceptEncoding != null && acceptEncoding.contains("gzip")) {
+			responseBuilder.putHeader(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING), "gzip");
 		}
 	}
 }

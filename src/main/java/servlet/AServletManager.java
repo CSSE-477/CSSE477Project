@@ -25,6 +25,7 @@ public abstract class AServletManager {
 	protected static final String URI_DELIMETER = "/";
 	protected static final String PATH_REPLACEMENT_DELIMETER = ".";
 	protected static final String ENCODING = "UTF-8";
+	protected static final String DEFAULT_SERVLET_KEY = " ";
 
     protected ClassLoader classLoader;
     
@@ -67,7 +68,11 @@ public abstract class AServletManager {
 
 	public abstract void init();
 
-	public abstract void destroy();
+	public final void destroy() {
+		for(AHttpServlet servlet : servletMap.values()) {
+			servlet.destroy();
+		}
+	}
 
 	public final boolean parseConfigFile() {
 		/*
@@ -147,7 +152,8 @@ public abstract class AServletManager {
 		return true;
 	}
 
-	public HttpResponse handleRequest(HttpRequest request) {
+	@SuppressWarnings("null")
+	public final HttpResponse handleRequest(HttpRequest request, HttpResponseBuilder responseBuilder) {
 		
 		if (request.getUri().contains("bork")) {
         	// plugin-borking easter egg
@@ -163,21 +169,18 @@ public abstract class AServletManager {
 			bork.indexOf("bork");
 		}
 
-        HttpResponseBuilder responseBuilder = new HttpResponseBuilder();
-
 		String uri = request.getUri();
 		// should look like "/userapp/users/{id}"
         String[] uriSplit = uri.split(URI_DELIMETER);
-        
-        if(uriSplit.length <= 1){
-            return responseBuilder.generateResponse();
+
+        // if available, pull the servlet key from the uri /{servletmanager}/{servletkey}
+        String servletKey = DEFAULT_SERVLET_KEY;
+        if (uriSplit.length > 2){
+        	servletKey = uriSplit[2];
         }
 
-		String servletKey = uriSplit[2];
-
 		AHttpServlet servlet = this.servletMap.get(servletKey);
-
-		if(servlet == null){
+		if (servlet == null) {
             SwsLogger.errorLogger.error("Could not find associated servlet. Caught Null.");
             return responseBuilder.generateResponse();
         }

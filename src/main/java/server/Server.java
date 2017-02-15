@@ -23,13 +23,9 @@ package server;
 
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.net.SocketException;
 import java.security.KeyStore;
-import java.time.LocalDateTime;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -39,7 +35,6 @@ import java.util.concurrent.Executors;
 import javax.net.ssl.KeyManager;
 import javax.net.ssl.KeyManagerFactory;
 import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
@@ -49,15 +44,10 @@ import javax.net.ssl.TrustManagerFactory;
 import handlers.ConnectionHandler;
 import handlers.Counter;
 import protocol.HttpPriorityElement;
+import protocol.HttpPriorityElementComparator;
 import protocol.HttpRequest;
-import protocol.HttpResponse;
-import protocol.HttpResponseBuilder;
-import protocol.Keywords;
-import protocol.Protocol;
-import protocol.ProtocolException;
 import servlet.AServletManager;
 import utils.SwsLogger;
-
 
 /**
  * This represents a welcoming server for the incoming
@@ -73,7 +63,6 @@ public class Server implements Runnable, IDirectoryListener {
 	private boolean readyState;
 	private HashMap<String, AServletManager> pluginRootToServlet;
     private PriorityQueue<HttpPriorityElement> requestQueue;
-    private HashMap<String, Integer> valueMap;
 	private ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	/**
@@ -84,73 +73,39 @@ public class Server implements Runnable, IDirectoryListener {
 		this.stop = false;
 		this.readyState = false;
 		this.pluginRootToServlet = new HashMap<>();
-        this.valueMap = new HashMap<>();
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.GET), 2);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.DELETE), 3);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.HEAD), 1);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.POST), 4);
-        this.valueMap.put(Protocol.getProtocol().getStringRep(Keywords.PUT), 5);
-        this.requestQueue = new PriorityQueue<>(10, new Comparator<HttpPriorityElement>() {
-            @Override
-            public int compare(HttpPriorityElement o1, HttpPriorityElement o2) {
-                HttpRequest o1Req = o1.getRequest();
-                HttpRequest o2Req = o2.getRequest();
-                LocalDateTime now = LocalDateTime.now();
-                if(o1.getTime().minusSeconds(1).isAfter(now) && !o2.getTime().minusSeconds(1).isAfter(now)) {
-                    return -1;
-                }
-                int o1Total = getMethodVal(o1Req.getMethod());
-                int o2Total = getMethodVal(o2Req.getMethod());
-                int o1Length;
-                try{
-                    o1Length = Integer.parseInt(o1Req.getHeader()
-                            .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
-                } catch (Exception e){
-                    o1Length = 0;
-                }
-                int o2Length;
-                try{
-                    o2Length = Integer.parseInt(o2Req.getHeader()
-                            .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
-                } catch (Exception e){
-                    o2Length = 0;
-                }
-                o2Length += 1;
-                o1Length += 1;
-                o1Total = o1Total * getPayloadSizeFactor(o1Req.getMethod(), o1Length);
-                o2Total = o2Total * getPayloadSizeFactor(o2Req.getMethod(), o2Length);
-                if(o1Total < o2Total) {
-                    return -1;
-                }
-                if(o1Total > o2Total) {
-                    return 1;
-                }
-                return 0;
-            }
-
-            int getMethodVal(String method){
-                if(method == null){
-                    return 1;
-                }
-                Integer value = valueMap.get(method);
-                if(value == null){
-                    return 1;
-                }
-                return value;
-            }
-
-            int getPayloadSizeFactor(String method, int payloadSize){
-                if(method == null) {
-                    return 1;
-                }
-                if(method.equals(Protocol.getProtocol().getStringRep(Keywords.POST)) || method.equals(Protocol.getProtocol().getStringRep(Keywords.PUT))){
-                    return payloadSize;
-                }
-                return 1;
-            }
-        });
+        this.requestQueue = new PriorityQueue<>(10, new HttpPriorityElementComparator());
 	}
+
+	/**
+	 * Initialize an SSLContext for the server to open a socket against
+	 * @return SSLContext
+	 * @throws Exception
+	 */
+	private SSLContext getSSLContext() throws Exception {
+        SSLContext sslContext = null;
+		try {
+			KeyStore keyStore = KeyStore.getInstance("JKS");
+	        keyStore.load(new FileInputStream("/home/csse/keystore.jks"), "password".toCharArray());
 	
+	        // Create key manager
+	        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+	        keyManagerFactory.init(keyStore, "password".toCharArray());
+	        KeyManager[] km = keyManagerFactory.getKeyManagers();
+
+	        // Create trust manager
+	        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+	        trustManagerFactory.init(keyStore);
+	        TrustManager[] tm = trustManagerFactory.getTrustManagers();
+
+	        // Initialize SSLContext
+	        sslContext = SSLContext.getInstance("TLSv1");
+	        sslContext.init(km,  tm, null);
+        } catch (Exception e) {
+        	SwsLogger.errorLogger.error("Error in getting ssl context: ", e);
+        }
+        return sslContext;
+	}
+
 	/**
 	 * The entry method for the main server thread that accepts incoming
 	 * TCP connection request and creates a {@link ConnectionHandler} for
@@ -160,23 +115,7 @@ public class Server implements Runnable, IDirectoryListener {
 	public void run() {
 		Map<InetAddress, Counter> addressMap = new HashMap<InetAddress, Counter>();
 		try {
-            KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream("/home/csse/keystore.jks"),"password".toCharArray());
-
-            // Create key manager
-            KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-            keyManagerFactory.init(keyStore, "password".toCharArray());
-            KeyManager[] km = keyManagerFactory.getKeyManagers();
-
-            // Create trust manager
-            TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
-            trustManagerFactory.init(keyStore);
-            TrustManager[] tm = trustManagerFactory.getTrustManagers();
-
-            // Initialize SSLContext
-            SSLContext sslContext = SSLContext.getInstance("TLSv1");
-            sslContext.init(km,  tm, null);
-
+			SSLContext sslContext = getSSLContext();
             SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
 
             // Create server socket
@@ -219,11 +158,9 @@ public class Server implements Runnable, IDirectoryListener {
                 }
 
                 InputStream inStream = null;
-                OutputStream outStream = null;
 
                 try {
                     inStream = connectionSocket.getInputStream();
-                    outStream = connectionSocket.getOutputStream();
                 } catch (Exception e) {
                     // Cannot do anything if we have exception reading input or output
                     // stream
@@ -238,8 +175,7 @@ public class Server implements Runnable, IDirectoryListener {
                 try {
                     request = HttpRequest.read(inStream);
                     SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
-                }
-                catch (Exception e){
+                } catch (Exception e) {
                     SwsLogger.errorLogger.error("Bad Request", e);
                     continue;
                 }
