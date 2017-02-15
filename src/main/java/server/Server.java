@@ -29,6 +29,7 @@ import java.security.KeyStore;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.PriorityQueue;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -38,15 +39,15 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLServerSocket;
 import javax.net.ssl.SSLServerSocketFactory;
 import javax.net.ssl.SSLSocket;
+import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.TrustManagerFactory;
 
 import handlers.ConnectionHandler;
 import handlers.Counter;
-import protocol.HttpPriorityElement;
-import protocol.HttpPriorityElementComparator;
-import protocol.HttpRequest;
+import protocol.*;
 import servlet.AServletManager;
+import utils.ServerProperties;
 import utils.SwsLogger;
 
 /**
@@ -239,7 +240,37 @@ public class Server implements Runnable, IDirectoryListener {
 
 	@Override
 	public void addPlugin(String contextRoot, AServletManager manager) {
+		// Add plugin route to local plugin map
 		this.pluginRootToServlet.put(contextRoot, manager);
+
+		// use HTTP post to register microservice at gateway
+		try {
+			ServerProperties config = new ServerProperties();
+			Properties properties = config.getProperties("config.properties");
+
+			String gatewayHost = properties.getProperty("gatewayHost");
+			int gatewayPort = Integer.parseInt(properties.getProperty("gatewayPort"));
+
+			SSLContext sslContext = getSSLContext();
+			SSLSocketFactory socketFactory = sslContext.getSocketFactory();
+			Socket socket = socketFactory.createSocket(gatewayHost, gatewayPort);
+
+			String method = Protocol.getProtocol().getStringRep(Keywords.POST);
+			String uri = "/microserviceregistration";
+			String version = "HTTP/1.1";
+			Map<String, String> header = new HashMap<>();
+			char[] body = contextRoot.toCharArray();
+			header.put("Host", InetAddress.getLocalHost().toString().trim());
+			header.put("Content-Length", String.valueOf(body.length));
+			header.put("User-Agent", "#YOLOSWAG *dabs* microservice");
+
+			HttpRequest request = new HttpRequest(method, uri, version, header, body);
+
+			//TODO: create HttpRequest write() function to write to outputstream
+
+		} catch (Exception e) {
+			SwsLogger.errorLogger.error("Microservice registration failed!", e);
+		}
 	}
 
 	@Override

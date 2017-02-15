@@ -23,9 +23,18 @@ public class HttpRequest {
 	private String version;
 	private Map<String, String> header;
 	private char[] body;
+
 	public HttpRequest() {
 		this.header = new HashMap<>();
 		this.body = new char[0];
+	}
+
+	public HttpRequest(String method, String uri, String version, Map<String, String> header, char[] body) {
+		this.method = method;
+		this.uri = uri;
+		this.version = version;
+		this.header = header;
+		this.body = body;
 	}
 	
 	/**
