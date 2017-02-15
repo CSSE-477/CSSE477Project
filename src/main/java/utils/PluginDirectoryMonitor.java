@@ -3,6 +3,7 @@ package utils;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Constructor;
+import java.net.Socket;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.file.FileSystems;
@@ -15,36 +16,38 @@ import java.nio.file.WatchKey;
 import java.nio.file.WatchService;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 import java.util.jar.Attributes;
 import java.util.jar.JarFile;
 import java.util.jar.Manifest;
 
+import protocol.HttpRequest;
 import server.IDirectoryListener;
 import servlet.AServletManager;
 
 public class PluginDirectoryMonitor implements Runnable {
-	private final WatchService watcher;
-	private final Map<WatchKey, Path> keys;
-	private Map<String, String> jarPathToContextRoot;
-	private IDirectoryListener listener;
-	private String directoryPath;
+    private final WatchService watcher;
+    private final Map<WatchKey, Path> keys;
+    private Map<String, String> jarPathToContextRoot;
+    private IDirectoryListener listener;
+    private String directoryPath;
 
-	public PluginDirectoryMonitor(String directoryPath, IDirectoryListener listener) throws IOException {
-		this.directoryPath = directoryPath;
-		this.watcher = FileSystems.getDefault().newWatchService();
-		this.keys = new HashMap<>();
-		this.jarPathToContextRoot = new HashMap<>();
-		this.listener = listener;
-		
-		register(Paths.get(this.directoryPath));
-		loadExistingJars();
-	}
+    public PluginDirectoryMonitor(String directoryPath, IDirectoryListener listener) throws IOException {
+        this.directoryPath = directoryPath;
+        this.watcher = FileSystems.getDefault().newWatchService();
+        this.keys = new HashMap<>();
+        this.jarPathToContextRoot = new HashMap<>();
+        this.listener = listener;
 
-	@SuppressWarnings("unchecked")
-	static <T> WatchEvent<T> cast(WatchEvent<?> event) {
-		return (WatchEvent<T>)event;
-	}
-	
+        register(Paths.get(this.directoryPath));
+        loadExistingJars();
+    }
+
+    @SuppressWarnings("unchecked")
+    static <T> WatchEvent<T> cast(WatchEvent<?> event) {
+        return (WatchEvent<T>) event;
+    }
+
     /**
      * Register the given directory with the WatchService
      * Taken from tutorial...
@@ -59,119 +62,122 @@ public class PluginDirectoryMonitor implements Runnable {
      * Load them into the jar to context root map
      */
     private void loadExistingJars() {
-    	File f = new File(this.directoryPath);
-    	if (f.isDirectory()) {
-    		for (File jar : f.listFiles()) {
-    			if (jar.getName().endsWith(".jar")) {
-    				this.handleJarUpserted(jar.getAbsolutePath());
-    			}
-    		}
-    	} else {
-    		SwsLogger.errorLogger.error("Cannot read directory for jars: " + this.directoryPath);
-    	}
+        File f = new File(this.directoryPath);
+        if (f.isDirectory()) {
+            for (File jar : f.listFiles()) {
+                if (jar.getName().endsWith(".jar")) {
+                    this.handleJarUpserted(jar.getAbsolutePath());
+                }
+            }
+        } else {
+            SwsLogger.errorLogger.error("Cannot read directory for jars: " + this.directoryPath);
+        }
     }
 
     /**
      * Read the jar's manifest file and load its entry class
      */
     private void handleJarUpserted(String pathToJar) {
-    	String entryPointClassName = null;
-    	JarFile jar = null;
-    	try {
-    		jar = new JarFile(pathToJar);
-    		URL[] urls = { new URL("jar:file:" + pathToJar + "!/") };
-    		URLClassLoader cl = URLClassLoader.newInstance(urls);
+        String entryPointClassName = null;
+        JarFile jar = null;
+        try {
+            jar = new JarFile(pathToJar);
+            URL[] urls = {new URL("jar:file:" + pathToJar + "!/")};
+            URLClassLoader cl = URLClassLoader.newInstance(urls);
 
-    		// just load the manifest file
-    		Manifest manifest = jar.getManifest();
-    		entryPointClassName = initializeManifestValues(manifest, pathToJar);
-  
-    		// if the manifest file succeeded
-    		if (entryPointClassName != null) {
-    			Class<?> c = cl.loadClass(entryPointClassName);
-    			Constructor<?> constructor = c.getConstructor(String.class, ClassLoader.class);
-    			
-    			String contextRoot = this.jarPathToContextRoot.get(pathToJar);
-    			// DEFAULT plugin gets web as the directory it reads / writes to
-    			if (contextRoot.equals("")) {
-    				contextRoot = "web";
-    			}
+            // just load the manifest file
+            Manifest manifest = jar.getManifest();
+            entryPointClassName = initializeManifestValues(manifest, pathToJar);
 
-    			String pluginPathDirectory = this.directoryPath + "/" + contextRoot;
-    			Object result = constructor.newInstance(pluginPathDirectory, cl);
+            // if the manifest file succeeded
+            if (entryPointClassName != null) {
+                Class<?> c = cl.loadClass(entryPointClassName);
+                Constructor<?> constructor = c.getConstructor(String.class, ClassLoader.class);
 
-    			// create this directory on the VM
-    			if (!contextRoot.equals("web")) {
-    				File dir = new File(pluginPathDirectory);
-    				if (!dir.exists()) {
-    					dir.mkdir();
-    				}
-    			}
+                String contextRoot = this.jarPathToContextRoot.get(pathToJar);
+                // DEFAULT plugin gets web as the directory it reads / writes to
+                if (contextRoot.equals("")) {
+                    contextRoot = "web";
+                }
 
-    			if (result instanceof AServletManager && ((AServletManager) result).isValid()) {
-    				SwsLogger.accessLogger.info("Successfully loaded plugin jar: " + pathToJar);
-    				AServletManager manager = (AServletManager) result;
-    				this.listener.addPlugin(this.jarPathToContextRoot.get(pathToJar), manager);
-    			} else {
-    				SwsLogger.errorLogger.error("Error loading jar file's entry point class. Not AServletManager instance " + pathToJar);
-    			}
-    		} else {
-    			SwsLogger.errorLogger.error("Error loading jar file's entry point class name " + pathToJar);
-    		}
+                String pluginPathDirectory = this.directoryPath + "/" + contextRoot;
+                Object result = constructor.newInstance(pluginPathDirectory, cl);
 
-    	} catch (Exception e) {
-    		SwsLogger.errorLogger.error("Error loading jar file " + pathToJar, e);
-    	} finally {
-    		try {
-    			jar.close();
-    		} catch (Exception er) {
-    			SwsLogger.errorLogger.error("Error closing jar file " + pathToJar, er);
-    		}
-    	}
+                // create this directory on the VM
+                if (!contextRoot.equals("web")) {
+                    File dir = new File(pluginPathDirectory);
+                    if (!dir.exists()) {
+                        dir.mkdir();
+                    }
+                }
+
+                if (result instanceof AServletManager && ((AServletManager) result).isValid()) {
+                    SwsLogger.accessLogger.info("Successfully loaded plugin jar: " + pathToJar);
+                    AServletManager manager = (AServletManager) result;
+
+                    // add plugin to local web server
+                    this.listener.addPlugin(this.jarPathToContextRoot.get(pathToJar), manager);
+                } else {
+                    SwsLogger.errorLogger.error("Error loading jar file's entry point class. Not AServletManager instance " + pathToJar);
+                }
+            } else {
+                SwsLogger.errorLogger.error("Error loading jar file's entry point class name " + pathToJar);
+            }
+
+        } catch (Exception e) {
+            SwsLogger.errorLogger.error("Error loading jar file " + pathToJar, e);
+        } finally {
+            try {
+                jar.close();
+            } catch (Exception er) {
+                SwsLogger.errorLogger.error("Error closing jar file " + pathToJar, er);
+            }
+        }
     }
 
     /**
      * Custom code.
      * Read the manifest file and set the context root.
      * Return the entry point class to the plugin.
+     *
      * @param manifest
      * @param jarPath
      * @return entryPointClassName
      */
-	private String initializeManifestValues(Manifest manifest, String jarPath) {
-		final String MANIFEST_CONTEXT_ROOT = "Context-Root";
-		final String MANIFEST_ENTRY_POINT = "Entry-Point";
-		String contextRoot = null;
-		String entryPoint = null;
-		if (manifest == null) {
-			SwsLogger.errorLogger.error("manifest file is invalid: " + jarPath);
-			return "";
-		}
+    private String initializeManifestValues(Manifest manifest, String jarPath) {
+        final String MANIFEST_CONTEXT_ROOT = "Context-Root";
+        final String MANIFEST_ENTRY_POINT = "Entry-Point";
+        String contextRoot = null;
+        String entryPoint = null;
+        if (manifest == null) {
+            SwsLogger.errorLogger.error("manifest file is invalid: " + jarPath);
+            return "";
+        }
 
-		Attributes attributes = manifest.getMainAttributes();
-		for (Object key : attributes.keySet()) {
-			if (key.toString().equals(MANIFEST_CONTEXT_ROOT)) {
-				contextRoot = attributes.getValue(key.toString());
-			} else if (key.toString().equals(MANIFEST_ENTRY_POINT)) {
-				entryPoint = attributes.getValue(key.toString());
-			}
-		}
+        Attributes attributes = manifest.getMainAttributes();
+        for (Object key : attributes.keySet()) {
+            if (key.toString().equals(MANIFEST_CONTEXT_ROOT)) {
+                contextRoot = attributes.getValue(key.toString());
+            } else if (key.toString().equals(MANIFEST_ENTRY_POINT)) {
+                entryPoint = attributes.getValue(key.toString());
+            }
+        }
 
-		if (contextRoot == null || entryPoint == null) {
-			SwsLogger.accessLogger.info("manifest file does not contain contextRoot or entryPoint: " + jarPath);
-			return "";
-		} else {
-			this.jarPathToContextRoot.put(jarPath, contextRoot);
-			return entryPoint.replace('/', '.');
-		}
-	}
+        if (contextRoot == null || entryPoint == null) {
+            SwsLogger.accessLogger.info("manifest file does not contain contextRoot or entryPoint: " + jarPath);
+            return "";
+        } else {
+            this.jarPathToContextRoot.put(jarPath, contextRoot);
+            return entryPoint.replace('/', '.');
+        }
+    }
 
     /**
      * Process all events for keys queued to the watcher
      * This was from the tutorial...
      */
     private void processEvents() {
-        for (;;) {
+        for (; ; ) {
 
             // wait for key to be signalled
             WatchKey key;
@@ -187,7 +193,7 @@ public class PluginDirectoryMonitor implements Runnable {
                 continue;
             }
 
-            for (WatchEvent<?> event: key.pollEvents()) {
+            for (WatchEvent<?> event : key.pollEvents()) {
                 Kind<?> kind = event.kind();
 
                 if (kind == StandardWatchEventKinds.OVERFLOW) {
@@ -200,10 +206,10 @@ public class PluginDirectoryMonitor implements Runnable {
                 Path child = dir.resolve(name);
 
                 // handle event
-            	if (!child.toString().endsWith(".jar")) {
-            		SwsLogger.accessLogger.info("Plugin directory didn't process: " + child + " file");
-            	} else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
-            		handleJarUpserted(child.toString());
+                if (!child.toString().endsWith(".jar")) {
+                    SwsLogger.accessLogger.info("Plugin directory didn't process: " + child + " file");
+                } else if (event.kind() == StandardWatchEventKinds.ENTRY_CREATE) {
+                    handleJarUpserted(child.toString());
                 }
             }
 
@@ -220,8 +226,8 @@ public class PluginDirectoryMonitor implements Runnable {
         }
     }
 
-	@Override
-	public void run() {
-		this.processEvents();
-	}
+    @Override
+    public void run() {
+        this.processEvents();
+    }
 }
