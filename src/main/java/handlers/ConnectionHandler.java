@@ -23,7 +23,7 @@ import utils.SwsLogger;
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
 	private HashMap<String, AServletManager> contextRootToServlet;
-	private HashMap<String, HttpResponse> cache;
+	private HashMap<String, String> cache;
 	private HttpRequest request;
 
 	private static final String DEFAULT_ROOT = "";
@@ -32,7 +32,7 @@ public class ConnectionHandler implements Runnable {
 			HashMap<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
-		this.cache = new HashMap<String, HttpResponse>();
+		this.cache = new HashMap<>();
 		this.request = httpRequest;
 	}
 
@@ -72,7 +72,7 @@ public class ConnectionHandler implements Runnable {
 			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
 				// Retrieve cached response if it is
-				cachedResponse = this.cache.get(request.getUri());
+				cachedResponse = new HttpResponseBuilder(200).setBody(this.cache.get(request.getUri())).generateResponse();
 			} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.DELETE))) {
@@ -124,7 +124,7 @@ public class ConnectionHandler implements Runnable {
 			// request
 			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-				this.cache.put(request.getUri(), response);
+				this.cache.put(request.getUri(), response.getBody());
 			}
 		}
 
