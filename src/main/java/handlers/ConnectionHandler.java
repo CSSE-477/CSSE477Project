@@ -1,7 +1,13 @@
 package handlers;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.HashMap;
 
 import protocol.HttpRequest;
@@ -71,7 +77,7 @@ public class ConnectionHandler implements Runnable {
 			// Check cache if it is a GET or HEAD request
 			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-				// Retrieve cached response if it is
+				// Retrieve cached body if it is
 				cachedResponse = new HttpResponseBuilder(200).setBody(this.cache.get(request.getUri())).generateResponse();
 			} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))
@@ -124,7 +130,24 @@ public class ConnectionHandler implements Runnable {
 			// request
 			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-				this.cache.put(request.getUri(), response.getBody());
+				if (response.getFile() != null) {
+					// write response file contents to cache
+					try {
+						FileInputStream fis = new FileInputStream(response.getFile());
+						byte[] data = new byte[(int) response.getFile().length()];
+						fis.read(data);
+						fis.close();
+
+						String content = new String(data, "UTF-8");
+						this.cache.put(request.getUri(), content);
+					} catch (java.io.IOException e) {
+						// Cache write borked, clear the entry
+						this.cache.remove(request.getUri());
+					}
+				} else {
+					// Write response body to cache
+					this.cache.put(request.getUri(), response.getBody());
+				}
 			}
 		}
 
