@@ -161,7 +161,7 @@ public class Server implements Runnable, IDirectoryListener {
 		Map<InetAddress, Counter> addressMap = new HashMap<InetAddress, Counter>();
 		try {
             KeyStore keyStore = KeyStore.getInstance("JKS");
-            keyStore.load(new FileInputStream("/home/csse/keystore.jks"),"password".toCharArray());
+            keyStore.load(new FileInputStream("./src/main/resources/keystore.jks"),"password".toCharArray());
 
             // Create key manager
             KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
@@ -191,9 +191,10 @@ public class Server implements Runnable, IDirectoryListener {
                 try{
                     connectionSocket = (SSLSocket) this.welcomeSocket.accept();
                     connectionSocket.setEnabledCipherSuites(connectionSocket.getSupportedCipherSuites());
-                    // sslSocket.startHandshake();
-                } catch (SSLException | SocketException e){
+                    connectionSocket.startHandshake();
+                } catch (Exception e){
                     SwsLogger.errorLogger.error(e);
+                    continue;
                 }
 				InetAddress address = connectionSocket.getInetAddress();
 				
@@ -234,33 +235,13 @@ public class Server implements Runnable, IDirectoryListener {
                 // At this point we have the input and output stream of the socket
                 // Now lets create a HttpRequest object
                 HttpRequest request = null;
-                HttpResponse response = null;
                 try {
                     request = HttpRequest.read(inStream);
                     SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
-                } catch (ProtocolException pe) {
-                    // We have some sort of protocol exception. Get its status code and
-                    // create response
-                    // We know only two kind of exception is possible inside
-                    // fromInputStream
-                    // Protocol.BAD_REQUEST_CODE and Protocol.NOT_SUPPORTED_CODE
-                    int status = pe.getStatus();
-                    response = (new HttpResponseBuilder(status)).generateResponse();
-                } catch (Exception e) {
-                    // For any other error, we will create bad request response as well
-                    response = (new HttpResponseBuilder(400)).generateResponse();
                 }
-
-                if (response != null) {
-                    // Means there was an error, now write the response object to the
-                    // socket
-                    try {
-                        response.write(outStream);
-                        // System.out.println(response);
-                    } catch (Exception e) {
-                        // We will ignore this exception
-                        SwsLogger.errorLogger.error("Exception occured while sending HTTP resonponse!\n" + e.toString());
-                    }
+                catch (Exception e){
+                    SwsLogger.errorLogger.error("Bad Request", e);
+                    continue;
                 }
 
     			// FIXME: after benchmarking, fix this garbage code - collin
