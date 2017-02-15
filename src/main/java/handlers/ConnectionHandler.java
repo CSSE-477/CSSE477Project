@@ -144,9 +144,12 @@ public class ConnectionHandler implements Runnable {
 						// Cache write borked, clear the entry
 						this.cache.remove(request.getUri());
 					}
-				} else {
+				} else if (response.getBody() != null){
 					// Write response body to cache
 					this.cache.put(request.getUri(), response.getBody());
+				} else {
+					// Cache write borked, clear the entry
+					this.cache.remove(request.getUri());
 				}
 			}
 		}
