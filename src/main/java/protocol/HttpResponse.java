@@ -21,14 +21,11 @@
  
 package protocol;
 
-import java.io.BufferedOutputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.zip.GZIPOutputStream;
 
@@ -136,7 +133,7 @@ public class HttpResponse {
     		String contentEncoding = header.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING));
     		// is the content encoding set and gzip?
     		if (contentEncoding != null && (contentEncoding.equals("gzip") || contentEncoding.equals("application/gzip"))) {
-    			bodyBytes = compressBody(bodyToWrite);
+    			bodyBytes = GZipUtils.compressBody(bodyToWrite, this.header);
     		} else {
     			// content encoding is something besides gzip, oh well we only support plain text or gzip for now
     			bodyBytes = bodyToWrite.getBytes();
@@ -177,6 +174,106 @@ public class HttpResponse {
 		out.flush();
 	}
 
+	public static HttpResponse read(InputStream inputStream) throws Exception {
+		HttpResponseBuilder rb = new HttpResponseBuilder();
+
+		InputStreamReader isr = new InputStreamReader(inputStream);
+		BufferedReader br = new BufferedReader(isr);
+
+		// Read status line: HTTP/1.1 200 OK
+		String statusLine = br.readLine();
+
+		if (statusLine == null) {
+			throw new ProtocolException("Invalid HTTP response");
+		}
+
+		// Split status line on space
+		String[] statusLineElements = statusLine.split(Protocol.getProtocol().getStringRep(Keywords.SPACE));
+		if (statusLineElements.length != 3) {
+			throw new ProtocolException("Invalid HTTP response");
+		}
+		rb.setVersion(statusLineElements[0]);
+		rb.setStatus(Integer.parseInt(statusLineElements[1]));
+		rb.setPhrase(statusLineElements[2]);
+
+		// Rest of the request is a header that maps keys to values
+		// e.g. Host: www.rose-hulman.edu
+		Map<String, String> header = new HashMap<>();
+		String line = br.readLine();
+		// Chandan's readLine().trim() was blowing up
+		if (line == null) {
+			line = "";
+		}
+
+		while (!line.equals("")) {
+			// First lets trim the line to remove escape characters
+			line = line.trim();
+
+			// Now, get index of the first occurrence of space
+			int index = line.indexOf(' ');
+
+			if (index > 0 && index < line.length() - 1) {
+				// Now lets break the string in two parts
+				String key = line.substring(0, index); // Get first part, e.g. "Host:"
+				String value = line.substring(index + 1); // Get the rest, e.g. "www.rose-hulman.edu"
+
+				// Lets strip off the white spaces from key if any and change it to lower case
+				key = key.trim();
+
+				// Lets also remove ":" from the key
+				key = key.substring(0, key.length() - 1);
+
+				// Lets strip white spaces if any from value as well
+				value = value.trim();
+
+				// Now lets put the key=>value mapping to the header map
+				header.put(key, value);
+			}
+
+			// Processed one more line, now lets read another header line and loop
+			line = br.readLine();
+			// Chandan's readLine().trim() was blowing up
+			if (line == null) {
+				line = "";
+			}
+		}
+
+		// Set header map on response builder
+		rb.setHeader(header);
+
+		// read body
+		int contentLength = 0;
+		String contentEncoding = null;
+		try {
+			contentLength = Integer.parseInt(header
+					.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
+			// check to see if Content-Encoding is gzip
+			contentEncoding = header.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING));
+		} catch (Exception e) {
+			// I like this
+			SwsLogger.errorLogger.error("Parsing response body borked", e);
+		}
+
+		if (contentLength > 0) {
+			// read in the body, gzip or plain text
+			char[] body = new char[contentLength];
+			br.read(body);
+
+			// should we decompress?
+			if (contentEncoding != null && (contentEncoding.equals("gzip") || contentEncoding.equals("application/gzip"))) {
+				String theBody = new String(body);
+				char[] decompressedBody = GZipUtils.decompressString(theBody);
+
+				// update the content length
+				rb.putHeader(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), decompressedBody.length + "");
+				rb.setBody(new String(decompressedBody));
+			}
+		}
+
+		// Fix
+		return null;
+	}
+
 	/**
 	 * Determines whether we are sending file or body text
 	 * @return String if file or body, null if no body is to be sent
@@ -192,33 +289,6 @@ public class HttpResponse {
 		}
 
 		return bodyToWrite;
-	}
-
-	/**
-	 * Compress the body to gzip format
-	 * @param the body as a string
-	 * @return the body as a gzip byte[]
-	 */
-	private byte[] compressBody(String str) {
-		// check to see if header map exists, if not return null since body cannot be processed
-		if (header == null) {
-			return null;
-		}
-
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		try {
-			GZIPOutputStream gzip = new GZIPOutputStream(bos);
-			gzip.write(str.getBytes());
-			gzip.close();
-			bos.close();
-		} catch (IOException e) {
-			SwsLogger.errorLogger.error("Error writing body as gzip.", e);
-		}
-
-		byte[] compressed = bos.toByteArray();
-		// update headers that are relevant
-		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), compressed.length + "");
-		return compressed;
 	}
 
 	@Override
