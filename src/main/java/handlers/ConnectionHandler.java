@@ -1,5 +1,6 @@
 package handlers;
 
+import java.io.FileInputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ import utils.SwsLogger;
 public class ConnectionHandler implements Runnable {
 	private Socket socket;
 	private Map<String, AServletManager> contextRootToServlet;
-	private HashMap<String, HttpResponse> cache;
+	private HashMap<String, String> cache;
 	private HttpRequest request;
 
 	private static final String DEFAULT_ROOT = "";
@@ -33,7 +34,7 @@ public class ConnectionHandler implements Runnable {
 			Map<String, AServletManager> contextRootToServlet) {
 		this.socket = socket;
 		this.contextRootToServlet = contextRootToServlet;
-		this.cache = new HashMap<String, HttpResponse>();
+		this.cache = new HashMap<>();
 		this.request = httpRequest;
 	}
 
@@ -65,8 +66,8 @@ public class ConnectionHandler implements Runnable {
 			// Check cache if it is a GET or HEAD request
 			if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-				// Retrieve cached response if it is
-				cachedResponse = this.cache.get(request.getUri());
+				// Retrieve cached body if it is
+				cachedResponse = new HttpResponseBuilder(200).setBody(this.cache.get(request.getUri())).generateResponse();
 			} else if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.POST))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.PUT))
 					|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.DELETE))) {
@@ -103,9 +104,30 @@ public class ConnectionHandler implements Runnable {
 		}
 
 		// response is valid, write it to cache if it is a GET or HEAD
+		// request
 		if (request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.GET))
 				|| request.getMethod().equals(Protocol.getProtocol().getStringRep(Keywords.HEAD))) {
-			this.cache.put(request.getUri(), response);
+			if (response.getFile() != null) {
+				// write response file contents to cache
+				try {
+					FileInputStream fis = new FileInputStream(response.getFile());
+					byte[] data = new byte[(int) response.getFile().length()];
+					fis.read(data);
+					fis.close();
+
+					String content = new String(data, "UTF-8");
+					this.cache.put(request.getUri(), content);
+				} catch (java.io.IOException e) {
+					// Cache write borked, clear the entry
+					this.cache.remove(request.getUri());
+				}
+			} else if (response.getBody() != null){
+				// Write response body to cache
+				this.cache.put(request.getUri(), response.getBody());
+			} else {
+				// Cache write borked, clear the entry
+				this.cache.remove(request.getUri());
+			}
 		}
 
 		try {
