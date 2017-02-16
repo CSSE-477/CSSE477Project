@@ -270,8 +270,7 @@ public class HttpResponse {
 			}
 		}
 
-		// Fix
-		return null;
+		return rb.generateResponse();
 	}
 
 	/**

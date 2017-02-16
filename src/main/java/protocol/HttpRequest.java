@@ -218,13 +218,13 @@ public class HttpRequest {
                 Protocol.getProtocol().getStringRep(Keywords.LF)).getBytes());
 
         // Body
-        byte[] bodyByteArray = this.getBody().toString().getBytes();
+        byte[] bodyByteArray = new String(this.getBody()).getBytes();
         if (bodyByteArray != null) {
             bos.write(bodyByteArray);
         }
 
         // SEND IT BRUH
-        outputStream.flush();
+        bos.flush();
     }
 
     @Override
