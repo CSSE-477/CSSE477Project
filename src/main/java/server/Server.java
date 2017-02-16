@@ -265,9 +265,25 @@ public class Server implements Runnable, IDirectoryListener {
 			header.put("User-Agent", "#YOLOSWAG *dabs* microservice");
 
 			HttpRequest request = new HttpRequest(method, uri, version, header, body);
-
-			//TODO: create HttpRequest write() function to write to outputstream
-
+			request.write(socket.getOutputStream());
+			Thread.sleep(500);
+			
+			boolean responseReceived = false;
+			HttpResponse response = null;
+			while (!responseReceived) {
+				if (socket.getInputStream().available() > 0) {
+					response = HttpResponse.read(socket.getInputStream());
+					responseReceived = true;
+					socket.close();
+				} else {
+					request.write(socket.getOutputStream());
+					Thread.sleep(1000);
+				}
+			}
+			if (response.getStatus() != 200) {
+				SwsLogger.errorLogger.error("Received bad response from server when registering microservice!");
+			}
+			
 		} catch (Exception e) {
 			SwsLogger.errorLogger.error("Microservice registration failed!", e);
 		}
