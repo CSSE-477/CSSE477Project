@@ -291,8 +291,9 @@ public class Server implements Runnable, IDirectoryListener {
 		} finally {
 			try {
 				socket.close();
+				SwsLogger.accessLogger.info("Closed socket to Gateway after registration");
 			} catch (IOException e) {
-				SwsLogger.errorLogger.error("Unable to close socket. Just ignore, its probs fine.");
+				SwsLogger.errorLogger.error("Unable to close socket. Just ignore, its probs fine.", e);
 			}
 		}
 	}
