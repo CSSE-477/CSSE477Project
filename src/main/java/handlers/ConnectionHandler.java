@@ -36,6 +36,9 @@ public class ConnectionHandler implements Runnable {
 		this.contextRootToServlet = contextRootToServlet;
 		this.cache = new HashMap<>();
 		this.request = httpRequest;
+
+		SwsLogger.accessLogger.info("Socket inetAddress: "  + socket.getInetAddress());
+		SwsLogger.accessLogger.info("Socket local address: "  + socket.getLocalAddress());
 	}
 
 	/**
