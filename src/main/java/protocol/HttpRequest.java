@@ -164,7 +164,7 @@ public class HttpRequest {
                     .get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH)));
             // check to see if Content-Encoding is gzip
             contentEncoding = request.header.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING));
-        } catch (Exception e) { // Expected behavior, dont log }
+        } catch (Exception e) { }
 
         if (contentLength > 0) {
             // read in the body, gzip or plain text
