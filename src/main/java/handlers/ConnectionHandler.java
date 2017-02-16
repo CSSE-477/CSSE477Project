@@ -135,6 +135,7 @@ public class ConnectionHandler implements Runnable {
 		try {
 			// Write response and we are all done so close the socket
 			response.write(outStream);
+			SwsLogger.accessLogger.info("Sending response:\r\n" + response.toString());
 			socket.close();
 		} catch (Exception e) {
 			// We will ignore this exception
