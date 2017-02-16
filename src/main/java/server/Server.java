@@ -287,11 +287,11 @@ public class Server implements Runnable, IDirectoryListener {
 		} catch (Exception e) {
 			SwsLogger.errorLogger.error("Microservice registration failed!", e);
 		} finally {
-				try {
-					socket.close();
-				} catch (IOException e) {
-					SwsLogger.errorLogger.error("Unable to close socket. Just ignore, its probs fine.");
-				}
+			try {
+				socket.close();
+			} catch (IOException e) {
+				SwsLogger.errorLogger.error("Unable to close socket. Just ignore, its probs fine.");
+			}
 		}
 	}
 
