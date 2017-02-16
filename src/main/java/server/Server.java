@@ -180,7 +180,7 @@ public class Server implements Runnable, IDirectoryListener {
 				HttpRequest request = null;
 				try {
 					request = HttpRequest.read(inStream);
-					SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
+					SwsLogger.accessLogger.info("Recieved Request:\r\n" + request.toString());
 				} catch (Exception e) {
 					SwsLogger.errorLogger.error("Bad Request", e);
 					continue;
