@@ -18,7 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/lgpl.html>.
  * 
  */
- 
+
 package server;
 
 import java.io.FileInputStream;
@@ -51,8 +51,8 @@ import utils.ServerProperties;
 import utils.SwsLogger;
 
 /**
- * This represents a welcoming server for the incoming
- * TCP request from a HTTP client such as a web browser. 
+ * This represents a welcoming server for the incoming TCP request from a HTTP
+ * client such as a web browser.
  * 
  * @author Chandan R. Rupakheti (rupakhet@rose-hulman.edu)
  */
@@ -63,7 +63,7 @@ public class Server implements Runnable, IDirectoryListener {
 	private SSLServerSocket welcomeSocket;
 	private boolean readyState;
 	private HashMap<String, AServletManager> pluginRootToServlet;
-    private PriorityQueue<HttpPriorityElement> requestQueue;
+	private PriorityQueue<HttpPriorityElement> requestQueue;
 	private ExecutorService pool = Executors.newFixedThreadPool(POOL_SIZE);
 
 	/**
@@ -74,132 +74,135 @@ public class Server implements Runnable, IDirectoryListener {
 		this.stop = false;
 		this.readyState = false;
 		this.pluginRootToServlet = new HashMap<>();
-        this.requestQueue = new PriorityQueue<>(10, new HttpPriorityElementComparator());
+		this.requestQueue = new PriorityQueue<>(10, new HttpPriorityElementComparator());
 	}
 
 	/**
 	 * Initialize an SSLContext for the server to open a socket against
+	 * 
 	 * @return SSLContext
 	 * @throws Exception
 	 */
 	private SSLContext getSSLContext() throws Exception {
-        SSLContext sslContext = null;
+		SSLContext sslContext = null;
 		try {
 			KeyStore keyStore = KeyStore.getInstance("JKS");
-	        keyStore.load(new FileInputStream("/home/csse/keystore.jks"), "password".toCharArray());
-	
-	        // Create key manager
-	        KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
-	        keyManagerFactory.init(keyStore, "password".toCharArray());
-	        KeyManager[] km = keyManagerFactory.getKeyManagers();
+			keyStore.load(new FileInputStream("./src/main/resources/keystore.jks"), "password".toCharArray());
 
-	        // Create trust manager
-	        TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
-	        trustManagerFactory.init(keyStore);
-	        TrustManager[] tm = trustManagerFactory.getTrustManagers();
+			// Create key manager
+			KeyManagerFactory keyManagerFactory = KeyManagerFactory.getInstance("SunX509");
+			keyManagerFactory.init(keyStore, "password".toCharArray());
+			KeyManager[] km = keyManagerFactory.getKeyManagers();
 
-	        // Initialize SSLContext
-	        sslContext = SSLContext.getInstance("TLSv1");
-	        sslContext.init(km,  tm, null);
-        } catch (Exception e) {
-        	SwsLogger.errorLogger.error("Error in getting ssl context: ", e);
-        }
-        return sslContext;
+			// Create trust manager
+			TrustManagerFactory trustManagerFactory = TrustManagerFactory.getInstance("SunX509");
+			trustManagerFactory.init(keyStore);
+			TrustManager[] tm = trustManagerFactory.getTrustManagers();
+
+			// Initialize SSLContext
+			sslContext = SSLContext.getInstance("TLSv1");
+			sslContext.init(km, tm, null);
+		} catch (Exception e) {
+			SwsLogger.errorLogger.error("Error in getting ssl context: ", e);
+		}
+		return sslContext;
 	}
 
 	/**
-	 * The entry method for the main server thread that accepts incoming
-	 * TCP connection request and creates a {@link ConnectionHandler} for
-	 * the request.
+	 * The entry method for the main server thread that accepts incoming TCP
+	 * connection request and creates a {@link ConnectionHandler} for the
+	 * request.
 	 */
 	@SuppressWarnings("null")
 	public void run() {
 		Map<InetAddress, Counter> addressMap = new HashMap<InetAddress, Counter>();
 		try {
 			SSLContext sslContext = getSSLContext();
-            SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
+			SSLServerSocketFactory sslServerSocketFactory = sslContext.getServerSocketFactory();
 
-            // Create server socket
-            this.welcomeSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(this.port);
+			// Create server socket
+			this.welcomeSocket = (SSLServerSocket) sslServerSocketFactory.createServerSocket(this.port);
 
-            // Now keep welcoming new connections until stop flag is set to true
-			while(true) {
-			    this.readyState = true;
+			// Now keep welcoming new connections until stop flag is set to true
+			while (true) {
+				this.readyState = true;
 				// Listen for incoming socket connection
 				// This method block until somebody makes a request
-			    SSLSocket connectionSocket = null;
-                try{
-                    connectionSocket = (SSLSocket) this.welcomeSocket.accept();
-                    connectionSocket.setEnabledCipherSuites(connectionSocket.getSupportedCipherSuites());
-                    connectionSocket.startHandshake();
-                } catch (Exception e){
-                    SwsLogger.errorLogger.error(e);
-                    continue;
-                }
+				SSLSocket connectionSocket = null;
+				try {
+					connectionSocket = (SSLSocket) this.welcomeSocket.accept();
+					connectionSocket.setEnabledCipherSuites(connectionSocket.getSupportedCipherSuites());
+					connectionSocket.startHandshake();
+				} catch (Exception e) {
+					SwsLogger.errorLogger.error(e);
+					continue;
+				}
 				InetAddress address = connectionSocket.getInetAddress();
-				
+
 				Counter counter = addressMap.get(address);
 				boolean serviceRequest = false;
-				if(counter == null) {
+				if (counter == null) {
 					addressMap.put(address, new Counter());
 					serviceRequest = true;
 				} else {
 					serviceRequest = counter.increment();
 				}
 				if (!serviceRequest) {
-					SwsLogger.accessLogger.info(address.toString() + " has sent too many requests too quickly. Denying access.");
+					SwsLogger.accessLogger
+							.info(address.toString() + " has sent too many requests too quickly. Denying access.");
 					connectionSocket.close();
 					continue;
 				}
-				
+
 				// Come out of the loop if the stop flag is set
-				if(this.stop){
-				    this.readyState = false;
-				    break;
-                }
+				if (this.stop) {
+					this.readyState = false;
+					break;
+				}
 
-                InputStream inStream = null;
+				InputStream inStream = null;
 
-                try {
-                    inStream = connectionSocket.getInputStream();
-                } catch (Exception e) {
-                    // Cannot do anything if we have exception reading input or output
-                    // stream
-                    // May be have text to log this for further analysis?
-                    SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
-                    return;
-                }
+				try {
+					inStream = connectionSocket.getInputStream();
+				} catch (Exception e) {
+					// Cannot do anything if we have exception reading input or
+					// output
+					// stream
+					// May be have text to log this for further analysis?
+					SwsLogger.errorLogger.error("Exception while creating socket connections!\n" + e.toString());
+					return;
+				}
 
-                // At this point we have the input and output stream of the socket
-                // Now lets create a HttpRequest object
-                HttpRequest request = null;
-                try {
-                    request = HttpRequest.read(inStream);
-                    SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
-                } catch (Exception e) {
-                    SwsLogger.errorLogger.error("Bad Request", e);
-                    continue;
-                }
+				// At this point we have the input and output stream of the
+				// socket
+				// Now lets create a HttpRequest object
+				HttpRequest request = null;
+				try {
+					request = HttpRequest.read(inStream);
+					SwsLogger.accessLogger.info("Recieved Request: " + request.toString());
+				} catch (Exception e) {
+					SwsLogger.errorLogger.error("Bad Request", e);
+					continue;
+				}
 
-    			// FIXME: after benchmarking, fix this garbage code - collin
-    			if (request.getUri().equals("/serverexplosion.bat")) {
-    				String collin = null;
-    				collin.indexOf("explosion");
-    			}
+				// FIXME: after benchmarking, fix this garbage code - collin
+				if (request.getUri().equals("/serverexplosion.bat")) {
+					String collin = null;
+					collin.indexOf("explosion");
+				}
 				HttpPriorityElement newElement = new HttpPriorityElement(request,
-                        new ConnectionHandler(connectionSocket, request, this.pluginRootToServlet));
+						new ConnectionHandler(connectionSocket, request, this.pluginRootToServlet));
 
 				this.requestQueue.add(newElement);
 
 				ConnectionHandler handler = this.requestQueue.poll().getHandler();
 
-				if(handler != null) {
-                    pool.execute(handler);
-                }
+				if (handler != null) {
+					pool.execute(handler);
+				}
 			}
 			this.welcomeSocket.close();
-		}
-		catch(Exception e) {
+		} catch (Exception e) {
 			SwsLogger.errorLogger.error("Server exception accepting connection...", e);
 			pool.shutdownNow();
 			System.exit(-1);
@@ -210,28 +213,31 @@ public class Server implements Runnable, IDirectoryListener {
 	 * Stops the server from listening further.
 	 */
 	public synchronized void stop() {
-		if(this.stop)
+		if (this.stop)
 			return;
-		
+
 		// Set the stop flag to be true
 		this.stop = true;
 		try {
-			// This will force welcomeSocket to come out of the blocked accept() method 
+			// This will force welcomeSocket to come out of the blocked accept()
+			// method
 			// in the main loop of the start() method
 			Socket socket = new Socket(InetAddress.getLocalHost(), port);
-			
+
 			// We do not have any other job for this socket so just close it
 			socket.close();
+		} catch (Exception e) {
+			SwsLogger.errorLogger.error(e.getMessage());
 		}
-		catch(Exception e){SwsLogger.errorLogger.error(e.getMessage());}
 	}
 
 	public synchronized boolean isReady() {
-	    return this.readyState;
-    }
+		return this.readyState;
+	}
 
 	/**
 	 * Checks if the server is stopeed or not.
+	 * 
 	 * @return
 	 */
 	public boolean isStopped() {
@@ -253,7 +259,10 @@ public class Server implements Runnable, IDirectoryListener {
 
 			SSLContext sslContext = getSSLContext();
 			SSLSocketFactory socketFactory = sslContext.getSocketFactory();
-			Socket socket = socketFactory.createSocket(gatewayHost, gatewayPort);
+			SSLSocket socket = (SSLSocket) socketFactory.createSocket(gatewayHost, gatewayPort);
+			String[] cipherBytes = socket.getSupportedCipherSuites();
+			socket.setEnabledCipherSuites(cipherBytes);
+			socket.startHandshake();
 
 			String method = Protocol.getProtocol().getStringRep(Keywords.POST);
 			String uri = "/microserviceregistration";
@@ -267,7 +276,7 @@ public class Server implements Runnable, IDirectoryListener {
 			HttpRequest request = new HttpRequest(method, uri, version, header, body);
 			request.write(socket.getOutputStream());
 			Thread.sleep(500);
-			
+
 			boolean responseReceived = false;
 			HttpResponse response = null;
 			while (!responseReceived) {
@@ -282,8 +291,9 @@ public class Server implements Runnable, IDirectoryListener {
 			}
 			if (response.getStatus() != 200) {
 				SwsLogger.errorLogger.error("Received bad response from server when registering microservice!");
+				System.out.println("Got response");
 			}
-			
+
 		} catch (Exception e) {
 			SwsLogger.errorLogger.error("Microservice registration failed!", e);
 		}
