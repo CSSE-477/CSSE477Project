@@ -22,6 +22,7 @@
 package server;
 
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -250,6 +251,7 @@ public class Server implements Runnable, IDirectoryListener {
 		this.pluginRootToServlet.put(contextRoot, manager);
 
 		// use HTTP post to register microservice at gateway
+		SSLSocket socket = null;
 		try {
 			ServerProperties config = new ServerProperties();
 			Properties properties = config.getProperties("config.properties");
@@ -259,7 +261,7 @@ public class Server implements Runnable, IDirectoryListener {
 
 			SSLContext sslContext = getSSLContext();
 			SSLSocketFactory socketFactory = sslContext.getSocketFactory();
-			SSLSocket socket = (SSLSocket) socketFactory.createSocket(gatewayHost, gatewayPort);
+			socket = (SSLSocket) socketFactory.createSocket(gatewayHost, gatewayPort);
 			String[] cipherBytes = socket.getSupportedCipherSuites();
 			socket.setEnabledCipherSuites(cipherBytes);
 			socket.startHandshake();
@@ -275,27 +277,21 @@ public class Server implements Runnable, IDirectoryListener {
 
 			HttpRequest request = new HttpRequest(method, uri, version, header, body);
 			request.write(socket.getOutputStream());
-			Thread.sleep(500);
 
-			boolean responseReceived = false;
-			HttpResponse response = null;
-			while (!responseReceived) {
-				if (socket.getInputStream().available() > 0) {
-					response = HttpResponse.read(socket.getInputStream());
-					responseReceived = true;
-					socket.close();
-				} else {
-					request.write(socket.getOutputStream());
-					Thread.sleep(1000);
-				}
-			}
+			HttpResponse response = HttpResponse.read(socket.getInputStream());
+
 			if (response.getStatus() != 200) {
 				SwsLogger.errorLogger.error("Received bad response from server when registering microservice!");
-				System.out.println("Got response");
 			}
 
 		} catch (Exception e) {
 			SwsLogger.errorLogger.error("Microservice registration failed!", e);
+		} finally {
+				try {
+					socket.close();
+				} catch (IOException e) {
+					SwsLogger.errorLogger.error("Unable to close socket. Just ignore, its probs fine.");
+				}
 		}
 	}
 
