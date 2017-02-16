@@ -250,8 +250,7 @@ public class HttpResponse {
 			// check to see if Content-Encoding is gzip
 			contentEncoding = header.get(Protocol.getProtocol().getStringRep(Keywords.CONTENT_ENCODING));
 		} catch (Exception e) {
-			// I like this
-			SwsLogger.errorLogger.error("Parsing response body borked", e);
+			// Doesn't matter
 		}
 
 		if (contentLength > 0) {

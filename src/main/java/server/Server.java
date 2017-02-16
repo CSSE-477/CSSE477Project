@@ -282,6 +282,8 @@ public class Server implements Runnable, IDirectoryListener {
 
 			if (response.getStatus() != 200) {
 				SwsLogger.errorLogger.error("Received bad response from server when registering microservice!");
+			} else {
+				SwsLogger.accessLogger.info("Successfully registered " + contextRoot + " as a microservice!");
 			}
 
 		} catch (Exception e) {
