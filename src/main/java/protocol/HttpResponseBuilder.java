@@ -167,7 +167,7 @@ public class HttpResponseBuilder {
 	public HttpResponseBuilder setBody(String body) {
 		this.body = body;
 		// Lets get content length in bytes
-		long length = body.length();
+		long length = body.getBytes().length;
 		this.header.put(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), length + "");
 		
 
