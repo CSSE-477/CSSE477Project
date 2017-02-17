@@ -1,7 +1,7 @@
 stages:
   - build
-  - deploy
-  - staging-deploy
+  - microservice-deploy1
+  - microservice-deploy2
   - maven-deploy
 
 build:
@@ -12,7 +12,7 @@ build:
     - 'Team #YOLOSWAG *dabs* SWS'
 
 microservice-deploy1:
-  stage: staging-deploy
+  stage: microservice-deploy1
   variables:
     SSH_HOST: '477-19.csse.rose-hulman.edu'
   script:
@@ -25,7 +25,7 @@ microservice-deploy1:
     - master
 
 microservice-deploy2:
-  stage: staging-deploy
+  stage: microservice-deploy2
   variables:
     SSH_HOST: '477-18.csse.rose-hulman.edu'
   script:
