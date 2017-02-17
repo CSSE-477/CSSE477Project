@@ -283,10 +283,10 @@ The detection of plugin failure tactic allows us to detect plugins in an unusabl
 All together, our performance remained very consistent with our baseline. This is what we expected as a team, as most of our tactics increase our systems security or availability, with must naturally come at the cost of performance. It seems that our performance imporvements offset the additional overhead from the other tactics.
 
 ## Architecture Diagram
-![Architecture Diagram](docs/2017-02-02 SWS UML Diagram.png)
+![Architecture Diagram](docs/Milestone 5 UML Diagram.png)
 
 ## Module Diagram
-![Module Diagram](docs/ModuleDiagram.png)
+![Module Diagram](docs/modules.png)
 
 ## Production Environment Allocation Structure
 ![Allocation Diagram](docs/AllocationDiagram.png)
