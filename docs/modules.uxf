@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="14.2">
-  <zoom_level>9</zoom_level>
+  <zoom_level>11</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>567</x>
-      <y>216</y>
-      <w>252</w>
-      <h>99</h>
+      <x>539</x>
+      <y>121</y>
+      <w>308</w>
+      <h>121</h>
     </coordinates>
     <panel_attributes>app</panel_attributes>
     <additional_attributes/>
@@ -15,10 +15,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>567</x>
-      <y>549</y>
-      <w>378</w>
-      <h>135</h>
+      <x>539</x>
+      <y>528</y>
+      <w>440</w>
+      <h>165</h>
     </coordinates>
     <panel_attributes>protocol</panel_attributes>
     <additional_attributes/>
@@ -26,10 +26,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>567</x>
-      <y>369</y>
-      <w>378</w>
-      <h>117</h>
+      <x>539</x>
+      <y>308</y>
+      <w>462</w>
+      <h>143</h>
     </coordinates>
     <panel_attributes>server</panel_attributes>
     <additional_attributes/>
@@ -37,10 +37,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>585</x>
-      <y>576</y>
-      <w>81</w>
-      <h>27</h>
+      <x>561</x>
+      <y>561</y>
+      <w>99</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>Protocol</panel_attributes>
     <additional_attributes/>
@@ -48,10 +48,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>801</x>
-      <y>630</y>
-      <w>99</w>
-      <h>27</h>
+      <x>825</x>
+      <y>627</y>
+      <w>121</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>HttpResponse</panel_attributes>
     <additional_attributes/>
@@ -59,10 +59,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>801</x>
-      <y>576</y>
-      <w>99</w>
-      <h>27</h>
+      <x>825</x>
+      <y>561</y>
+      <w>121</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>HttpRequest</panel_attributes>
     <additional_attributes/>
@@ -70,10 +70,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>639</x>
-      <y>252</y>
-      <w>117</w>
-      <h>27</h>
+      <x>627</x>
+      <y>165</y>
+      <w>143</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>SimpleWebServer</panel_attributes>
     <additional_attributes/>
@@ -81,10 +81,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>594</x>
-      <y>396</y>
-      <w>144</w>
-      <h>27</h>
+      <x>572</x>
+      <y>341</y>
+      <w>176</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>Server</panel_attributes>
     <additional_attributes/>
@@ -92,10 +92,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>594</x>
-      <y>450</y>
-      <w>144</w>
-      <h>27</h>
+      <x>572</x>
+      <y>407</y>
+      <w>176</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>ConnectionHandler</panel_attributes>
     <additional_attributes/>
@@ -103,10 +103,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>648</x>
-      <y>414</y>
-      <w>27</w>
-      <h>54</h>
+      <x>638</x>
+      <y>363</y>
+      <w>33</w>
+      <h>66</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;40.0;10.0;10.0</additional_attributes>
@@ -114,10 +114,10 @@
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>963</x>
-      <y>387</y>
-      <w>333</w>
-      <h>36</h>
+      <x>682</x>
+      <y>462</y>
+      <w>407</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>Server uses ConnectionHandler to accept HttpRequests</panel_attributes>
     <additional_attributes/>
@@ -126,9 +126,9 @@
     <id>Relation</id>
     <coordinates>
       <x>693</x>
-      <y>270</y>
-      <w>27</w>
-      <h>144</h>
+      <y>187</y>
+      <w>33</w>
+      <h>176</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;140.0;10.0;10.0</additional_attributes>
@@ -136,10 +136,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>783</x>
-      <y>396</y>
-      <w>144</w>
-      <h>27</h>
+      <x>803</x>
+      <y>341</y>
+      <w>176</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>IDirectoryListener</panel_attributes>
     <additional_attributes/>
@@ -147,10 +147,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>135</x>
-      <y>405</y>
-      <w>324</w>
-      <h>153</h>
+      <x>77</x>
+      <y>352</y>
+      <w>264</w>
+      <h>187</h>
     </coordinates>
     <panel_attributes>servlet</panel_attributes>
     <additional_attributes/>
@@ -158,10 +158,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>234</x>
-      <y>513</y>
-      <w>144</w>
-      <h>27</h>
+      <x>132</x>
+      <y>484</y>
+      <w>176</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>/AHttpServlet/</panel_attributes>
     <additional_attributes/>
@@ -169,10 +169,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>234</x>
-      <y>450</y>
-      <w>144</w>
-      <h>27</h>
+      <x>132</x>
+      <y>407</y>
+      <w>176</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>/AServletManager/</panel_attributes>
     <additional_attributes/>
@@ -180,10 +180,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>369</x>
-      <y>450</y>
-      <w>243</w>
-      <h>27</h>
+      <x>297</x>
+      <y>407</y>
+      <w>297</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;250.0;10.0</additional_attributes>
@@ -191,10 +191,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>297</x>
-      <y>531</y>
-      <w>306</w>
-      <h>72</h>
+      <x>209</x>
+      <y>506</y>
+      <w>374</w>
+      <h>88</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>320.0;60.0;10.0;60.0;10.0;10.0</additional_attributes>
@@ -202,10 +202,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>297</x>
-      <y>468</y>
-      <w>27</w>
-      <h>63</h>
+      <x>209</x>
+      <y>429</y>
+      <w>33</w>
+      <h>77</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>10.0;50.0;10.0;10.0</additional_attributes>
@@ -213,10 +213,10 @@
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>585</x>
-      <y>630</y>
-      <w>162</w>
-      <h>27</h>
+      <x>561</x>
+      <y>627</y>
+      <w>198</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>HttpResponseBuilder</panel_attributes>
     <additional_attributes/>
@@ -224,10 +224,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>297</x>
-      <y>576</y>
-      <w>306</w>
-      <h>81</h>
+      <x>209</x>
+      <y>561</y>
+      <w>374</w>
+      <h>99</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>320.0;70.0;10.0;70.0;10.0;10.0</additional_attributes>
@@ -235,10 +235,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>738</x>
-      <y>630</y>
-      <w>81</w>
-      <h>27</h>
+      <x>748</x>
+      <y>627</y>
+      <w>99</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>70.0;10.0;10.0;10.0</additional_attributes>
@@ -246,10 +246,10 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>729</x>
-      <y>396</y>
-      <w>72</w>
-      <h>27</h>
+      <x>737</x>
+      <y>341</y>
+      <w>88</w>
+      <h>33</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
     <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
@@ -257,36 +257,114 @@
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>657</x>
-      <y>468</y>
-      <w>216</w>
-      <h>126</h>
+      <x>649</x>
+      <y>429</y>
+      <w>264</w>
+      <h>154</h>
     </coordinates>
     <panel_attributes>lt=&lt;-</panel_attributes>
-    <additional_attributes>220.0;120.0;220.0;50.0;10.0;50.0;10.0;10.0</additional_attributes>
+    <additional_attributes>220.0;120.0;220.0;70.0;10.0;70.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>144</x>
-      <y>333</y>
-      <w>333</w>
-      <h>54</h>
+      <x>11</x>
+      <y>297</y>
+      <w>385</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>ConnectionHandler delegates the handling of requests
-to servlets, depnding on the URI</panel_attributes>
+to servlets or microservices, depnding on the URI</panel_attributes>
     <additional_attributes/>
   </element>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>954</x>
-      <y>576</y>
-      <w>225</w>
-      <h>63</h>
+      <x>1001</x>
+      <y>561</y>
+      <w>275</w>
+      <h>44</h>
     </coordinates>
     <panel_attributes>The Protocol provides communication
 standards for the server and servlets</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1221</x>
+      <y>242</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Microservice 1</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1221</x>
+      <y>297</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Microservice 2</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1221</x>
+      <y>352</y>
+      <w>110</w>
+      <h>33</h>
+    </coordinates>
+    <panel_attributes>Microservice n</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1177</x>
+      <y>209</y>
+      <w>187</w>
+      <h>187</h>
+    </coordinates>
+    <panel_attributes>Microservices</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>715</x>
+      <y>242</y>
+      <w>484</w>
+      <h>121</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>10.0;90.0;10.0;10.0;420.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>Relation</id>
+    <coordinates>
+      <x>737</x>
+      <y>385</y>
+      <w>550</w>
+      <h>55</h>
+    </coordinates>
+    <panel_attributes>lt=&lt;-</panel_attributes>
+    <additional_attributes>480.0;10.0;480.0;30.0;10.0;30.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLNote</id>
+    <coordinates>
+      <x>880</x>
+      <y>198</y>
+      <w>275</w>
+      <h>44</h>
+    </coordinates>
+    <panel_attributes>Each microservice will register itself to
+the server on startup</panel_attributes>
     <additional_attributes/>
   </element>
 </diagram>

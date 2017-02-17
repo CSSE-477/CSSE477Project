@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <diagram program="umlet" version="14.2">
-  <zoom_level>5</zoom_level>
+  <zoom_level>8</zoom_level>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1210</x>
-      <y>425</y>
-      <w>210</w>
-      <h>120</h>
+      <x>1816</x>
+      <y>448</y>
+      <w>336</w>
+      <h>192</h>
     </coordinates>
     <panel_attributes>PluginDirectoryMonitor
 --
@@ -31,10 +31,10 @@ group=5</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1210</x>
-      <y>575</y>
-      <w>195</w>
-      <h>40</h>
+      <x>1816</x>
+      <y>688</y>
+      <w>312</w>
+      <h>64</h>
     </coordinates>
     <panel_attributes>SwsLogger
 --
@@ -48,10 +48,10 @@ group=5</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>1210</x>
-      <y>375</y>
-      <w>175</w>
-      <h>30</h>
+      <x>1816</x>
+      <y>368</y>
+      <w>280</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>ServerProperties
 --
@@ -64,10 +64,10 @@ group=5</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>785</x>
-      <y>615</y>
-      <w>175</w>
-      <h>120</h>
+      <x>1136</x>
+      <y>752</y>
+      <w>280</w>
+      <h>192</h>
     </coordinates>
     <panel_attributes>/AServletManager/
 --
@@ -91,10 +91,10 @@ group=4</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>785</x>
-      <y>765</y>
-      <w>250</w>
-      <h>85</h>
+      <x>1136</x>
+      <y>992</y>
+      <w>400</w>
+      <h>136</h>
     </coordinates>
     <panel_attributes>/AHttpServlet/
 --
@@ -114,35 +114,10 @@ group=4</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>805</x>
-      <y>295</y>
-      <w>210</w>
-      <h>110</h>
-    </coordinates>
-    <panel_attributes>Server
---
--port: int
--stop: boolean
--welcomeSocket: ServerSocket
--readyState: boolean
--pluginRootToServlet: HashMap&lt;String, AServletManager&gt;
---
-+run(): void
-+stop(): void
-+isReady(): boolean
-+isStopped(): boolean
-+addPlugin(String contextRoot, AServletManager manager): void
-+removePlugin(String contextRoot): void
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>1210</x>
-      <y>645</y>
-      <w>195</w>
-      <h>45</h>
+      <x>1816</x>
+      <y>800</y>
+      <w>312</w>
+      <h>72</h>
     </coordinates>
     <panel_attributes>GMTConversion
 --
@@ -157,10 +132,10 @@ group=5</panel_attributes>
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>805</x>
-      <y>505</y>
-      <w>210</w>
-      <h>45</h>
+      <x>1168</x>
+      <y>632</y>
+      <w>336</w>
+      <h>64</h>
     </coordinates>
     <panel_attributes>&lt;&lt;interface&gt;&gt;
 IDirectoryListener
@@ -174,10 +149,10 @@ IDirectoryListener
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>275</x>
-      <y>480</y>
-      <w>205</w>
-      <h>160</h>
+      <x>320</x>
+      <y>536</y>
+      <w>328</w>
+      <h>256</h>
     </coordinates>
     <panel_attributes>HttpResponseBuilder
 --
@@ -205,10 +180,10 @@ IDirectoryListener
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>505</x>
-      <y>505</y>
-      <w>125</w>
-      <h>135</h>
+      <x>688</x>
+      <y>576</y>
+      <w>200</w>
+      <h>216</h>
     </coordinates>
     <panel_attributes>HttpResponse
 --
@@ -232,10 +207,10 @@ IDirectoryListener
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>100</x>
-      <y>520</y>
-      <w>155</w>
-      <h>120</h>
+      <x>40</x>
+      <y>600</y>
+      <w>248</w>
+      <h>192</h>
     </coordinates>
     <panel_attributes>HttpRequest
 --
@@ -258,10 +233,10 @@ IDirectoryListener
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>445</x>
-      <y>360</y>
-      <w>145</w>
-      <h>80</h>
+      <x>592</x>
+      <y>344</y>
+      <w>232</w>
+      <h>128</h>
     </coordinates>
     <panel_attributes>Protocol
 --
@@ -279,10 +254,10 @@ IDirectoryListener
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>220</x>
-      <y>360</y>
-      <w>170</w>
-      <h>50</h>
+      <x>232</x>
+      <y>344</y>
+      <w>272</w>
+      <h>80</h>
     </coordinates>
     <panel_attributes>ProtocolException
 --
@@ -296,27 +271,10 @@ IDirectoryListener
   <element>
     <id>UMLClass</id>
     <coordinates>
-      <x>805</x>
-      <y>425</y>
-      <w>195</w>
-      <h>45</h>
-    </coordinates>
-    <panel_attributes>ConnectionHandler
---
--socket: Socket
--contextRootToServlet: HashMap&lt;String, AServletManager&gt;
---
-+run(): void
-</panel_attributes>
-    <additional_attributes/>
-  </element>
-  <element>
-    <id>UMLClass</id>
-    <coordinates>
-      <x>870</x>
-      <y>175</y>
-      <w>85</w>
-      <h>30</h>
+      <x>1272</x>
+      <y>48</y>
+      <w>136</w>
+      <h>48</h>
     </coordinates>
     <panel_attributes>SimpleWebServer
 --
@@ -328,10 +286,10 @@ group=1</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>1185</x>
-      <y>355</y>
-      <w>255</w>
-      <h>350</h>
+      <x>1776</x>
+      <y>336</y>
+      <w>408</w>
+      <h>560</h>
     </coordinates>
     <panel_attributes>Utils
 group=5</panel_attributes>
@@ -340,10 +298,10 @@ group=5</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>75</x>
-      <y>345</y>
-      <w>570</w>
-      <h>315</h>
+      <x>0</x>
+      <y>320</y>
+      <w>912</w>
+      <h>504</h>
     </coordinates>
     <panel_attributes>Protocol</panel_attributes>
     <additional_attributes/>
@@ -351,10 +309,10 @@ group=5</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>860</x>
-      <y>160</y>
-      <w>110</w>
-      <h>60</h>
+      <x>1256</x>
+      <y>24</y>
+      <w>176</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>App
 
@@ -364,10 +322,10 @@ group=1</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>765</x>
-      <y>595</y>
-      <w>295</w>
-      <h>285</h>
+      <x>1104</x>
+      <y>720</y>
+      <w>472</w>
+      <h>456</h>
     </coordinates>
     <panel_attributes>Servlet
 group=4</panel_attributes>
@@ -376,10 +334,10 @@ group=4</panel_attributes>
   <element>
     <id>UMLNote</id>
     <coordinates>
-      <x>785</x>
-      <y>275</y>
-      <w>250</w>
-      <h>285</h>
+      <x>1136</x>
+      <y>168</y>
+      <w>440</w>
+      <h>536</h>
     </coordinates>
     <panel_attributes>Server</panel_attributes>
     <additional_attributes/>
@@ -387,32 +345,32 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>905</x>
-      <y>200</y>
-      <w>15</w>
-      <h>105</h>
+      <x>1328</x>
+      <y>88</y>
+      <w>24</w>
+      <h>112</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;190.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;120.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>905</x>
-      <y>250</y>
-      <w>315</w>
-      <h>220</h>
+      <x>1328</x>
+      <y>136</y>
+      <w>504</w>
+      <h>384</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>610.0;420.0;400.0;420.0;400.0;10.0;10.0;10.0</additional_attributes>
+    <additional_attributes>610.0;460.0;400.0;460.0;400.0;10.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1100</x>
-      <y>380</y>
-      <w>120</w>
-      <h>15</h>
+      <x>1640</x>
+      <y>376</y>
+      <w>192</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>220.0;10.0;10.0;10.0</additional_attributes>
@@ -420,21 +378,21 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>705</x>
-      <y>370</y>
-      <w>110</w>
-      <h>310</h>
+      <x>1008</x>
+      <y>312</y>
+      <w>176</w>
+      <h>544</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
-    <additional_attributes>200.0;10.0;10.0;10.0;10.0;600.0;160.0;600.0</additional_attributes>
+    <additional_attributes>200.0;10.0;10.0;10.0;10.0;660.0;160.0;660.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>865</x>
-      <y>730</y>
-      <w>15</w>
-      <h>45</h>
+      <x>1264</x>
+      <y>936</y>
+      <w>24</w>
+      <h>72</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;&lt;-</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;70.0</additional_attributes>
@@ -442,10 +400,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>1030</x>
-      <y>590</y>
-      <w>190</w>
-      <h>235</h>
+      <x>1528</x>
+      <y>712</y>
+      <w>304</w>
+      <h>376</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>360.0;10.0;150.0;10.0;150.0;450.0;10.0;450.0</additional_attributes>
@@ -453,10 +411,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>955</x>
-      <y>660</y>
-      <w>160</w>
-      <h>15</h>
+      <x>1408</x>
+      <y>824</y>
+      <w>256</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>lt=.</panel_attributes>
     <additional_attributes>300.0;10.0;10.0;10.0</additional_attributes>
@@ -464,21 +422,21 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>865</x>
-      <y>545</y>
-      <w>15</w>
+      <x>1264</x>
+      <y>688</y>
+      <w>24</w>
       <h>80</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
-    <additional_attributes>10.0;140.0;10.0;10.0</additional_attributes>
+    <additional_attributes>10.0;80.0;10.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>730</x>
-      <y>445</y>
-      <w>85</w>
-      <h>205</h>
+      <x>1048</x>
+      <y>480</y>
+      <w>136</w>
+      <h>328</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;&lt;&lt;-</panel_attributes>
     <additional_attributes>150.0;10.0;10.0;10.0;10.0;390.0;110.0;390.0</additional_attributes>
@@ -486,10 +444,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>405</x>
-      <y>635</y>
-      <w>390</w>
-      <h>90</h>
+      <x>528</x>
+      <y>784</y>
+      <w>624</w>
+      <h>144</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;160.0;760.0;160.0</additional_attributes>
@@ -497,10 +455,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>560</x>
-      <y>635</y>
-      <w>15</w>
-      <h>90</h>
+      <x>776</x>
+      <y>784</y>
+      <w>24</w>
+      <h>144</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;160.0</additional_attributes>
@@ -508,10 +466,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>165</x>
-      <y>635</y>
-      <w>630</w>
-      <h>175</h>
+      <x>144</x>
+      <y>784</y>
+      <w>1008</w>
+      <h>280</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;330.0;1240.0;330.0</additional_attributes>
@@ -519,10 +477,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>325</x>
-      <y>635</y>
-      <w>15</w>
-      <h>175</h>
+      <x>400</x>
+      <y>784</y>
+      <w>24</w>
+      <h>280</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;330.0</additional_attributes>
@@ -530,10 +488,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>475</x>
-      <y>535</y>
-      <w>40</w>
-      <h>15</h>
+      <x>640</x>
+      <y>624</y>
+      <w>64</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>60.0;10.0;10.0;10.0</additional_attributes>
@@ -541,10 +499,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>385</x>
-      <y>375</y>
-      <w>70</w>
-      <h>15</h>
+      <x>496</x>
+      <y>368</y>
+      <w>112</w>
+      <h>24</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;120.0;10.0</additional_attributes>
@@ -552,10 +510,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>585</x>
-      <y>395</y>
-      <w>120</w>
-      <h>415</h>
+      <x>816</x>
+      <y>400</y>
+      <w>192</w>
+      <h>664</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;180.0;10.0;180.0;620.0;220.0;620.0;220.0;670.0;180.0;670.0;180.0;810.0</additional_attributes>
@@ -563,21 +521,21 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>910</x>
-      <y>360</y>
-      <w>160</w>
-      <h>155</h>
+      <x>1336</x>
+      <y>296</y>
+      <w>296</w>
+      <h>352</h>
     </coordinates>
     <panel_attributes>lt=&lt;&lt;.</panel_attributes>
-    <additional_attributes>10.0;290.0;10.0;250.0;300.0;250.0;300.0;10.0;210.0;10.0</additional_attributes>
+    <additional_attributes>10.0;420.0;10.0;390.0;350.0;390.0;350.0;10.0;250.0;10.0</additional_attributes>
   </element>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>510</x>
-      <y>435</y>
-      <w>305</w>
-      <h>35</h>
+      <x>696</x>
+      <y>464</y>
+      <w>488</w>
+      <h>56</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;10.0;10.0;50.0;300.0;50.0;300.0;20.0;360.0;20.0;360.0;50.0;590.0;50.0</additional_attributes>
@@ -585,10 +543,10 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>170</x>
-      <y>455</y>
-      <w>355</w>
-      <h>75</h>
+      <x>152</x>
+      <y>496</y>
+      <w>568</w>
+      <h>120</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;130.0;10.0;10.0;690.0;10.0</additional_attributes>
@@ -596,12 +554,64 @@ group=4</panel_attributes>
   <element>
     <id>Relation</id>
     <coordinates>
-      <x>565</x>
-      <y>455</y>
-      <w>15</w>
-      <h>60</h>
+      <x>784</x>
+      <y>496</y>
+      <w>24</w>
+      <h>96</h>
     </coordinates>
     <panel_attributes>lt=&lt;.</panel_attributes>
     <additional_attributes>10.0;100.0;10.0;10.0</additional_attributes>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1168</x>
+      <y>184</y>
+      <w>368</w>
+      <h>232</h>
+    </coordinates>
+    <panel_attributes>Server
+--
+-POOL_SIZE = 20: int
+-port: int
+-stop: boolean
+-welcomeSocket: SSLServerSocket
+-readyState: boolean
+-pluginRootToServlet: HashMap&lt;String, AServletManager&gt;
+-microserviceRootToHost: Map&lt;String, Host&gt;
+-requestQueue: PriorityQueue&lt;HttpPriorityElement&gt;
+-pool = Executors.newFixedThreadPool(POOL_SIZE): ExecutorService
+--
++getSSLContext(): SSLContext
++run(): void
++stop(): void
++isReady(): boolean
++isStopped(): boolean
++addPlugin(String contextRoot, AServletManager manager): void
++removePlugin(String contextRoot): void</panel_attributes>
+    <additional_attributes/>
+  </element>
+  <element>
+    <id>UMLClass</id>
+    <coordinates>
+      <x>1168</x>
+      <y>432</y>
+      <w>368</w>
+      <h>160</h>
+    </coordinates>
+    <panel_attributes>handlers::ConnectionHandler
+--
+-socket: Socket
+-contextRootToServlet: Map&lt;String, AServletManager&gt;
+-microserviceRootToHost: Map&lt;String, Host&gt;
+-cache: HashMap&lt;String, String&gt;
+-request: HttpRequest
+-DEFAULT_ROOT = "": String
+--
++run(): void
+-sendRequestToMicroservice(Host microserviceHost): HttpResponse
+-getContextRootFromUri(String uri): String
+-interceptResponseForGzip(HttpResponseBuilder responseBuilder): void</panel_attributes>
+    <additional_attributes/>
   </element>
 </diagram>
