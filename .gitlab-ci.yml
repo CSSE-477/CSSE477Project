@@ -11,10 +11,23 @@ build:
   tags:
     - 'Team #YOLOSWAG *dabs* SWS'
 
-staging-deploy:
+staging-deploy1:
   stage: staging-deploy
   variables:
     SSH_HOST: '477-19.csse.rose-hulman.edu'
+  script:
+    - gradle publishToWebServer
+  tags:
+    - linux
+    - gradle
+    - java
+  only:
+    - master
+
+staging-deploy2:
+  stage: staging-deploy
+  variables:
+    SSH_HOST: '477-18.csse.rose-hulman.edu'
   script:
     - gradle publishToWebServer
   tags:
