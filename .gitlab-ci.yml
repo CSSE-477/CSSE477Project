@@ -11,7 +11,7 @@ build:
   tags:
     - 'Team #YOLOSWAG *dabs* SWS'
 
-staging-deploy1:
+microservice-deploy1:
   stage: staging-deploy
   variables:
     SSH_HOST: '477-19.csse.rose-hulman.edu'
@@ -24,7 +24,7 @@ staging-deploy1:
   only:
     - master
 
-staging-deploy2:
+microservice-deploy2:
   stage: staging-deploy
   variables:
     SSH_HOST: '477-18.csse.rose-hulman.edu'
@@ -41,17 +41,6 @@ maven-deploy:
   stage: maven-deploy
   script:
     - gradle publish
-  tags:
-    - 'Team #YOLOSWAG *dabs* SWS'
-  only:
-    - tags
-
-deploy:
-  stage: deploy
-  variables:
-    SSH_HOST: '477-06.csse.rose-hulman.edu'
-  script:
-    - gradle publishToWebServer
   tags:
     - 'Team #YOLOSWAG *dabs* SWS'
   only:
