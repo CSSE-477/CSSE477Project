@@ -47,8 +47,8 @@ public class ConnectionHandler implements Runnable {
 	public void run() {
 		OutputStream outStream = null;
 
-		SwsLogger.accessLogger.info("Socket inetAddress: "  + socket.getInetAddress());
-		SwsLogger.accessLogger.info("Socket local address: "  + socket.getLocalAddress());
+		SwsLogger.accessLogger.info("Socket inetAddress: "  + socket.getInetAddress() + " Port: " + socket.getPort());
+		SwsLogger.accessLogger.info("Socket local address: "  + socket.getLocalAddress() + " Port: " + socket.getLocalPort());
 
 		try {
 			outStream = this.socket.getOutputStream();
