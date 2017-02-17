@@ -23,6 +23,135 @@ For Servlet plugins, there are a few requirements that must be met to stand up y
 - A plugin must be dropped in the `/home/csse/plugin` directory on the server
 - A plugin will have its own directory created for reading and writing located at `/home/csse/"Context-Root-Value"`
 
+## API Design
+Feature	1: Retrieving a file
+    Method:	 PUT
+    URI: /filename.txt
+    Request	Body:
+        
+    Response
+        “code”:	200
+        “message”:	“Ok”
+        Body: {
+            “payload”:	file_contents
+        }
+    
+Feature	2: Editing a file
+    Method:	 PUT
+    URI: /filename.txt
+    Request	
+        Body: edited_file_contents
+        
+    Response
+        “code”:	200
+        “message”:	“Ok”
+        Body: {
+            “payload”:	edited_file_contents
+        }
+        
+Feature	3: Creating a file
+    Method:	 POST
+    URI: /filename.txt
+    Request	
+        Body: created_file_contents
+        
+    Response
+        “code”:	200
+        “message”:	“Ok”
+        Body: {
+            “payload”:	created_file_contents
+        }
+
+Feature	4: Deleting a file
+    Method:	 DELETE
+    URI: /filename.txt
+    Request	
+        Body: 
+        
+    Response
+        “code”:	204
+        “message”:	“No Content”
+        Body:
+        
+Feature	5: Retrieving a user
+    Method:	 GET
+    URI: /userapp/users/#
+    Request	Body:
+        {
+            "firstName": "Tayler",
+            "lastName": "How",
+            "phoneNumber": "123-456-7890",
+            "address": "Somewhere in Hawaii"
+        }
+    Response
+        "code": 200
+        "message": "OK"
+        "Checksum": AF0E0F5A150D52A51C586ASDF7654AFDAE4ABAADD9F85BAAAFE85D90AA9A8
+        Body: {
+            "firstName": "Tayler",
+            "lastName": "How",
+            "phoneNumber": "123-456-7890"",
+            "address": "Somewhere in Hawaii"
+        }
+        
+Feature	6: Editing a user
+    Method:	 PUT
+    URI: /userapp/users/#
+    Request	Body:
+        {
+            "firstName": "New",
+            "lastName": "USER",
+            "phoneNumber": "123-456-7890",
+            "address": "5500 Wabash"
+        }
+        
+    Response
+        "code": 200
+        "message": "OK"
+        "Checksum": AF0E0F5A150D52A51C586D05C5C6E4AC21D5E4ABAADD9F85BAAAFE85D90AA9A8
+        Body: {
+            "firstName": "New",
+            "lastName": "USER",
+            "phoneNumber": "123-456-7890",
+            "address": "5500 Wabash"
+        }
+    
+Feature	7: Creating a user
+    Method:	 POST
+    URI: /userapp/users/#
+    Request	Body:
+        {
+            "firstName": "New",
+            "lastName": "USER",
+            "phoneNumber": "123-456-7890",
+            "address": "5500 Wabash"
+        }
+        
+    Response
+        "code": 200
+        "message": "OK"
+        "Checksum": AF0E0F5A150D52A51C586D05C5C6E4AC21D5E4ABAADD9F85BAAAFE85D90AA9A8
+        Body: {
+            "firstName": "New",
+            "lastName": "USER",
+            "phoneNumber": "123-456-7890",
+            "address": "5500 Wabash"
+        }
+        
+Feature	8: Deleting a user
+    Method:	 DELETE
+    URI: /userapp/users/#
+    Request	
+        Body:
+        
+    Response
+        “code”:	204
+        “message”:	“No content”
+        Body: {
+        }
+        
+The groups app can be access through /usersapp/groups/# and used the same way as the users app.
+        
 ## Scenarios and Associated Improvement Tactics
 ### Availability
 #### Server Restart on Failure
