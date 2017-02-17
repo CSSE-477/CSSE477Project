@@ -25,6 +25,7 @@ For Servlet plugins, there are a few requirements that must be met to stand up y
 
 ## API Design
 Feature	1: Retrieving a file
+```
     Method:	 PUT
     URI: /filename.txt
     Request	Body:
@@ -35,21 +36,24 @@ Feature	1: Retrieving a file
         Body: {
             “payload”:	file_contents
         }
-    
+```
+        
 Feature	2: Editing a file
+```
     Method:	 PUT
     URI: /filename.txt
     Request	
         Body: edited_file_contents
-        
     Response
         “code”:	200
         “message”:	“Ok”
         Body: {
             “payload”:	edited_file_contents
         }
+```
         
 Feature	3: Creating a file
+```
     Method:	 POST
     URI: /filename.txt
     Request	
@@ -61,8 +65,10 @@ Feature	3: Creating a file
         Body: {
             “payload”:	created_file_contents
         }
+```
 
 Feature	4: Deleting a file
+```
     Method:	 DELETE
     URI: /filename.txt
     Request	
@@ -72,8 +78,10 @@ Feature	4: Deleting a file
         “code”:	204
         “message”:	“No Content”
         Body:
+```
         
 Feature	5: Retrieving a user
+```
     Method:	 GET
     URI: /userapp/users/#
     Request	
@@ -84,7 +92,7 @@ Feature	5: Retrieving a user
                 "phoneNumber": "123-456-7890",
                 "address": "Somewhere in Hawaii"
             }
-    Response
+    Response:
         "code": 200
         "message": "OK"
         "Checksum": AF0E0F5A150D52A51C586ASDF7654AFDAE4ABAADD9F85BAAAFE85D90AA9A8
@@ -94,8 +102,10 @@ Feature	5: Retrieving a user
             "phoneNumber": "123-456-7890"",
             "address": "Somewhere in Hawaii"
         }
+```
         
 Feature	6: Editing a user
+```
     Method:	 PUT
     URI: /userapp/users/#
     Request	
@@ -117,8 +127,10 @@ Feature	6: Editing a user
             "phoneNumber": "123-456-7890",
             "address": "5500 Wabash"
         }
+```
     
 Feature	7: Creating a user
+```
     Method:	 POST
     URI: /userapp/users/#
     Request	
@@ -140,8 +152,10 @@ Feature	7: Creating a user
             "phoneNumber": "123-456-7890",
             "address": "5500 Wabash"
         }
+```
         
 Feature	8: Deleting a user
+```
     Method:	 DELETE
     URI: /userapp/users/#
     Request	
@@ -152,6 +166,7 @@ Feature	8: Deleting a user
         “message”:	“No content”
         Body: {
         }
+```
         
 The groups app can be access through /usersapp/groups/# and used the same way as the users app.
         
