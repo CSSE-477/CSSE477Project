@@ -259,14 +259,15 @@ public class HttpResponse {
 			br.read(body);
 
 			// should we decompress?
+			String theBody = new String(body);
 			if (contentEncoding != null && (contentEncoding.equals("gzip") || contentEncoding.equals("application/gzip"))) {
-				String theBody = new String(body);
 				char[] decompressedBody = GZipUtils.decompressString(theBody);
 
 				// update the content length
 				rb.putHeader(Protocol.getProtocol().getStringRep(Keywords.CONTENT_LENGTH), decompressedBody.length + "");
-				rb.setBody(new String(decompressedBody));
+				theBody = new String(decompressedBody);
 			}
+			rb.setBody(theBody);
 		}
 
 		return rb.generateResponse();
