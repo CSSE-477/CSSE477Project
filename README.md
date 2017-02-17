@@ -29,7 +29,7 @@ Feature	1: Retrieving a file
     URI: /filename.txt
     Request	Body:
         
-    Response
+    Response:
         “code”:	200
         “message”:	“Ok”
         Body: {
@@ -76,13 +76,14 @@ Feature	4: Deleting a file
 Feature	5: Retrieving a user
     Method:	 GET
     URI: /userapp/users/#
-    Request	Body:
-        {
-            "firstName": "Tayler",
-            "lastName": "How",
-            "phoneNumber": "123-456-7890",
-            "address": "Somewhere in Hawaii"
-        }
+    Request	
+        Body:
+            {
+                "firstName": "Tayler",
+                "lastName": "How",
+                "phoneNumber": "123-456-7890",
+                "address": "Somewhere in Hawaii"
+            }
     Response
         "code": 200
         "message": "OK"
@@ -97,13 +98,14 @@ Feature	5: Retrieving a user
 Feature	6: Editing a user
     Method:	 PUT
     URI: /userapp/users/#
-    Request	Body:
-        {
-            "firstName": "New",
-            "lastName": "USER",
-            "phoneNumber": "123-456-7890",
-            "address": "5500 Wabash"
-        }
+    Request	
+        Body:
+            {
+                "firstName": "New",
+                "lastName": "USER",
+                "phoneNumber": "123-456-7890",
+                "address": "5500 Wabash"
+            }
         
     Response
         "code": 200
@@ -119,13 +121,14 @@ Feature	6: Editing a user
 Feature	7: Creating a user
     Method:	 POST
     URI: /userapp/users/#
-    Request	Body:
-        {
-            "firstName": "New",
-            "lastName": "USER",
-            "phoneNumber": "123-456-7890",
-            "address": "5500 Wabash"
-        }
+    Request	
+        Body:
+            {
+                "firstName": "New",
+                "lastName": "USER",
+                "phoneNumber": "123-456-7890",
+                "address": "5500 Wabash"
+            }
         
     Response
         "code": 200
